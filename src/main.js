@@ -18,6 +18,9 @@ const game = new Phaser.Game({
   roundPixels: false,
   backgroundColor: COLORS.bg,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+  // Real elapsed time: Phaser's smoothing caps each frame at 16.7 ms while unfocused / warming up, which turns a
+  // 30 fps browser into slow motion. GameScene already clamps a single frame to 50 ms (tab switches).
+  fps: { target: 60, smoothStep: false },
   physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, fps: PHYSICS_FPS, debug: DEBUG.debug } },
   scene: [BootScene, GameScene, UIScene, LessonsLearnedScene, BudgetOverScene, MvpEndScene],
 });
