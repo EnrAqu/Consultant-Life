@@ -3,7 +3,7 @@
 const T = 32;
 
 export const MM_DEFAULTS = {
-  walkSpeed: 60,
+  walkSpeed: 80,
   turnEveryMs: 3000,
   turnTellMs: 400,
   sightRange: 5,
@@ -76,9 +76,16 @@ export default class MicromanagerBrain {
     return this.mode === 'normal' && this.state === 'patrol';
   }
 
-  // The "…" before he turns around.
+  // ms until he reaches the end of his floor span in the walking direction
+  msToEdge() {
+    const [lo, hi] = this.spanOf(this.x);
+    const dist = this.facing > 0 ? hi - this.x : this.x - lo;
+    return (dist / this.p.walkSpeed) * 1000;
+  }
+
+  // The "…" before he turns around: every turnEveryMs, or when he is about to reach the end of his floor.
   get turning() {
-    return this.lightOn && this.turnTimer >= this.p.turnEveryMs - this.p.turnTellMs;
+    return this.lightOn && (this.turnTimer >= this.p.turnEveryMs - this.p.turnTellMs || this.msToEdge() <= this.p.turnTellMs);
   }
 
   // How far the light reaches in front of him (px): stops at the first plant or pit.
@@ -124,7 +131,7 @@ export default class MicromanagerBrain {
           this.told = true;
           actions.push({ type: 'tell' });
         }
-        if (this.turnTimer >= this.p.turnEveryMs) {
+        if (this.turnTimer >= this.p.turnEveryMs || this.msToEdge() <= 0) {
           this.facing = -this.facing;
           this.turnTimer = 0;
           this.told = false;

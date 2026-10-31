@@ -5,7 +5,7 @@ const g = createGrid(W);
 
 // S0 — spawn
 g.ground(0, 26).put(2, 14, 'P');
-// S1 — micromanager zone A (14–40), plants at 20 and 33, pit 27–29 = his demo jump
+// S1 — micromanager zone A (16–40), plants at 20 and 33, pit 27–29 = his demo jump
 g.put(20, 14, 'p').ground(30, 123).put(33, 14, 'p');
 // S2 — two "hai 5 minuti?" doors (47, 56) on a flat corridor
 // S3 — slot replyAll corridor 66–75, unreachable ledge (+5) with coffee, door at the exit (84)

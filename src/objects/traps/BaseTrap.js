@@ -66,6 +66,11 @@ export default class BaseTrap {
     return null;
   }
 
+  // Columns where being frozen would be deadly (the micromanager never stops you there), or null.
+  dangerCols() {
+    return null;
+  }
+
   // Returns { stay: true } when the junior stays there (e.g. on a plate).
   onDelegate() {
     return {};

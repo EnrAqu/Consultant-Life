@@ -50,7 +50,7 @@ export default class Team {
   }
 
   emit() {
-    bus.emit(EV.TEAM_CHANGED, { count: this.count });
+    bus.emit(EV.TEAM_CHANGED, { count: this.count, canDelegate: Boolean(this.canDelegate) });
   }
 
   resetTrail() {
@@ -86,7 +86,8 @@ export default class Team {
     const scene = this.scene;
     const player = scene.player;
     const view = scene.playerView;
-    this.trail.push(dt, { x: player.body.center.x, y: player.body.bottom, flipX: player.flipX, frame: view.frameName() });
+    // the trail stops with you while you are frozen (KT call, micromanager, colleague…)
+    if (!player.inputLocked) this.trail.push(dt, { x: player.body.center.x, y: player.body.bottom, flipX: player.flipX, frame: view.frameName() });
 
     this.followers.forEach((m, i) => {
       const s = this.trail.positionFor(i);
@@ -112,6 +113,26 @@ export default class Team {
     }
 
     if (delegatePressed) this.delegate();
+
+    // HUD hint: "E" lights up when there is something to delegate
+    const can = this.count > 0 && this.findTarget() !== null;
+    if (can !== this.canDelegate) {
+      this.canDelegate = can;
+      this.emit();
+    }
+  }
+
+  findTarget() {
+    const scene = this.scene;
+    const player = scene.player;
+    const owners = [...scene.traps, ...scene.npcs].filter((o) => !o.delegateReserved);
+    const targets = owners.map((o) => {
+      const t = o.delegateTarget?.();
+      return t && { ...t, owner: o };
+    });
+    // a closed "Approvazione richiesta" gate is a wall for juniors too
+    const blockers = scene.traps.filter((tr) => tr.type === 'approvalGate' && !tr.open).map((tr) => tr.tx * TILE + 16);
+    return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers });
   }
 
   // Juniors replaying your path get hit by the falling emails/slides you only just escaped.
@@ -141,13 +162,7 @@ export default class Team {
       bus.emit(EV.TOAST, { text: 'Nessuno a cui delegare. Assumi uno stagista.', durationMs: 1800 });
       return;
     }
-    const owners = [...scene.traps, ...scene.npcs].filter((o) => !o.delegateReserved);
-    const targets = owners.map((o) => {
-      const t = o.delegateTarget?.();
-      return t && { ...t, owner: o };
-    });
-    const facing = player.flipX ? -1 : 1;
-    const pick = pickDelegateTarget(player.body.center.x, facing, targets);
+    const pick = this.findTarget();
     if (!pick) {
       this.say('Su cosa, di preciso?', first.sprite.x, first.sprite.y);
       return;
@@ -169,12 +184,22 @@ export default class Team {
     const k = m.duration > 0 ? Math.min(1, m.t / m.duration) : 1;
     const x = m.fromX + (m.target.x - m.fromX) * k;
     // a hop every tile or so: they get there whatever the floor looks like
-    const floorY = this.floorAt(x) ?? m.fromY;
+    const floorY = this.floorAt(x, m.fromY) ?? m.fromY;
     m.sprite.setPosition(x, floorY - Math.abs(Math.sin(k * Math.PI * Math.max(1, m.duration / 300))) * 18);
     m.sprite.setFlipX(m.target.x < m.fromX).setFrame(`run${Math.floor(m.t / 80) % 4}`);
     if (k < 1) return;
-    m.sprite.setPosition(m.target.x, this.floorAt(m.target.x) ?? m.fromY).setFrame('freeze');
-    const result = m.target.owner.onDelegate(m) ?? {};
+    m.sprite.setPosition(m.target.x, this.floorAt(m.target.x, m.fromY) ?? m.fromY).setFrame('freeze');
+    const owner = m.target.owner;
+    owner.delegateReserved = false;
+    // things may have changed while the junior was running (it already fired, it caught you…): re-check
+    if (!owner.delegateTarget?.()) {
+      m.state = 'follow';
+      this.say('Ah, è già stato fatto?', m.sprite.x, m.sprite.y);
+      this.emit();
+      return;
+    }
+    owner.delegateReserved = true;
+    const result = owner.onDelegate(m) ?? {};
     if (result.stay) {
       m.state = 'staying';
       m.stayLeft = result.staySeconds ? result.staySeconds * 1000 : undefined;
@@ -188,11 +213,13 @@ export default class Team {
     }
   }
 
-  floorAt(x) {
+  // Floor under x near height refY (feet): searched from one tile above refY downwards, so overhead ledges are ignored.
+  floorAt(x, refY) {
     const col = Math.floor(x / TILE);
     const tiles = this.scene.levelTiles;
     if (!tiles || col < 0 || col >= tiles[0].length) return null;
-    for (let y = 2; y < tiles.length; y++) if (tiles[y][col] !== -1) return y * TILE;
+    const from = Math.max(2, Math.floor(refY / TILE) - 1);
+    for (let y = from; y < tiles.length; y++) if (tiles[y][col] !== -1) return y * TILE;
     return null;
   }
 

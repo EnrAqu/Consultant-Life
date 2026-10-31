@@ -50,6 +50,16 @@ describe('pickDelegateTarget', () => {
     expect(pickDelegateTarget(250, -1, targets).kind).toBe('behind');
   });
 
+  it('falls back to a target just behind when nothing is ahead (e.g. the plate behind you at a gate)', () => {
+    expect(pickDelegateTarget(1000, 1, [{ x: 860, kind: 'plate' }]).kind).toBe('plate');
+    expect(pickDelegateTarget(1000, 1, [{ x: 600, kind: 'too far' }])).toBe(null);
+  });
+
+  it('never picks a target beyond a closed gate', () => {
+    const t = [{ x: 260, kind: 'plate' }, { x: 420, kind: 'micromanager' }];
+    expect(pickDelegateTarget(370, 1, t, 10, { blockers: [400] }).kind).toBe('plate');
+  });
+
   it('returns null when nothing is in range', () => {
     expect(pickDelegateTarget(1300, 1, targets)).toBe(null);
   });

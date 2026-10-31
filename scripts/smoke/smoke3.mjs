@@ -23,6 +23,17 @@ const state = (page) => page.evaluate(() => {
 });
 const teleport = (page, tx, ty) => page.evaluate(([tx, ty]) => globalThis.__game.scene.getScene('GameScene').player.body.reset(tx * 32 + 16, (ty + 1) * 32 - 16), [tx, ty]);
 async function hold(page, key, ms) { await page.keyboard.down(key); await sleep(ms); await page.keyboard.up(key); }
+async function holdUntil(page, key, cond, timeoutMs = 5000) {
+  await page.keyboard.down(key);
+  const t0 = Date.now();
+  let s = await state(page);
+  while (!cond(s) && Date.now() - t0 < timeoutMs) {
+    await sleep(50);
+    s = await state(page);
+  }
+  await page.keyboard.up(key);
+  return s;
+}
 const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}${info ? ' — ' + JSON.stringify(info) : ''}`);
 
 // email bridge (level 1, S6a)
@@ -38,8 +49,7 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   await sleep(3200);
   await page.screenshot({ path: OUT + 'i3-bridge.png' });
   const before = await state(page);
-  await hold(page, 'ArrowRight', 1800); await sleep(300);
-  const s2 = await state(page);
+  const s2 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] >= 124 || s.deaths > before.deaths);
   check('waiting for the emails builds a bridge you can walk on', s2.tile[0] >= 124 && s2.deaths === before.deaths, { before, s2 });
   await page.close();
 }

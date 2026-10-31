@@ -97,6 +97,13 @@ export default class ScopeCreepPlatform extends BaseTrap {
     this.playerOnTrigger = true;
   }
 
+  dangerCols() {
+    if (this.pivoted) return null;
+    const a = this.rootCol;
+    const b = this.endHeadCol;
+    return [Math.min(a, b) - 1, Math.max(a, b) + 1];
+  }
+
   delegateTarget() {
     if (this.state !== 'idle' || this.pivoted) return null;
     return { x: (this.tx + this.p.triggerDx + 1) * TILE + 16, kind: 'scopeCreep' };

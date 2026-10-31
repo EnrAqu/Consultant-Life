@@ -90,6 +90,12 @@ export default class ReplyAllAvalanche extends BaseTrap {
     if (this.scene.debugMode) this.logImpacts();
   }
 
+  dangerCols() {
+    if (this.pivoted) return null;
+    const cols = this.p.columns;
+    return [this.tx + Math.min(...cols) - 1, this.tx + Math.max(...cols) + 1];
+  }
+
   delegateTarget() {
     if (!this.armed || this.pivoted) return null;
     return { x: (this.tx + this.p.triggerDx + 1) * TILE, kind: 'replyAll' };

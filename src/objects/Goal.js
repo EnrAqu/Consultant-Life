@@ -45,8 +45,7 @@ export default class Goal {
     const scene = this.scene;
     const result = this.brain.touch(scene.player.body.center.x, this.x);
     if (result !== 'troll') {
-      if (result === 'winRight') scene.narrate('goalRight');
-      scene.completeLevel();
+      scene.completeLevel(result === 'winRight' ? 'goalRight' : 'levelComplete');
       return;
     }
     this.state = 'troll';

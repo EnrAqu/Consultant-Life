@@ -14,6 +14,8 @@ export default class Rival {
     this.scene = scene;
     this.def = def;
     this.brain = new RivalBrain(def.params);
+    // the "presented your work" penalty is charged once per level, not after every respawn
+    this.charged = false;
   }
 
   build() {
@@ -51,10 +53,13 @@ export default class Rival {
     this.bubbleLeft = ms;
   }
 
+  // Floor under x near his current height (overhead ledges are ignored).
   floorAt(x) {
     const tiles = this.scene.levelTiles;
     const col = Math.floor(x / TILE);
-    for (let y = 2; y < tiles.length; y++) if (tiles[y][col] !== -1) return y * TILE;
+    const ref = this.lastFloor ?? (this.def.y + 1) * TILE;
+    const from = Math.max(2, Math.floor(ref / TILE) - 1);
+    for (let y = from; y < tiles.length; y++) if (tiles[y][col] !== -1) return y * TILE;
     return null;
   }
 
@@ -77,7 +82,8 @@ export default class Rival {
     const rivalTop = this.sprite.y - 36;
     const dx = body.center.x - this.brain.x;
     const onHead = body.velocity.y > 0 && Math.abs(dx) < 14 && body.bottom >= rivalTop - 6 && body.bottom <= rivalTop + 10;
-    const overlapping = Math.abs(dx) < 12 && Math.abs(body.bottom - this.sprite.y) < 10;
+    // he only leapfrogs a player standing on the floor: never a stop in mid-air over a pit
+    const overlapping = player.grounded && Math.abs(dx) < 12 && Math.abs(body.bottom - this.sprite.y) < 10;
     const coffees = scene.pickups.map((p) => ({ x: p.sprite.x, taken: p.collected, ref: p }));
     const firstFollowerX = scene.team?.followers[0]?.sprite.x ?? null;
     const actions = this.brain.update(dt, { player: { x: body.center.x, onHead, overlapping }, coffees, firstFollowerX });
@@ -105,7 +111,7 @@ export default class Rival {
     const player = scene.player;
     switch (a.type) {
       case 'start':
-        this.say('Vado avanti io, ok? Tu fai con calma.');
+        this.say(this.def.params.atGoal ? 'Il cliente lo vedo io, ok?' : 'Arrivo! Se vi fermate, mi prendo qualcuno del team.');
         scene.narrate('rivalStart');
         break;
       case 'takeCoffee':
@@ -134,10 +140,11 @@ export default class Rival {
         this.say('Permesso, permesso!');
         break;
       case 'arrived':
-        if (scene.ended || !this.def.params.atGoal) {
-          if (!scene.ended) this.say('Io aspetto qui. Ho le mie conoscenze.');
+        if (scene.ended || !this.def.params.atGoal || this.charged) {
+          if (!scene.ended && !this.def.params.atGoal) this.say('Io aspetto qui. Ho le mie conoscenze.');
           break;
         }
+        this.charged = true;
         this.say("Il cliente ha già visto il lavoro. L'ho presentato io.", 3000);
         scene.narrate('rivalGoal');
         scene.spendGu(GOAL_COST, 'rival');

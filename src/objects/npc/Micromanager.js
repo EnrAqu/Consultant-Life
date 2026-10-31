@@ -50,6 +50,7 @@ export default class Micromanager {
   say(text, ms = BUBBLE_MS) {
     this.bubble.setText(text).setVisible(true);
     this.bubbleLeft = ms;
+    this.bubble.setPosition(this.sprite?.x ?? 0, (this.sprite?.y ?? 0) - 44);
   }
 
   release() {
@@ -78,7 +79,13 @@ export default class Micromanager {
     const player = scene.player;
     const body = player.body;
     this.t += dt;
-    const actions = this.brain.update(dt, { x: body.center.x, y: body.bottom, vx: body.velocity.x, grounded: player.grounded, locked: player.inputLocked });
+    // he never stops you inside a trap corridor (frozen under falling slides = an unfair death)
+    const col = Math.floor(body.center.x / TILE);
+    const inTrap = this.scene.traps.some((t) => {
+      const d = t.dangerCols?.();
+      return d && col >= d[0] && col <= d[1];
+    });
+    const actions = this.brain.update(dt, { x: body.center.x, y: body.bottom, vx: body.velocity.x, grounded: player.grounded, locked: player.inputLocked || inTrap });
     for (const a of actions) this.handle(a);
 
     // view
@@ -136,7 +143,7 @@ export default class Micromanager {
     const player = scene.player;
     switch (a.type) {
       case 'tell':
-        this.say('…', this.brain.p.tellMs);
+        this.say('…', this.brain.p.turnTellMs);
         break;
       case 'catch':
         player.lockInput('mm', true);
@@ -172,6 +179,7 @@ export default class Micromanager {
   }
 
   onDelegate() {
+    this.release();
     this.brain.occupy(8000);
     this.say('Ah, perfetto. Spiegami tu, allora. Con calma.', 3000);
     return { stay: true, staySeconds: 8 };

@@ -109,7 +109,7 @@ export default class UIScene extends Phaser.Scene {
       [EV.BUDGET_OVER]: () => this.hideAll(),
       [EV.FIRST_MOVE]: () => this.hideTitle(),
       [EV.DEBUG]: (s) => this.debugText.setText(s),
-      [EV.TEAM_CHANGED]: ({ count }) => this.showTeam(count),
+      [EV.TEAM_CHANGED]: ({ count, canDelegate }) => this.showTeam(count, canDelegate),
     });
     bus.emit(EV.UI_READY);
   }
@@ -139,12 +139,13 @@ export default class UIScene extends Phaser.Scene {
     }
   }
 
-  showTeam(count) {
+  showTeam(count, canDelegate = false) {
     if (count === null || count === undefined) {
       this.teamText.setText('');
       return;
     }
-    this.teamText.setText(`Team: ${'● '.repeat(count)}${count === 0 ? 'nessuno' : ''}   [E] delega`);
+    this.teamText.setText(`Team: ${'● '.repeat(count)}${count === 0 ? 'nessuno' : ''}   [E] delega${canDelegate ? ' ◀' : ''}`);
+    this.teamText.setColor(canDelegate ? '#fbbf24' : '#fde68a');
   }
 
   hideTitle() {

@@ -97,6 +97,29 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.close();
 }
 
+// delegation re-checks its target on arrival: the junior comes back if the trap already fired
+{
+  const page = await open('?debug=1&standup=off&level=level3');
+  await page.keyboard.press('KeyE');
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').traps.find((t) => t.def.id === 'gate1').open, { timeout: 4000 }).catch(() => {});
+  // fire the deck before the junior gets there
+  const r = await page.evaluate(() => {
+    const g = globalThis.__game.scene.getScene('GameScene');
+    const team = g.team;
+    const deck = g.traps.find((t) => t.def.id === 'slotC');
+    g.npcs.find((n) => n.def.id === 'mmB').brain.occupy(20000); // keep the deck the only target in range
+    g.player.body.reset(90 * 32 + 16, 15 * 32 - 16);
+    return { before: team.count, deckState: deck.state };
+  });
+  await sleep(300);
+  await page.keyboard.press('KeyE');
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((t) => t.def.id === 'slotC').onTrigger());
+  await sleep(2500);
+  const after = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.count);
+  check('a junior sent to a trap that already fired comes back to the team', after === r.before, { ...r, after });
+  await page.close();
+}
+
 // level 4: arrivista and AI draft
 {
   const page = await open('?debug=1&standup=off&level=level4');
@@ -104,7 +127,7 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   check('level 4 starts with a team', s0.team === 3 && s0.level === 'level4', s0);
   await teleport(page, 10, 14); await sleep(600);
   const rival = await page.evaluate(() => { const r = globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'rival1'); return { state: r.brain.state, col: Math.floor(r.brain.x / 32) }; });
-  check('the arrivista starts running when you pass him', rival.state === 'running' && rival.col > 6, rival);
+  check('the arrivista starts running when you pass him', rival.state === 'running' && rival.col > 0, rival);
   await teleport(page, 82, 11); await sleep(400);
   const ai = await page.evaluate(() => { const t = globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'ai1'); return { taken: t.taken, visible: t.platforms.filter((p) => p.ts.visible).length }; });
   await page.screenshot({ path: OUT + 'i4-ai.png' });

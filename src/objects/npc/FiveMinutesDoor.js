@@ -31,8 +31,9 @@ export default class FiveMinutesDoor {
     this.reset();
   }
 
-  say(text) {
+  say(text, ms = 0) {
     this.bubble.setText(text).setVisible(text !== '');
+    this.bubbleLeft = ms;
   }
 
   release() {
@@ -61,7 +62,7 @@ export default class FiveMinutesDoor {
   onDelegate() {
     this.brain.occupy();
     this.door.setTexture('doorAjar');
-    this.say('Ehi, tu! Hai 5 minuti? Ottimo, entra.');
+    this.say('Ehi, tu! Hai 5 minuti? Ottimo, entra.', 2500);
     return {};
   }
 
@@ -79,6 +80,10 @@ export default class FiveMinutesDoor {
 
     this.npc.setAlpha(this.brain.outAmount);
     this.npc.setFrame(`idle${Math.floor(this.t / 400) % 2}`);
+    if (this.bubbleLeft > 0) {
+      this.bubbleLeft -= dt;
+      if (this.bubbleLeft <= 0) this.say('');
+    }
     if (this.brain.state === 'hooked') {
       this.hookedMs += dt;
       this.say(HOOK_LINES[Math.floor(this.hookedMs / 1000) % HOOK_LINES.length]);

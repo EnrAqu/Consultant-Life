@@ -57,6 +57,19 @@ describe('MicromanagerBrain (flashlight)', () => {
     expect(caught(run(b, 30000, at(15)))).toBe(false);
   });
 
+  it('patrols the whole zone: turns at the edge too, with the "…" first', () => {
+    const b = make({ gaps: [], turnEveryMs: 100000 });
+    let maxX = 0;
+    let tells = 0;
+    for (let t = 0; t < 12000; t += 20) {
+      tells += b.update(20, { x: 40 * T, y: FEET, vx: 0, grounded: true, locked: false }).filter((a) => a.type === 'tell').length;
+      maxX = Math.max(maxX, b.x);
+    }
+    expect(maxX).toBe(30 * T + 16);
+    expect(tells).toBeGreaterThanOrEqual(1);
+    expect(b.x).toBeLessThan(30 * T);
+  });
+
   it('the light is 5 tiles long', () => {
     const b = make({ gaps: [] });
     expect(caught(run(b, 20, at(10 + MM_DEFAULTS.sightRange + 1)))).toBe(false);

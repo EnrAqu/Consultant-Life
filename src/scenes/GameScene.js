@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
-import { LEVELS, nextLevel } from '../levels/index.js';
+import { LEVELS, nextLevel, LEVEL_ORDER } from '../levels/index.js';
 import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
 import { resolveLevel } from '../core/pivot.js';
 import Budget from '../core/Budget.js';
@@ -56,6 +56,8 @@ export default class GameScene extends Phaser.Scene {
     this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : def.career ?? 'junior';
     this.playerView = new PlayerView(this, this.player, this.outfit);
     this.levelTiles = level.tiles;
+    // a new campaign starts with a fresh team
+    if (this.levelId === LEVEL_ORDER[0]) session.team = null;
     // team of juniors from level 3 on; lost juniors stay lost across levels (minimum 1)
     this.teamAtStart = def.team ? Math.max(1, session.team ?? def.team.size) : 0;
     this.team = def.team ? new Team(this, this.teamAtStart) : null;
@@ -416,11 +418,11 @@ export default class GameScene extends Phaser.Scene {
     this.time.delayedCall(600, () => fadeTo(this, 'BudgetOverScene', { levelId: this.levelId, pivotCause: this.pivotCause, runStats }));
   }
 
-  completeLevel() {
+  completeLevel(narration = 'levelComplete') {
     if (this.player.isDead || this.ended) return;
     this.endLevel();
     this.stats.completeRun();
-    this.narrate('levelComplete');
+    this.narrate(narration);
     const run = this.stats.getRun();
     // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
     const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });

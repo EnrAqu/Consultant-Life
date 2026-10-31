@@ -53,9 +53,14 @@ export default class InternDesk {
       bus.emit(EV.TOAST, { text: 'Hai già un team. Il budget formazione è congelato.', durationMs: 1600 });
       return;
     }
-    if (scene.spendGu(COST, 'intern')) return;
+    if (scene.budget.gu <= COST) {
+      bus.emit(EV.TOAST, { text: 'Budget formazione esaurito. Non ci sono GU per uno stagista.', durationMs: 2200 });
+      return;
+    }
+    scene.spendGu(COST, 'intern');
     team.add(1);
-    team.snapshot();
+    // the hire survives a death, but does not overwrite the checkpoint team
+    team.savedCount += 1;
     bus.emit(EV.TOAST, { text: `Nuovo stagista assunto: -${COST} GU`, durationMs: 1800 });
     scene.narrate('intern');
   }

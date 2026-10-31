@@ -35,7 +35,8 @@ export default {
   map: g.toMap(),
   entities: [
     { id: 'sign1', type: 'sign', x: 3, y: 13, text: 'Senior Manager: ora il cliente ti chiama per nome. Purtroppo.' },
-    { id: 'rival1', type: 'rival', x: 6, y: 14, params: { startCol: 6, triggerCol: 9, stopCol: 75 } },
+    // starts well behind you and your team: he only steals a junior if you stop
+    { id: 'rival1', type: 'rival', x: 0, y: 14, params: { startCol: 0, triggerCol: 9, stopCol: 75 } },
     { id: 'five1', type: 'fiveMinutes', x: 46, y: 14, slot: true, params: { normal: {}, pivoted: { shortcutTo: { col: 70, row: 14 } } } },
     {
       id: 'slotA', type: 'replyAll', x: 52, y: 14, slot: true,
@@ -77,7 +78,7 @@ export default {
     },
     { id: 'intern2', type: 'intern', x: 147, y: 14 },
     { id: 'gate2', type: 'approvalGate', x: 156, y: 14, params: { plateDx: -4 } },
-    { id: 'rival2', type: 'rival', x: 158, y: 14, params: { startCol: 158, triggerCol: 160, stopCol: 176, atGoal: true } },
+    { id: 'rival2', type: 'rival', x: 157, y: 14, params: { startCol: 157, triggerCol: 163, stopCol: 176, atGoal: true, speed: 215 } },
     {
       id: 'raEnd', type: 'replyAll', x: 166, y: 14,
       params: { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 5, intervalMs: 120, columns: [0, 1, 2, 3, 4], spawnHeight: 6, fallSpeed: 14, restRow: 14 },
