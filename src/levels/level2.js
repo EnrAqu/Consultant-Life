@@ -18,7 +18,7 @@ for (let x = 85; x <= 94; x++) if (x !== 89 && x !== 90) g.put(x, 14, '^');
 g.ground(89, 90, 14).ground(95, 109);
 g.put(106, 14, 'G');
 
-const replyAllNormal = { triggerDx: -5, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 9, restRow: 14 };
+const replyAllNormal = { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 };
 
 export default {
   id: 'level2',
@@ -35,14 +35,14 @@ export default {
       id: 'slotA', type: 'replyAll', x: 10, y: 14, slot: true,
       params: {
         normal: replyAllNormal,
-        pivoted: { triggerDx: -5, triggerWidth: 2, startDelayMs: 200, count: 12, intervalMs: 300, columns: [7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9], spawnHeight: 6, fallSpeed: 9, restRow: 14, stayMs: 8000 },
+        pivoted: { triggerDx: -5, triggerWidth: 2, startDelayMs: 200, count: 12, intervalMs: 300, columns: [7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14, stayMs: 8000 },
       },
     },
     {
       id: 'slotB', type: 'scopeCreep', x: 30, y: 14, slot: true,
       params: {
-        normal: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 450, extendSpeed: 5, pitRect: { dx: 6, dy: 1, w: 11, h: 2 } },
-        pivoted: { direction: 'right', dy: 1, baseLength: 1, maxLength: 17, triggerDx: 0, triggerWidth: 3, armDelayMs: 300, extendSpeed: 8 },
+        normal: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 6, dy: 1, w: 11, h: 2 } },
+        pivoted: { direction: 'right', dy: 1, baseLength: 1, maxLength: 17, triggerDx: 0, triggerWidth: 3, armDelayMs: 300, extendSpeed: 14 },
       },
     },
     {

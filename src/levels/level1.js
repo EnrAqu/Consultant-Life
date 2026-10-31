@@ -37,11 +37,11 @@ export default {
     { id: 'sign1', type: 'sign', x: 5, y: 13, text: 'Primo giorno! Benvenuto in azienda.' },
     {
       id: 'ra1', type: 'replyAll', x: 42, y: 14,
-      params: { triggerDx: -5, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 9, restRow: 14 },
+      params: { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 },
     },
     {
       id: 'sc1', type: 'scopeCreep', x: 55, y: 12,
-      params: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 450, extendSpeed: 5, pitRect: { dx: 6, dy: 1, w: 4, h: 4 } },
+      params: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 6, dy: 1, w: 4, h: 4 } },
     },
     { id: 'kt1', type: 'fakeKT', x: 97, y: 11, params: { callMs: 4000 } },
     {
@@ -53,12 +53,12 @@ export default {
     },
     {
       id: 'ra2', type: 'replyAll', x: 132, y: 14,
-      params: { triggerDx: -6, triggerWidth: 2, startDelayMs: 0, count: 12, intervalMs: 150, columns: [0, 1, 2, 3, 4, 5], spawnHeight: 7, fallSpeed: 9, restRow: 15, landing: 'solid' },
+      params: { triggerDx: -6, triggerWidth: 2, startDelayMs: 0, count: 12, intervalMs: 100, columns: [0, 1, 2, 3, 4, 5], spawnHeight: 7, fallSpeed: 14, restRow: 15, landing: 'solid' },
     },
     { id: 'sign2', type: 'sign', x: 122, y: 13, text: 'In attesa di riscontro dal cliente...' },
     {
       id: 'sc2', type: 'scopeCreep', x: 157, y: 14,
-      params: { direction: 'left', baseLength: 1, maxLength: 7, triggerDx: -4, triggerWidth: 3, armDelayMs: 450, extendSpeed: 5, pitRect: { dx: -10, dy: 1, w: 4, h: 2 } },
+      params: { direction: 'left', baseLength: 1, maxLength: 7, triggerDx: -4, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: -10, dy: 1, w: 4, h: 2 } },
     },
   ],
 };
