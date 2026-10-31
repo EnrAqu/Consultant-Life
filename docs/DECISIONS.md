@@ -97,3 +97,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Livello 4 "Senior Manager" confermato: arrivista, bonus AI, porte "5 minuti" come slot, team, traguardo che tradisce, niente micromanager — utente.
 - 2026-10-31 — Iterazione 4 solo pianificata: non sviluppare finché l'utente non lo chiede.
 - 2026-10-31 — Micromanager "a torcia": niente controllo ogni 6 s né esenzione per chi corre; se entri (a terra) nella sua torcia ti ferma (−0,5 GU). Torcia corta e bassa (5×2 tile, si salta sopra), pattuglia che si gira ogni 3 s con preavviso, le piante bloccano la luce, 3 s di torcia spenta dopo una presa — utente ("abbastanza inutile"). Supersede ITERATION_3 §1.1–1.2.
+- 2026-10-31 — Risposte dell'utente all'iterazione 4: tasto delega **E** (alternativa Shift); team **dal livello 3**; junior persi **per sempre** (minimo 1 grazie allo stagista); **`puppeteer-core`** aggiunto come dipendenza di sviluppo per gli smoke test (`npm run smoke`). Iterazione 4 in sviluppo.
+- 2026-10-31 — Micromanager del livello 2: zona 54–66 (dopo il checkpoint, così al respawn non sei nella torcia).
+- 2026-10-31 — puppeteer-core 25.14.0 (non la 24.x: vulnerabilità; non l'ultima 25.16: ha meno di due settimane).

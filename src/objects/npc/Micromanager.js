@@ -1,4 +1,4 @@
-import { TILE, DEPTH, TEXTURE_SCALE, TEXT_RESOLUTION, UI_FONT, COLORS } from '../../config/constants.js';
+import { TILE, DEPTH, TEXTURE_SCALE, TEXT_RESOLUTION, UI_FONT } from '../../config/constants.js';
 import MicromanagerBrain from '../../core/MicromanagerBrain.js';
 import { TILE_EMPTY } from '../../core/LevelParser.js';
 
@@ -6,8 +6,9 @@ const BASE = 1 / TEXTURE_SCALE;
 const BUBBLE_MS = 1800;
 
 // View + side effects of the micromanager; all decisions live in MicromanagerBrain (pure, tested).
-// Normal: every 6 s he checks on you; if you are still/slow and in sight he stops you and explains how he'd do it.
-// Tell: visible gaze cone and a "…" bubble before each check. Escape: run, hide behind a plant, leave his zone.
+// Normal: he patrols with a "flashlight"; standing in the light gets you stopped (-0.5 GU) while he explains.
+// Tell: the light is always visible; "…" and a flicker 400 ms before he turns around.
+// Escape: jump over the light, pass behind him, hide behind a plant (plants block the light).
 // Pivoted: he walks ahead of you and points at the traps.
 export default class Micromanager {
   static type = 'micromanager';
@@ -109,11 +110,16 @@ export default class Micromanager {
     this.prevX = x;
 
     this.cone.clear();
-    if (this.mode === 'normal' && ['idle', 'watch', 'tell', 'dash'].includes(b.state)) {
-      const eyeY = this.floorY - 32;
-      const reach = b.p.sightRange * TILE * b.facing;
-      this.cone.fillStyle(COLORS.postit, b.state === 'tell' ? 0.3 : 0.1);
-      this.cone.fillTriangle(x + 6 * b.facing, eyeY, x + reach, eyeY - 56, x + reach, eyeY + 32);
+    if (b.lightOn) {
+      // flashlight: from his eyes to the floor, b.p.sightRows tiles tall at the far end
+      const f = b.facing;
+      const eyeY = this.floorY - 30;
+      const far = x + b.lightReach() * f;
+      const flicker = b.turning && Math.floor(this.t / 80) % 2 === 0;
+      const top = this.floorY - b.p.sightRows * TILE;
+      this.cone.fillStyle(0xfef08a, flicker ? 0.08 : 0.22);
+      this.cone.fillPoints([{ x: x + 6 * f, y: eyeY }, { x: far, y: top }, { x: far, y: this.floorY }, { x: x + 6 * f, y: this.floorY }], true);
+      this.cone.fillStyle(0xfde047, flicker ? 0.1 : 0.3).fillRect(Math.min(x, far), this.floorY - 3, Math.abs(far - x), 3);
     }
 
     if (this.bubbleLeft > 0) {

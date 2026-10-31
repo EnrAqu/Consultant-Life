@@ -1,9 +1,7 @@
-// Browser smoke test. Needs: npm run build && npx vite preview --port 4173, plus puppeteer-core (not yet a dependency: pending user decision, see docs/DECISIONS.md).
-// Run: node scripts/smoke/smoke3.mjs
 import puppeteer from 'puppeteer-core';
 const BASE = 'http://localhost:4173/';
 const OUT = new URL('./shots/', import.meta.url).pathname;
-const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', defaultViewport: { width: 1920, height: 1080 } });
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', defaultViewport: { width: 1920, height: 1080 } });
 const results = [];
 const errors = [];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

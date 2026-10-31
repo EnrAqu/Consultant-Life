@@ -1,6 +1,6 @@
 # Iterazione 4 — Ritmo, traguardo che tradisce, Team & Delega, Livello 4
 
-> Stato: **solo piano**. Non sviluppare finché l'utente non lo chiede (2026-10-31).
+> Stato: **in sviluppo** (2026-10-31): domande Q1–Q4 chiuse (E, team dal livello 3, junior persi per sempre, puppeteer-core).
 > Fonte: `docs/PLAYTEST.md` (playtest #2) e risposte dell'utente del 2026-10-31.
 > Regole invariate: trappole e NPC deterministici, logica pura in `src/core/` con test, percorsi obbligatori con salti "normali" (validatore), "crudele ma giusto".
 

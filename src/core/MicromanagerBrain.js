@@ -1,20 +1,18 @@
-// Pure state machine of the micromanager (ITERATION_3 §1). Pixels and ms; no Phaser.
+// Pure state machine of the micromanager "with the flashlight" (ITERATION_4 §0b). Pixels and ms; no Phaser.
+// He patrols his zone and turns around on a fixed rhythm; if you stand in his light, he stops you.
 const T = 32;
 
 export const MM_DEFAULTS = {
   walkSpeed: 60,
-  followDist: 5,
-  checkEveryMs: 6000,
-  tellMs: 500,
-  sightRange: 7,
-  sightRows: 3,
-  busySpeed: 200,
-  dashSpeed: 400,
-  catchDist: 20,
+  turnEveryMs: 3000,
+  turnTellMs: 400,
+  sightRange: 5,
+  sightRows: 2,
+  approachSpeed: 400,
   explainMs: 2000,
   explainCost: 0.5,
   demoMs: 1200,
-  cooldownMs: 4000,
+  cooldownMs: 3000,
   respawnMs: 3000,
   guideAhead: 3,
   guideSpeed: 300,
@@ -27,22 +25,23 @@ export default class MicromanagerBrain {
     this.mode = mode;
     this.minX = this.p.zoneFrom * T + 16;
     this.maxX = this.p.zoneTo * T + 16;
-    // feet of the micromanager: the zone floor (row the player stands on)
     this.floorY = (this.p.floorRow + 1) * T;
     // walkable floor spans of the zone (pits listed in p.gaps as [fromCol, toCol]); he never walks over a pit
+    this.gaps = (this.p.gaps ?? []).map(([a, b]) => [a * T, (b + 1) * T]);
     this.spans = this.computeSpans(this.p.gaps ?? []);
     this.reset();
   }
 
   reset() {
-    this.state = 'idle';
+    this.state = 'patrol';
     this.x = this.minX;
     this.facing = 1;
     this.timer = 0;
-    this.checkTimer = 0;
+    this.turnTimer = 0;
     this.demos = 0;
     this.demoSuccess = true;
     this.guided = false;
+    this.told = false;
   }
 
   computeSpans(gaps) {
@@ -71,26 +70,38 @@ export default class MicromanagerBrain {
     if (Math.abs(dx) <= step) this.x = target;
     else this.x += Math.sign(dx) * step;
     this.x = Math.min(hi, Math.max(lo, this.x));
-    if (dx !== 0) this.facing = Math.sign(dx);
   }
 
-  // Hidden = standing at a plant (either side) or with a plant between him and you, on the same floor.
-  hiddenBehindPlant(player) {
-    const lo = Math.min(this.x, player.x);
-    const hi = Math.max(this.x, player.x);
-    return this.p.plants.some((pl) => {
-      const px = pl.col * T + 16;
-      const sameFloor = Math.abs((pl.row + 1) * T - player.y) <= T;
-      return sameFloor && (Math.abs(px - player.x) <= T || (px > lo && px < hi));
-    });
+  get lightOn() {
+    return this.mode === 'normal' && this.state === 'patrol';
   }
 
-  sees(player) {
-    const dx = player.x - this.x;
-    if (Math.sign(dx) !== this.facing && dx !== 0) return false;
-    if (Math.abs(dx) > this.p.sightRange * T) return false;
-    if (Math.abs(player.y - this.floorY) > this.p.sightRows * T) return false;
-    return !this.hiddenBehindPlant(player);
+  // The "…" before he turns around.
+  get turning() {
+    return this.lightOn && this.turnTimer >= this.p.turnEveryMs - this.p.turnTellMs;
+  }
+
+  // How far the light reaches in front of him (px): stops at the first plant or pit.
+  lightReach() {
+    let reach = this.p.sightRange * T;
+    const f = this.facing;
+    for (const pl of this.p.plants ?? []) {
+      const d = (pl.col * T + 16 - this.x) * f;
+      if (d > 0) reach = Math.min(reach, d - 12);
+    }
+    for (const [a, b] of this.gaps) {
+      const edge = f > 0 ? a - this.x : this.x - b;
+      if (edge > 0) reach = Math.min(reach, edge);
+    }
+    return Math.max(0, reach);
+  }
+
+  // Player standing (feet on his floor) inside the light.
+  inLight(player) {
+    if (!this.lightOn || !player.grounded || player.locked) return false;
+    if (Math.abs(player.y - this.floorY) > 8) return false;
+    const d = (player.x - this.x) * this.facing;
+    return d >= -8 && d <= this.lightReach();
   }
 
   // player: { x, y (feet), vx, grounded, locked }. Returns actions for the view.
@@ -100,58 +111,19 @@ export default class MicromanagerBrain {
     if (this.mode === 'pivoted') return this.updateGuide(dt, player, present, actions);
 
     switch (this.state) {
-      case 'idle':
+      case 'patrol': {
         this.moveToward(this.facing > 0 ? this.maxX : this.minX, this.p.walkSpeed, dt);
-        {
-          const [lo, hi] = this.spanOf(this.x);
-          if (this.x >= hi) this.facing = -1;
-          if (this.x <= lo) this.facing = 1;
-        }
-        if (present) {
-          this.checkTimer = 0;
-          this.enter('watch');
-        }
-        break;
-      case 'watch': {
-        if (!present) {
-          this.enter('idle');
-          break;
-        }
-        const dx = player.x - this.x;
-        this.facing = Math.sign(dx) || this.facing;
-        if (Math.abs(dx) > this.p.followDist * T) this.moveToward(player.x - this.facing * this.p.followDist * T, this.p.walkSpeed, dt);
-        this.checkTimer += dt;
-        if (this.checkTimer >= this.p.checkEveryMs) {
-          this.checkTimer = 0;
-          this.enter('tell');
+        this.turnTimer += dt;
+        if (this.turning && !this.told) {
+          this.told = true;
           actions.push({ type: 'tell' });
         }
-        break;
-      }
-      case 'tell':
-        this.timer += dt;
-        if (this.timer >= this.p.tellMs) {
-          // running = "looks busy"; a player already frozen (KT call…) is left alone
-          const busy = Math.abs(player.vx) >= this.p.busySpeed || player.locked;
-          if (present && !busy && this.sees(player)) this.enter('dash');
-          else this.enter('watch');
+        if (this.turnTimer >= this.p.turnEveryMs) {
+          this.facing = -this.facing;
+          this.turnTimer = 0;
+          this.told = false;
         }
-        break;
-      case 'dash': {
-        if (!present || player.locked) {
-          this.enter('watch');
-          break;
-        }
-        const before = this.x;
-        this.moveToward(player.x, this.p.dashSpeed, dt);
-        const close = Math.abs(player.x - this.x) <= this.p.catchDist;
-        // never stop someone mid-air: wait until they land (a stop over a pit would kill)
-        const onFloor = player.grounded && Math.abs(player.y - this.floorY) <= 8;
-        if (!close && this.x === before) {
-          this.enter('watch'); // a pit is in the way
-          break;
-        }
-        if (close && onFloor) {
+        if (present && this.inLight(player)) {
           this.enter('explain');
           actions.push({ type: 'catch', cost: this.p.explainCost });
         }
@@ -159,6 +131,8 @@ export default class MicromanagerBrain {
       }
       case 'explain':
         this.timer += dt;
+        // walk up to the player while he explains (never over a pit)
+        if (Math.abs(player.x - this.x) > 20) this.moveToward(player.x - Math.sign(player.x - this.x) * 18, this.p.approachSpeed, dt);
         if (this.timer >= this.p.explainMs) {
           actions.push({ type: 'release' });
           this.demos += 1;
@@ -176,11 +150,7 @@ export default class MicromanagerBrain {
         if (this.timer >= this.p.demoMs) {
           actions.push({ type: 'demoEnd', success: this.demoSuccess });
           if (this.p.demoJump && this.demoSuccess) this.x = this.p.demoJump.toCol * T + 16;
-          if (!this.demoSuccess) {
-            this.enter('away');
-            break;
-          }
-          this.enter('cooldown');
+          this.enter(this.demoSuccess ? 'cooldown' : 'away');
         }
         break;
       case 'away':
@@ -193,11 +163,14 @@ export default class MicromanagerBrain {
         }
         break;
       case 'cooldown':
+        // light off: the window to slip past him
         this.timer += dt;
         if (this.timer >= this.p.cooldownMs) {
           // after a successful jump demo he hops back to his side of the pit
           if (this.p.demoJump && this.x === this.p.demoJump.toCol * T + 16) this.x = this.p.demoJump.fromCol * T + 16;
-          this.enter(present ? 'watch' : 'idle');
+          this.turnTimer = 0;
+          this.told = false;
+          this.enter('patrol');
         }
         break;
       default:
@@ -216,8 +189,8 @@ export default class MicromanagerBrain {
       actions.push({ type: 'guideStart' });
     }
     this.state = 'guide';
-    this.moveToward(player.x + this.p.guideAhead * T, this.p.guideSpeed, dt);
     this.facing = 1;
+    this.moveToward(player.x + this.p.guideAhead * T, this.p.guideSpeed, dt);
     return actions;
   }
 
