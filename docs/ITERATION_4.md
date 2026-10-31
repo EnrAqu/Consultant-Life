@@ -16,6 +16,44 @@
 
 ---
 
+## 0b. Micromanager "a torcia" (richiesta del 2026-10-31)
+
+Playtest: il micromanager è simpatico ma **inutile**: il controllo ogni 6 s e l'esenzione "se corri sei impegnato" lo rendono innocuo. Diventa una **sfida stealth**: il suo sguardo è una **torcia**, e se ci entri ti ferma.
+
+| Prima (iterazione 3) | Ora |
+|---|---|
+| Controllo ogni 6 s, annunciato da "…" | **Nessun timer**: entri nella torcia → ti ferma |
+| Se corri (≥ 200 px/s) non ti ferma | Correre **non** salva: conta solo stare fuori dalla luce |
+| Cono lungo 7 tile, alto 3 | Torcia **corta e bassa**: lunga 5 tile, alta 2 tile dai piedi, quindi si **salta sopra** |
+| Si gira solo ai bordi della zona | **Pattuglia a ritmo fisso**: si gira ogni `turnEveryMs` (3000) e ai bordi; 400 ms prima di girarsi fa "…" e la torcia lampeggia |
+
+Regole:
+- **Presa** = player **a terra** con la hitbox dentro la torcia, e non già bloccato. In aria dentro la torcia non succede nulla: se atterri fuori sei salvo. Così resta vero che il micromanager **non uccide mai** (nessuna presa sopra un burrone).
+- Effetto della presa invariato: si avvicina, *"Fermati un attimo. Spiegami cosa stai facendo."*, sei bloccato 2 s, **−0,5 GU**, poi la demo *"Io l'avrei fatto così"* (riuscita o caduta alternate).
+- Dopo la presa la torcia resta **spenta** per `cooldownMs` (3000): è la finestra per passare.
+- Le **piante bloccano la luce**: dietro una pianta sei invisibile anche dentro la portata.
+- La torcia non attraversa i burroni e lui non ci cammina sopra (invariato).
+- Modalità `pivoted` invariata: ti precede e ti indica le trappole.
+
+Contromosse leggibili: saltare sopra la torcia, passare alle sue spalle mentre guarda dall'altra parte (il "…" ti dice quando sta per girarsi), aspettare dietro una pianta.
+
+Il controllo periodico ogni 6 s e l'esenzione `busySpeed` vengono **rimossi**.
+
+Parametri: `{ sightRange: 5, sightRows: 2, turnEveryMs: 3000, turnTellMs: 400, explainMs: 2000, explainCost: 0.5, cooldownMs: 3000 }`.
+
+**Accettazione (agente):** test di `MicromanagerBrain`:
+- player a terra nella torcia → presa entro 1 frame (anche se corre);
+- in aria sopra la torcia → nessuna presa;
+- alle sue spalle → nessuna presa;
+- dietro una pianta → nessuna presa;
+- si gira ogni 3 s con "…" 400 ms prima;
+- dopo una presa, 3 s senza prese.
+
+Smoke: correndo dritto dentro la torcia nel livello 2 si perdono 0,5 GU; saltandoci sopra no.
+**Playtest utente:** il micromanager diventa una sfida vera, non un fastidio.
+
+---
+
 ## 1. Ritmo: niente tratti morti (A)
 
 **Regola nuova, misurabile:** in un percorso obbligatorio non ci sono più di **12 colonne consecutive "vuote"**, cioè senza trappola, salto ≥ 2, NPC o pickup. Il `LevelValidator` la verifica con la funzione `longestQuietStretch(level)`; il test fallisce oltre 12. Le zone del micromanager e i corridoi delle trappole contano come "attivi".
@@ -160,6 +198,7 @@ Mappa a sezioni (dettaglio ASCII in fase di implementazione, vincolato dal valid
 
 | Id | Contenuto | Verifica |
 |---|---|---|
+| I4-M0 | Micromanager "a torcia" (§0b) | Vitest + smoke |
 | I4-M1 | Velocità email/CR + ricalcolo trigger (§2) | Vitest + smoke |
 | I4-M2 | Ritmo: `longestQuietStretch` + livello 1 accorciato (§1) | Vitest + smoke |
 | I4-M3 | Traguardo che tradisce + livello 2 esteso (§3) | Vitest + smoke |

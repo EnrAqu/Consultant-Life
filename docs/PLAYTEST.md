@@ -37,3 +37,4 @@ Raccolta grezza delle impressioni; l'analisi e le decisioni vanno poi in `DECISI
 | 5 | Ok a pensare il livello 4 | Contenuti | da pianificare |
 | 6 | Introdurre il concetto di **team**, ma discuterne prima nel piano | Meccanica nuova | da discutere |
 | 7 | Al traguardo "Consegna al cliente" il cliente cambia idea e affida il progetto ad altri. Costo: 5 GU | Traguardo / troll | idea nuova |
+| 8 | Il micromanager è simpatico ma abbastanza inutile: deve fermarti se vai troppo vicino alla torcia (−0,5 GU) | Micromanager | → ITERATION_4 §0b |
