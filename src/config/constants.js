@@ -1,0 +1,77 @@
+export const GAME_WIDTH = 960;
+export const GAME_HEIGHT = 540;
+export const TILE = 32;
+export const LEVEL_ROWS = 17;
+export const GRAVITY = 1800;
+
+export const PLAYER = {
+  maxRunSpeed: 260,
+  groundAccel: 2400,
+  groundDecel: 3000,
+  airAccel: 1700,
+  airDecel: 900,
+  turnMultiplier: 1.6,
+  jumpVelocity: 620,
+  jumpCutMultiplier: 0.45,
+  fallGravityExtra: 700,
+  maxFallSpeed: 900,
+  coyoteTimeMs: 90,
+  jumpBufferMs: 110,
+  width: 24,
+  height: 32,
+  bodyWidth: 18,
+  bodyHeight: 28,
+};
+
+export const DEATH_FREEZE_MS = 250;
+export const LEVEL_COMPLETE_DELAY_MS = 800;
+export const IDLE_MS = 10000;
+
+export const BUDGET = {
+  deathCost: 0.5,
+  fakeKtCost: 3,
+  realKtBonus: 1,
+  coffeeBonus: 0.5,
+};
+
+export const STANDUP = {
+  clockStart: 9 * 60,
+  minutesPerRealSecond: 1,
+  firstAt: 9 * 60 + 20,
+  interval: 20,
+  warningLeadMinutes: 3,
+  durationMs: 3000,
+  overrunEvery: 3,
+};
+
+export const COLORS = {
+  bg: '#1b1f2a',
+  navy: 0x1e3a8a,
+  skin: 0xf1c27d,
+  white: 0xffffff,
+  red: 0xdc2626,
+  wall: 0x4b5563,
+  wallEdge: 0x6b7280,
+  carpet: 0x334155,
+  desk: 0x92400e,
+  spike: 0xef4444,
+  postit: 0xfacc15,
+  postitEdge: 0xca8a04,
+  slideBar: 0x2563eb,
+  gold: 0xfbbf24,
+  green: 0x22c55e,
+  coffee: 0x78350f,
+  orange: 0xf97316,
+  grey: 0x94a3b8,
+};
+
+export const DEPTH = {
+  background: 0,
+  tiles: 10,
+  objects: 20,
+  traps: 30,
+  player: 40,
+  fx: 50,
+};
+
+export const TEXT_RESOLUTION = 2;
