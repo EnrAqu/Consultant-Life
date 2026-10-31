@@ -25,3 +25,15 @@ Raccolta grezza delle impressioni; l'analisi e le decisioni vanno poi in `DECISI
 - #6: è la trappola che non fa paura; vuole vedere "URGENTE" ecc. e la variante "aspetta e usale come ponte" → §5–6.
 - Nuovo #7: leaderboard, anche temporanea → §8.
 - Nuovo #8: più battute, sul cliente e simili → §7.
+
+## Playtest #2 — utente, 2026-10-31 (iterazioni 2–3)
+
+| # | Commento | Area | Tipo |
+|---|---|---|---|
+| 1 | In generale piace | — | ✅ |
+| 2 | Un po' noioso in alcune parti, es. la fine del livello 1 | Ritmo dei livelli | da correggere |
+| 3 | Le email piacciono molto: farle cadere più velocemente | Trappola reply-all | tuning |
+| 4 | Le CR (scope creep) devono essere molto più veloci | Trappola scope creep | tuning |
+| 5 | Ok a pensare il livello 4 | Contenuti | da pianificare |
+| 6 | Introdurre il concetto di **team**, ma discuterne prima nel piano | Meccanica nuova | da discutere |
+| 7 | Al traguardo "Consegna al cliente" il cliente cambia idea e affida il progetto ad altri. Costo: 5 GU | Traguardo / troll | idea nuova |
