@@ -67,3 +67,11 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Tile disegnati da una seconda tilemap HD scalata (il Blitter di Phaser ignora la scala); la tilemap a 32 px resta invisibile per le collisioni.
 - 2026-10-31 — Box del narratore in alto al centro, così non copre il pavimento dove si gioca.
 - 2026-10-31 — Livello 2, slot D: pilastro largo 2 (cols 89–90), salti da 4 invece di 5 — senza il KT verde il salto era al limite della fisica; l'utente ha scelto di ammorbidire (supersede la riga "geometria invariata").
+
+## Iterazione 3 (pianificata, non sviluppata)
+- 2026-10-31 — Micromanager nei livelli 2 e 3, non dal 4 in poi (sei più alto di grado) — utente.
+- 2026-10-31 — Micromanager e "Hai 5 minuti?" non uccidono: bloccano e costano 0,5 GU; contano come incidenti (peso 1) e sono pivotabili — coerente con "crudele ma giusto".
+- 2026-10-31 — Il micromanager vive in una zona fissa del livello (il "suo ufficio"), con controlli regolari ogni 6 s annunciati da "…"; ti lascia stare se corri o se sei dietro una pianta; esito della demo alternato (deterministico).
+- 2026-10-31 — Seconda sfida scelta: "Hai 5 minuti?" — utente. Arrivista e bonus AI restano nel backlog.
+- 2026-10-31 — Livello 3 "Manager" con Lessons Learned anche dopo il livello 2 — piano iterazione 3.
+- 2026-10-31 — Iterazione 3 solo pianificata: non sviluppare finché l'utente non lo chiede.
