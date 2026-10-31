@@ -27,4 +27,5 @@ export const DEBUG = {
   clockSpeed: num('clockSpeed') ?? 1,
   cp: q.get('cp'),
   god: q.get('god') === '1',
+  outfit: q.get('outfit'),
 };

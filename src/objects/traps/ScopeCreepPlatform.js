@@ -1,5 +1,5 @@
 import BaseTrap from './BaseTrap.js';
-import { TILE, DEPTH, COLORS, TEXT_RESOLUTION } from '../../config/constants.js';
+import { TILE, DEPTH, COLORS, TEXT_RESOLUTION, TEXTURE_SCALE, UI_FONT } from '../../config/constants.js';
 
 const CONTACT_WINDOW_MS = 2000;
 
@@ -31,13 +31,13 @@ export default class ScopeCreepPlatform extends BaseTrap {
 
     if (!this.pivoted) {
       scene.add
-        .text(this.rootCol * TILE + 16, this.y - 14, 'CR #47', { fontFamily: 'Arial', fontSize: '14px', color: '#facc15', resolution: TEXT_RESOLUTION })
+        .text(this.rootCol * TILE + 16, this.y - 14, 'CR #47', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#facc15', resolution: TEXT_RESOLUTION * 2 })
         .setOrigin(0.5)
         .setDepth(DEPTH.traps);
     }
 
     this.trail = this.addPlatform(this.rootCol, this.row, 1, 1, 'scopeBlock');
-    this.head = scene.physics.add.image(0, 0, 'scopeBlock').setOrigin(0, 0).setDepth(DEPTH.traps);
+    this.head = scene.physics.add.image(0, 0, 'scopeBlock').setOrigin(0, 0).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.traps);
     this.head.body.setAllowGravity(false);
     this.head.body.setImmovable(true);
     this.solids.push(this.head);

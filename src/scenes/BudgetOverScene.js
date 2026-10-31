@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION } from '../config/constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
+import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatDuration } from '../core/format.js';
 
-const style = (size, color = '#fecaca') => ({ fontFamily: '"Courier New", monospace', fontSize: `${size}px`, color, align: 'center', resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
+const style = (size, color = '#fecaca') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, align: 'center', resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
 
 export default class BudgetOverScene extends Phaser.Scene {
   constructor() {
@@ -11,6 +12,8 @@ export default class BudgetOverScene extends Phaser.Scene {
   }
 
   create({ levelId, pivotCause, runStats }) {
+    setupScreenCamera(this);
+    fadeIn(this);
     this.cameras.main.setBackgroundColor('#450a0a');
     const cx = GAME_WIDTH / 2;
     this.add.text(cx, 120, 'BUDGET SFORATO', style(56, '#ffffff')).setOrigin(0.5);
@@ -23,7 +26,7 @@ export default class BudgetOverScene extends Phaser.Scene {
 
     this.time.delayedCall(1000, () => {
       prompt.setText('Premi R o Spazio per riaprire il progetto (nuova SOW)');
-      const again = () => this.scene.start('GameScene', { levelId, pivotCause });
+      const again = () => fadeTo(this, 'GameScene', { levelId, pivotCause });
       this.input.keyboard.once('keydown-R', again);
       this.input.keyboard.once('keydown-SPACE', again);
     });

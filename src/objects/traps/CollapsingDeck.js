@@ -1,5 +1,5 @@
 import BaseTrap from './BaseTrap.js';
-import { TILE, DEPTH, TEXT_RESOLUTION } from '../../config/constants.js';
+import { TILE, DEPTH, TEXT_RESOLUTION, TEXTURE_SCALE, UI_FONT } from '../../config/constants.js';
 
 // Normal: entering the corridor makes the deck wobble, then slides fall from the exit backwards and crush you.
 // Tell: deck file name, the top slide always wobbles a little.
@@ -18,9 +18,10 @@ export default class CollapsingDeck extends BaseTrap {
       const above = p.targets.slice(i + 1, p.slideCount).filter((o) => o.dx === t.dx).length;
       const x = (this.tx + t.dx) * TILE;
       const home = this.pivoted ? this.stackBottom - i * 38 : this.stackBottom - above * 36;
-      const slide = this.objectGroup.create(x, home, key).setOrigin(0, 1).setDepth(DEPTH.traps);
-      slide.body.setSize(64, 32);
-      slide.body.setOffset(0, 4);
+      const slide = this.objectGroup.create(x, home, key).setOrigin(0, 1).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.traps);
+      // body sizes are in texture pixels (scaled by the sprite scale): 64×32 in the world
+      slide.body.setSize(64 * TEXTURE_SCALE, 32 * TEXTURE_SCALE);
+      slide.body.setOffset(0, 6 * TEXTURE_SCALE);
       slide.setData({ state: 'idle', lethal: !this.pivoted, home, target: (t.row + 1) * TILE });
       return slide;
     });
@@ -32,10 +33,10 @@ export default class CollapsingDeck extends BaseTrap {
     const topY = Math.min(...this.slides.map((s) => s.getData('home'))) - 50;
     scene.add
       .text((minX + maxX) / 2, topY, this.pivoted ? 'deck_FINAL_v8_APPROVATO.pptx' : 'deck_FINAL_v7_DEF_ok.pptx', {
-        fontFamily: 'Arial',
-        fontSize: '14px',
+        fontFamily: UI_FONT,
+        fontSize: '12px',
         color: this.pivoted ? '#22c55e' : '#e5e7eb',
-        resolution: TEXT_RESOLUTION,
+        resolution: TEXT_RESOLUTION * 2,
       })
       .setOrigin(0.5)
       .setDepth(DEPTH.traps);
@@ -53,6 +54,7 @@ export default class CollapsingDeck extends BaseTrap {
       s.body.reset(s.x, s.getData('home'));
       s.setData('state', 'idle').setAngle(0);
     }
+    this.shaken = false;
   }
 
   onTrigger() {
@@ -81,12 +83,21 @@ export default class CollapsingDeck extends BaseTrap {
     while (this.dropped < this.slides.length && this.elapsed >= this.dropped * p.dropIntervalMs) {
       const s = this.slides[this.dropped++];
       s.setData('state', 'falling');
+      s.setData('angle', this.dropped % 2 === 0 ? 10 : -10);
       s.body.setVelocityY(p.fallSpeed * TILE);
     }
     for (const s of this.slides) {
-      if (s.getData('state') === 'falling' && s.y >= s.getData('target')) {
+      if (s.getData('state') !== 'falling') continue;
+      const total = s.getData('target') - s.getData('home');
+      const progress = total > 0 ? (s.y - s.getData('home')) / total : 1;
+      s.setAngle(s.getData('angle') * (1 - progress));
+      if (s.y >= s.getData('target')) {
         s.body.reset(s.x, s.getData('target'));
-        s.setData('state', 'landed');
+        s.setData('state', 'landed').setAngle(0);
+        if (!this.shaken) {
+          this.shaken = true;
+          this.scene.cameras.main.shake(60, 0.003);
+        }
       }
     }
   }

@@ -1,10 +1,10 @@
 import BaseTrap from './BaseTrap.js';
-import { TILE, DEPTH, BUDGET, COLORS } from '../../config/constants.js';
+import { TILE, DEPTH, BUDGET, COLORS, TEXTURE_SCALE } from '../../config/constants.js';
 import { EV, bus } from '../../events/EventBus.js';
 
 // Normal: a shiny "KT" pickup. Taking it starts an endless call: you are frozen and burn GU.
-// Tell: pulses at 1300 ms (coffee pulses at 1000 ms) and has a tiny calendar in the corner.
-// Pivoted: a real KT (green, no calendar) gives GU and reveals hidden platforms.
+// Tell: it is red (and pulses at 1300 ms, with a tiny calendar in the corner).
+// Pivoted: a real KT is green: it gives GU and reveals hidden platforms.
 export default class FakeKT extends BaseTrap {
   static type = 'fakeKT';
 
@@ -13,11 +13,11 @@ export default class FakeKT extends BaseTrap {
     this.period = this.pivoted ? 1000 : 1300;
     this.baseX = this.tx * TILE + 16;
     this.baseY = (this.ty + 1) * TILE - 16;
-    this.glow = scene.add.image(this.baseX, this.baseY, 'glow').setTint(this.pivoted ? COLORS.green : COLORS.gold).setDepth(DEPTH.objects);
-    this.sprite = scene.physics.add.staticImage(this.baseX, this.baseY, this.pivoted ? 'ktReal' : 'kt').setDepth(DEPTH.traps);
+    this.glow = scene.add.image(this.baseX, this.baseY, 'glow').setTint(this.pivoted ? COLORS.green : COLORS.red).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects);
+    this.sprite = scene.physics.add.staticImage(this.baseX, this.baseY, this.pivoted ? 'ktReal' : 'kt').setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.traps).refreshBody();
     this.triggers.push(this.sprite);
-    this.hidden = (this.p.hiddenPlatforms ?? []).map((h) => this.addPlatform(this.tx + h.dx, this.ty + h.dy, h.w, h.h, 'tiles', false));
-    for (const h of this.hidden) h.setTint(COLORS.green);
+    this.hidden = (this.p.hiddenPlatforms ?? []).map((h) => this.addPlatform(this.tx + h.dx, this.ty + h.dy, h.w, h.h, 'tilesHD', false, 'desk'));
+    for (const h of this.hidden) h.setTint(0x86efac);
     this.reset();
   }
 

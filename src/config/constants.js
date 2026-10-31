@@ -1,5 +1,17 @@
+// Logical view size: every scene lays out in these coordinates.
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
+// HD rendering: the canvas is RENDER_SCALE× bigger, cameras zoom in, textures are drawn at RENDER_SCALE.
+export const RENDER_SCALE = 2;
+// Textures are drawn at TEXTURE_SCALE and shown at 1 / TEXTURE_SCALE (world sizes stay logical).
+export const TEXTURE_SCALE = 3;
+// The world camera zooms in more than the HUD: a bigger, closer view of the action (768×432 world px).
+export const WORLD_ZOOM = 2.5;
+export const CANVAS_WIDTH = GAME_WIDTH * RENDER_SCALE;
+export const CANVAS_HEIGHT = GAME_HEIGHT * RENDER_SCALE;
+export const PHYSICS_FPS = 120;
+export const FADE_MS = 180;
+export const UI_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 export const TILE = 32;
 export const LEVEL_ROWS = 17;
 export const GRAVITY = 1800;

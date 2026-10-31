@@ -1,14 +1,15 @@
 import Phaser from 'phaser';
-import { PLAYER, DEPTH } from '../config/constants.js';
+import { PLAYER } from '../config/constants.js';
 
 const approach = (value, target, step) => (value < target ? Math.min(value + step, target) : Math.max(value - step, target));
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, 'player');
+    super(scene, x, y, 'playerBody');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setDepth(DEPTH.player);
+    // Physics only: the visible character is PlayerView.
+    this.setVisible(false);
     this.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
     this.body.setOffset((PLAYER.width - PLAYER.bodyWidth) / 2, PLAYER.height - PLAYER.bodyHeight);
     this.body.setMaxVelocityY(PLAYER.maxFallSpeed);
@@ -75,7 +76,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   respawnAt(x, y) {
     this.body.reset(x, y);
     this.body.setAllowGravity(true);
-    this.clearTint();
     this.setFlipX(false);
     this.isDead = false;
     this.inputLocked = false;

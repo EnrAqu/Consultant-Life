@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION } from '../config/constants.js';
+import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
 import { LEVELS } from '../levels/index.js';
-import { parseLevel, TILE_ONEWAY } from '../core/LevelParser.js';
+import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
 import { resolveLevel } from '../core/pivot.js';
 import Budget from '../core/Budget.js';
 import StandupSchedule from '../core/StandupSchedule.js';
@@ -11,6 +11,9 @@ import { CAUSES } from '../data/causes.js';
 import { bus, EV, listen } from '../events/EventBus.js';
 import { stats, narrator } from '../state.js';
 import Player from '../objects/Player.js';
+import PlayerView from '../objects/PlayerView.js';
+import { OUTFITS } from '../data/outfits.js';
+import { fadeIn, fadeTo } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
 import Checkpoint from '../objects/Checkpoint.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
@@ -47,12 +50,20 @@ export default class GameScene extends Phaser.Scene {
       this.spawnPoint = cp.spawn;
     }
     this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
+    this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : def.career ?? 'junior';
+    this.playerView = new PlayerView(this, this.player, this.outfit);
     this.registerColliders();
 
     const cam = this.cameras.main;
+    cam.setZoom(WORLD_ZOOM);
     cam.setBounds(0, 0, this.worldW, this.worldH);
-    cam.startFollow(this.player, true, 0.15, 0.15);
+    cam.startFollow(this.player, false, 0.12, 0.12);
     cam.setDeadzone(120, 80);
+    fadeIn(this);
+    this.lastDelta = 16;
+    const syncView = () => this.playerView.update(this.lastDelta, this.pauseReasons.size > 0);
+    this.events.on('postupdate', syncView);
+    this.events.once('shutdown', () => this.events.off('postupdate', syncView));
 
     this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,A,D,W,Z,SPACE,R');
 
@@ -71,12 +82,6 @@ export default class GameScene extends Phaser.Scene {
     this.firstMoveSent = false;
     this.lastNarration = null;
 
-    if (this.debugMode) {
-      this.debugText = this.add
-        .text(8, 64, '', { fontFamily: 'monospace', fontSize: '14px', color: '#a3e635', resolution: TEXT_RESOLUTION })
-        .setScrollFactor(0)
-        .setDepth(1000);
-    }
 
     listen(this, { [EV.UI_READY]: () => this.emitSnapshot() });
     this.emitSnapshot();
@@ -88,29 +93,47 @@ export default class GameScene extends Phaser.Scene {
   buildTilemap(level) {
     const map = this.make.tilemap({ data: level.tiles, tileWidth: TILE, tileHeight: TILE });
     const tileset = map.addTilesetImage('tiles', 'tiles', TILE, TILE, 0, 0);
-    this.layer = map.createLayer(0, tileset, 0, 0).setDepth(DEPTH.tiles);
+    // collision only: the visible tiles are drawn in HD by a blitter
+    this.layer = map.createLayer(0, tileset, 0, 0).setVisible(false);
     this.layer.setCollision([0, TILE_ONEWAY]);
     this.layer.forEachTile((tile) => {
       if (tile.index === TILE_ONEWAY) tile.setCollision(false, false, true, false);
     });
+
+    const bg = this.add.tileSprite(0, 0, this.worldW, this.worldH, 'bgWindows').setOrigin(0, 0).setScrollFactor(0.3, 1);
+    bg.setTileScale(1 / TEXTURE_SCALE).setDepth(DEPTH.background);
+    // HD visual layer: a second tilemap with big tiles, scaled down to the logical grid
+    const visual = level.tiles.map((row, y) =>
+      row.map((t, x) => {
+        if (t === TILE_SOLID) return y > 0 && level.tiles[y - 1][x] === TILE_SOLID ? 0 : 1;
+        return t === TILE_ONEWAY ? 2 : -1;
+      }),
+    );
+    const hd = TILE * TEXTURE_SCALE;
+    const vmap = this.make.tilemap({ data: visual, tileWidth: hd, tileHeight: hd });
+    const vset = vmap.addTilesetImage('tilesHD', 'tilesHD', hd, hd, 0, 0);
+    vmap.createLayer(0, vset, 0, 0).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.tiles);
   }
 
   buildObjects(level) {
     this.spikes = this.physics.add.staticGroup();
     for (const s of level.spikes) {
-      const spike = this.spikes.create(s.x * TILE + 16, s.y * TILE + 16, 'spike').setDepth(DEPTH.objects);
-      spike.body.setSize(28, 12).setOffset(2, 20);
+      this.add.image(s.x * TILE + 16, s.y * TILE + 16, 'spike').setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects);
+      // hitbox 28×12 at the base of the tile
+      const zone = this.add.zone(s.x * TILE + 16, s.y * TILE + 26, 28, 12);
+      this.physics.add.existing(zone, true);
+      this.spikes.add(zone);
     }
     this.pickups = level.pickups.map((p) => new Pickup(this, p.x, p.y));
     this.checkpoints = level.checkpoints.map((c) => new Checkpoint(this, c));
-    this.goal = this.physics.add.staticImage(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 32, 'goal').setDepth(DEPTH.objects);
+    this.goal = this.physics.add.staticImage(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 32, 'goal').setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects).refreshBody();
     this.add
-      .text(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 80, 'Consegna al cliente', { fontFamily: 'Arial', fontSize: '14px', color: '#e5e7eb', resolution: TEXT_RESOLUTION })
+      .text(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 80, 'Consegna al cliente', { fontFamily: UI_FONT, fontSize: '12px', color: '#e5e7eb', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5)
       .setDepth(DEPTH.objects);
     for (const e of level.entities.filter((en) => en.type === 'sign')) {
       const t = this.add
-        .text(e.x * TILE, e.y * TILE, e.text, { fontFamily: 'Arial', fontSize: '14px', color: '#111827', backgroundColor: '#f8fafc', padding: { x: 6, y: 4 }, resolution: TEXT_RESOLUTION })
+        .text(e.x * TILE, e.y * TILE, e.text, { fontFamily: UI_FONT, fontSize: '12px', color: '#111827', backgroundColor: '#f8fafc', padding: { x: 6, y: 4 }, resolution: TEXT_RESOLUTION * 2 })
         .setOrigin(0, 1)
         .setDepth(DEPTH.objects);
       t.setY((e.y + 1) * TILE - 40);
@@ -167,7 +190,7 @@ export default class GameScene extends Phaser.Scene {
   // ---------- state helpers ----------
 
   emitSnapshot() {
-    bus.emit(EV.LEVEL_START, { levelId: this.levelId, name: this.def.name, startGu: this.budget.max, pivotCause: this.pivotCause });
+    bus.emit(EV.LEVEL_START, { levelId: this.levelId, name: this.def.name, career: OUTFITS[this.outfit].title, startGu: this.budget.max, pivotCause: this.pivotCause });
     bus.emit(EV.GU_CHANGED, { gu: this.budget.gu, max: this.budget.max, delta: 0, reason: 'snapshot' });
     bus.emit(EV.CLOCK_TICK, { label: this.schedule.clockLabel, warning: this.schedule.isWarning });
     if (this.lastNarration) bus.emit(EV.NARRATE, this.lastNarration);
@@ -236,8 +259,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(_, delta) {
-    if (this.ended) return;
     const dt = Math.min(delta, 50);
+    this.lastDelta = dt;
+    if (this.ended) return;
 
     for (const ev of this.schedule.update(dt)) this.handleSchedule(ev);
 
@@ -266,11 +290,12 @@ export default class GameScene extends Phaser.Scene {
     }
     this.stats.addTime(dt);
 
-    if (this.debugText) {
+    if (this.debugMode) {
       const b = this.player.body;
-      this.debugText.setText(
+      bus.emit(
+        EV.DEBUG,
         `fps ${Math.round(this.game.loop.actualFps)}  grounded ${this.player.grounded}  coyote ${Math.max(0, Math.round(this.player.coyoteTimer))}  buffer ${Math.max(0, Math.round(this.player.jumpBufferTimer))}\n` +
-          `v ${Math.round(b.velocity.x)},${Math.round(b.velocity.y)}  tile ${Math.floor(this.player.x / TILE)},${Math.floor(this.player.y / TILE)}`,
+          `v ${Math.round(b.velocity.x)},${Math.round(b.velocity.y)}  tile ${Math.floor(this.player.x / TILE)},${Math.floor(this.player.y / TILE)}  anim ${this.playerView.anim}`,
       );
     }
   }
@@ -309,10 +334,10 @@ export default class GameScene extends Phaser.Scene {
     const player = this.player;
     player.isDead = true;
     for (const trap of this.traps) trap.cancelCall();
-    player.setTint(0xff4444);
+    this.playerView.onDeath();
     this.cameras.main.shake(120, 0.006);
     const fx = this.add
-      .text(player.x, player.y - 24, `-${formatGu(BUDGET.deathCost)} GU`, { fontFamily: 'monospace', fontSize: '16px', color: '#f87171', resolution: TEXT_RESOLUTION })
+      .text(player.x, player.y - 24, `-${formatGu(BUDGET.deathCost)} GU`, { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#f87171', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5)
       .setDepth(DEPTH.fx);
     this.time.delayedCall(700, () => fx.destroy());
@@ -329,6 +354,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.ended) return;
     for (const trap of this.traps) trap.reset();
     this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
+    this.playerView.onRespawn();
     this.cameras.main.centerOn(this.player.x, this.player.y);
     this.input.keyboard.resetKeys();
     this.idleMs = 0;
@@ -349,7 +375,7 @@ export default class GameScene extends Phaser.Scene {
     this.narrate('budgetOver');
     const runStats = { ...this.stats.getRun(), dominant: this.stats.dominantPivotCause() };
     bus.emit(EV.BUDGET_OVER, { levelId: this.levelId, runStats });
-    this.time.delayedCall(600, () => this.scene.start('BudgetOverScene', { levelId: this.levelId, pivotCause: this.pivotCause, runStats }));
+    this.time.delayedCall(600, () => fadeTo(this, 'BudgetOverScene', { levelId: this.levelId, pivotCause: this.pivotCause, runStats }));
   }
 
   completeLevel() {
@@ -361,7 +387,7 @@ export default class GameScene extends Phaser.Scene {
     const payload = { levelId: this.levelId, run, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
-      this.scene.start(this.levelId === 'level1' ? 'LessonsLearnedScene' : 'MvpEndScene', payload);
+      fadeTo(this, this.levelId === 'level1' ? 'LessonsLearnedScene' : 'MvpEndScene', payload);
     });
   }
 }

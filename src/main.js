@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, GRAVITY, COLORS } from './config/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, GRAVITY, COLORS, PHYSICS_FPS } from './config/constants.js';
 import { DEBUG } from './config/debug.js';
 import BootScene from './scenes/BootScene.js';
 import GameScene from './scenes/GameScene.js';
@@ -11,12 +11,14 @@ import MvpEndScene from './scenes/MvpEndScene.js';
 const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
-  pixelArt: true,
+  width: CANVAS_WIDTH,
+  height: CANVAS_HEIGHT,
+  pixelArt: false,
+  antialias: true,
+  roundPixels: false,
   backgroundColor: COLORS.bg,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, debug: DEBUG.debug } },
+  physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, fps: PHYSICS_FPS, debug: DEBUG.debug } },
   scene: [BootScene, GameScene, UIScene, LessonsLearnedScene, BudgetOverScene, MvpEndScene],
 });
 

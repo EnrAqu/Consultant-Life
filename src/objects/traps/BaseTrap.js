@@ -1,4 +1,4 @@
-import { TILE, DEPTH } from '../../config/constants.js';
+import { TILE, DEPTH, TEXTURE_SCALE } from '../../config/constants.js';
 
 /**
  * Common contract (plan §4.5 + §14.1):
@@ -42,8 +42,9 @@ export default class BaseTrap {
     return zone;
   }
 
-  addPlatform(col, row, w, h, key, visible = true) {
-    const ts = this.scene.add.tileSprite(col * TILE, row * TILE, w * TILE, h * TILE, key).setOrigin(0, 0).setDepth(DEPTH.traps);
+  addPlatform(col, row, w, h, key, visible = true, frame = undefined) {
+    const ts = this.scene.add.tileSprite(col * TILE, row * TILE, w * TILE, h * TILE, key, frame).setOrigin(0, 0).setDepth(DEPTH.traps);
+    ts.setTileScale(1 / TEXTURE_SCALE);
     this.scene.physics.add.existing(ts);
     ts.body.setAllowGravity(false);
     ts.body.setImmovable(true);

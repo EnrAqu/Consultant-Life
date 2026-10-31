@@ -1,8 +1,13 @@
 import BaseTrap from './BaseTrap.js';
-import { TILE, DEPTH, TEXT_RESOLUTION } from '../../config/constants.js';
+import { TILE, DEPTH, TEXT_RESOLUTION, TEXTURE_SCALE, UI_FONT } from '../../config/constants.js';
+import { EMAIL_KEYS } from '../../gfx/TextureFactory.js';
+
+const BASE = 1 / TEXTURE_SCALE;
+const DEBRIS_MS = 600;
+const SHAKE_GAP_MS = 100;
 
 // Normal: entering the trigger drops "reply all" emails along the corridor, timed on a running player.
-// Tell: inbox counter goes up first, a shadow marks each landing spot.
+// Tell: inbox counter pops up first, a growing shadow marks each landing spot.
 // Pivoted: green-bordered emails pile up into a 1/2/3 stair, then vanish after stayMs.
 export default class ReplyAllAvalanche extends BaseTrap {
   static type = 'replyAll';
@@ -12,12 +17,13 @@ export default class ReplyAllAvalanche extends BaseTrap {
     const scene = this.scene;
     this.floorY = (p.restRow + 1) * TILE;
     this.spawnY = this.floorY - p.spawnHeight * TILE;
+    this.fallMs = (p.spawnHeight / p.fallSpeed) * 1000;
 
     const badgeX = (this.tx + p.triggerDx) * TILE + 16;
     const badgeY = (p.restRow - 4) * TILE;
-    scene.add.image(badgeX, badgeY, 'inboxBadge').setDepth(DEPTH.traps);
+    this.badge = scene.add.image(badgeX, badgeY, 'inboxBadge').setScale(BASE).setDepth(DEPTH.traps);
     this.badgeText = scene.add
-      .text(badgeX + 10, badgeY - 12, '0', { fontFamily: 'Arial', fontSize: '12px', color: '#ffffff', resolution: TEXT_RESOLUTION })
+      .text(badgeX + 12, badgeY - 7, '0', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '10px', color: '#ffffff', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5)
       .setDepth(DEPTH.traps + 1);
 
@@ -30,17 +36,13 @@ export default class ReplyAllAvalanche extends BaseTrap {
       const stackIndex = heights[dx] ?? 0;
       heights[dx] = stackIndex + 1;
       const x = (this.tx + dx) * TILE + 16;
-      const email = this.objectGroup.create(x, this.spawnY, this.pivoted ? 'emailGreen' : 'email');
-      email.setOrigin(0.5, 1).setDepth(DEPTH.traps);
-      if (this.pivoted) {
-        email.setDisplaySize(32, 16);
-        email.body.setSize(email.width, email.height);
-      } else {
-        email.body.setSize(20, 12);
-      }
+      const email = this.objectGroup.create(x, this.spawnY, this.pivoted ? 'emailGreen' : EMAIL_KEYS[i % EMAIL_KEYS.length]);
+      email.setOrigin(0.5, 1).setScale(BASE).setDepth(DEPTH.traps);
+      // body sizes are in texture pixels (scaled by the sprite scale)
+      if (!this.pivoted) email.body.setSize(36 * TEXTURE_SCALE, 20 * TEXTURE_SCALE);
       email.setData({ state: 'idle', lethal: !this.pivoted, targetBottom: this.floorY - (this.pivoted ? stackIndex * 16 : 0) });
-      const shadow = scene.add.image(x, this.floorY - 2, 'emailShadow').setDepth(DEPTH.objects).setVisible(false);
-      this.emails.push({ email, shadow, goneAt: 0 });
+      const shadow = scene.add.image(x, this.floorY - 2, 'emailShadow').setScale(BASE).setDepth(DEPTH.objects).setVisible(false);
+      this.emails.push({ email, shadow, landedAt: 0, spawnedAt: 0 });
     }
     this.reset();
   }
@@ -51,10 +53,13 @@ export default class ReplyAllAvalanche extends BaseTrap {
     this.elapsed = 0;
     this.spawned = 0;
     this.stayTimer = 0;
-    this.badgeText.setText('0');
+    this.pop = 0;
+    this.lastShakeAt = -Infinity;
+    this.badgeText.setText('0').setColor('#ffffff');
+    this.badge.setScale(BASE);
     for (const e of this.emails) {
       e.email.disableBody(true, true);
-      e.email.setData('state', 'idle').setAlpha(1);
+      e.email.setData('state', 'idle').setAlpha(1).setAngle(0).setScale(BASE);
       e.shadow.setVisible(false);
     }
   }
@@ -70,8 +75,7 @@ export default class ReplyAllAvalanche extends BaseTrap {
 
   logImpacts() {
     const p = this.p;
-    const fallMs = (p.spawnHeight / p.fallSpeed) * 1000;
-    const lines = this.emails.map((_, i) => `col ${p.columns[i % p.columns.length]}: ${Math.round(p.startDelayMs + i * p.intervalMs + fallMs)}ms`);
+    const lines = this.emails.map((_, i) => `col ${p.columns[i % p.columns.length]}: ${Math.round(p.startDelayMs + i * p.intervalMs + this.fallMs)}ms`);
     console.log(`[${this.def.id}] t_impatto`, lines.join(', '));
   }
 
@@ -83,29 +87,44 @@ export default class ReplyAllAvalanche extends BaseTrap {
       this.spawn(this.emails[this.spawned]);
       this.spawned += 1;
       this.badgeText.setText(String(this.spawned));
+      if (this.spawned >= 5) this.badgeText.setColor('#fecaca');
+      this.pop = 1;
     }
+    this.pop = Math.max(0, this.pop - dt / 120);
+    this.badge.setScale(BASE * (1 + 0.3 * this.pop));
 
     let allDone = this.spawned === this.emails.length;
     for (const e of this.emails) {
       const { email } = e;
       const state = email.getData('state');
+      if (state === 'falling') {
+        const progress = Math.min(1, (this.elapsed - e.spawnedAt) / this.fallMs);
+        e.shadow.setScale(BASE * (0.4 + 0.6 * progress));
+        if (!this.pivoted) email.setAngle(8 * Math.sin((this.elapsed - e.spawnedAt) / 90));
+      }
       if (state === 'falling' && email.y >= email.getData('targetBottom')) {
         email.body.reset(email.x, email.getData('targetBottom'));
+        email.setAngle(0);
+        // squash only lethal debris: solid emails must keep their body size
+        if (!this.pivoted) email.setScale(BASE, BASE * 0.8);
         e.shadow.setVisible(false);
-        if (this.pivoted) {
-          email.setData('state', 'settling');
-        } else {
-          email.setData('state', 'gone');
-          e.goneAt = this.elapsed + 150;
+        e.landedAt = this.elapsed;
+        if (this.elapsed - this.lastShakeAt >= SHAKE_GAP_MS) {
+          this.scene.cameras.main.shake(40, 0.002);
+          this.lastShakeAt = this.elapsed;
         }
+        email.setData('state', this.pivoted ? 'settling' : 'gone');
       }
-      if (email.getData('state') === 'settling' && !this.scene.physics.overlap(this.scene.player, email)) {
+      const since = this.elapsed - e.landedAt;
+      const s = email.getData('state');
+      if (s === 'gone') email.setScale(BASE, BASE * Math.min(1, 0.8 + since / 500));
+      if (s === 'settling' && !this.scene.physics.overlap(this.scene.player, email)) {
         email.setData('state', 'landed');
       }
-      if (email.getData('state') === 'gone' && email.visible && this.elapsed >= e.goneAt) {
-        email.disableBody(true, true);
+      if (s === 'gone' && email.visible) {
+        email.setAlpha(Math.max(0, 1 - Math.max(0, since - DEBRIS_MS / 2) / (DEBRIS_MS / 2)));
+        if (since >= DEBRIS_MS) email.disableBody(true, true);
       }
-      const s = email.getData('state');
       if (s === 'falling' || s === 'settling' || s === 'idle') allDone = false;
     }
 
@@ -123,6 +142,7 @@ export default class ReplyAllAvalanche extends BaseTrap {
     email.enableBody(true, email.x, this.spawnY, true, true);
     email.setData('state', 'falling');
     email.body.setVelocityY(this.p.fallSpeed * TILE);
-    shadow.setVisible(true);
+    e.spawnedAt = this.elapsed;
+    shadow.setVisible(true).setScale(BASE * 0.4);
   }
 }

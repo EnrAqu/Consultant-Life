@@ -250,3 +250,13 @@ Ordine scelto: prima gameplay e contenuti (piccoli, testabili), poi la parte gra
 - **Q2 — Smoke test nel repo:** il test nel browser richiede `puppeteer-core` come dipendenza di sviluppo. Lo aggiungo?
 - **Q3 — Outfit:** solo estetici per ora. In futuro vuoi che cambino anche il gameplay (es. junior salta di più ma ha meno GU)?
 - **Q4 — Leaderboard globale:** quando ci arriveremo, ti va bene usare un tuo account Cloudflare (gratuito)?
+
+## 11. Stato
+
+- [x] §1 Nitidezza (con zoom mondo 2,5 e texture 3×, vedi DECISIONS) — 2026-10-31
+- [x] §2 Fluidità: PlayerView, animazioni, squash & stretch, particelle, fisica a 120 fps, camera morbida, dissolvenze — 2026-10-31
+- [x] §3 Outfit (6, `?outfit=<id>`) — 2026-10-31
+- [x] KT rosso/verde, checkpoint nel livello 2 — 2026-10-31
+- [x] §5 Email come card leggibili (parziale: card, badge, ombra che cresce, detriti, shake) — 2026-10-31
+- [ ] §5 resto, §6 ponte di email, §7 battute, §8 leaderboard
+- Verifica: 33 test Vitest, build, smoke test nel browser (28 controlli) senza errori in console.

@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION } from '../config/constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
 import { formatGu } from '../core/format.js';
 import { bus, EV, listen } from '../events/EventBus.js';
 import { stats, session } from '../state.js';
+import { setupScreenCamera } from './sceneUtils.js';
 
-const MONO = '"Courier New", monospace';
+const NARR_Y = 96;
 const KT_LINES = [
   'Mi sentite?',
   'Condivido lo schermo... ah no, aspettate.',
@@ -14,7 +15,7 @@ const KT_LINES = [
 ];
 
 const text = (scene, x, y, str, style = {}) =>
-  scene.add.text(x, y, str, { fontFamily: MONO, fontSize: '16px', color: '#e5e7eb', resolution: TEXT_RESOLUTION, ...style });
+  scene.add.text(x, y, str, { fontFamily: UI_FONT, fontSize: '15px', color: '#e5e7eb', resolution: TEXT_RESOLUTION, ...style });
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -22,6 +23,7 @@ export default class UIScene extends Phaser.Scene {
   }
 
   create() {
+    setupScreenCamera(this);
     this.hud = this.add.container(0, 0);
 
     // GU bar
@@ -29,12 +31,13 @@ export default class UIScene extends Phaser.Scene {
     this.guBar = this.add.rectangle(16, 16, 200, 14, 0x22c55e).setOrigin(0, 0);
     this.guText = text(this, 16, 34, '');
     // clock
-    this.clockText = text(this, GAME_WIDTH / 2, 12, '09:00', { fontSize: '22px' }).setOrigin(0.5, 0);
+    this.clockText = text(this, GAME_WIDTH / 2, 10, '09:00', { fontSize: '24px', fontStyle: 'bold' }).setOrigin(0.5, 0);
     // deaths
     this.deathsText = text(this, GAME_WIDTH - 16, 12, '', { align: 'right' }).setOrigin(1, 0);
     // narrator
-    this.narrBox = this.add.rectangle(16, GAME_HEIGHT - 16, 580, 64, 0x000000, 0.8).setOrigin(0, 1).setVisible(false);
-    this.narrText = text(this, 28, GAME_HEIGHT - 72, '', { wordWrap: { width: 556 }, fontSize: '16px' }).setVisible(false);
+    // narrator at the top, so it never covers the floor where the action is
+    this.narrBox = this.add.rectangle(GAME_WIDTH / 2, NARR_Y, 560, 40, 0x000000, 0.75).setOrigin(0.5, 0).setVisible(false);
+    this.narrText = text(this, GAME_WIDTH / 2, NARR_Y + 10, '', { wordWrap: { width: 532 }, fontSize: '15px', align: 'center' }).setOrigin(0.5, 0).setVisible(false);
     // toast
     this.toastText = text(this, GAME_WIDTH / 2, 44, '', { fontSize: '16px', backgroundColor: '#111827', padding: { x: 8, y: 4 } })
       .setOrigin(0.5, 0)
@@ -43,13 +46,14 @@ export default class UIScene extends Phaser.Scene {
     this.levelText = text(this, 16, 54, '', { fontSize: '14px', color: '#9ca3af' });
 
     this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText]);
+    this.debugText = text(this, 16, GAME_HEIGHT - 44, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
 
     // warning border, standup overlay, KT overlay, title
     this.border = this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0, 0).setStrokeStyle(8, 0xf97316).setVisible(false);
     this.standup = this.add.container(0, 0).setVisible(false);
     this.standup.add([
       this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x0f172a, 0.55).setOrigin(0, 0),
-      text(this, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30, 'DAILY STANDUP', { fontSize: '40px', color: '#f97316' }).setOrigin(0.5),
+      text(this, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30, 'DAILY STANDUP', { fontSize: '44px', fontStyle: 'bold', color: '#f97316' }).setOrigin(0.5),
       text(this, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 14, '"Allora, giro veloce..."', { fontSize: '18px' }).setOrigin(0.5),
     ]);
     this.standupCount = text(this, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50, '', { fontSize: '18px', color: '#fbbf24' }).setOrigin(0.5);
@@ -62,7 +66,7 @@ export default class UIScene extends Phaser.Scene {
 
     this.title = this.add.container(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60).setVisible(false);
     this.title.add([
-      text(this, 0, 0, 'RAGEBAIT', { fontSize: '56px', color: '#fbbf24' }).setOrigin(0.5),
+      text(this, 0, 0, 'RAGEBAIT', { fontSize: '60px', fontStyle: 'bold', color: '#fbbf24' }).setOrigin(0.5),
       text(this, 0, 50, '← → / A D muoviti   Spazio salta   R ricomincia', { fontSize: '16px' }).setOrigin(0.5),
       text(this, 0, 78, '(titolo provvisorio)', { fontSize: '14px', color: '#9ca3af' }).setOrigin(0.5),
     ]);
@@ -103,6 +107,7 @@ export default class UIScene extends Phaser.Scene {
       [EV.LEVEL_COMPLETE]: () => this.hideAll(),
       [EV.BUDGET_OVER]: () => this.hideAll(),
       [EV.FIRST_MOVE]: () => this.hideTitle(),
+      [EV.DEBUG]: (s) => this.debugText.setText(s),
     });
     bus.emit(EV.UI_READY);
   }
@@ -122,7 +127,7 @@ export default class UIScene extends Phaser.Scene {
     this.warning = false;
     this.standup.setVisible(false);
     this.kt.setVisible(false);
-    this.levelText.setText(e.name ?? '');
+    this.levelText.setText(e.career ? `${e.career} — ${e.name}` : e.name ?? '');
     this.refreshDeaths(stats.getRun().deaths);
     if (e.levelId === 'level1' && !session.titleShown) {
       session.titleShown = true;
@@ -162,8 +167,7 @@ export default class UIScene extends Phaser.Scene {
     this.narrPriority = line.priority;
     this.narrLeft = line.durationMs ?? 3000;
     this.narrText.setText(`Partner: ${line.text}`).setVisible(true);
-    this.narrBox.height = this.narrText.height + 24;
-    this.narrText.y = GAME_HEIGHT - 16 - this.narrBox.height + 12;
+    this.narrBox.setSize(560, this.narrText.height + 20);
     this.narrBox.setVisible(true);
   }
 

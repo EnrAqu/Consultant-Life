@@ -63,3 +63,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Email come card leggibili (URGENTE, RE: RE: FW:, ...) con hitbox letale più grande — "non fanno paura".
 - 2026-10-31 — Nuova variante delle email `landing: 'solid'`: letali in caduta, poi restano come ponte su un fosso non saltabile; usata nel livello 1 (S6a) — idea dell'utente.
 - 2026-10-31 — Leaderboard: per ora solo locale (tempi migliori + Hall of Shame per morti); globale rimandata — richiesta utente ("anche temporanea").
+- 2026-10-31 — Rendering: canvas 1920×1080; HUD e schermate a zoom 2 (layout 960×540); **mondo a zoom 2,5** (vista 768×432 px di mondo, personaggio più grande); texture disegnate a **3×** — l'utente vuole il gioco più grande e nitido. Supersede i numeri di ITERATION_2 §1.
+- 2026-10-31 — Tile disegnati da una seconda tilemap HD scalata (il Blitter di Phaser ignora la scala); la tilemap a 32 px resta invisibile per le collisioni.
+- 2026-10-31 — Box del narratore in alto al centro, così non copre il pavimento dove si gioca.

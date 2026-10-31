@@ -30,6 +30,7 @@ g.put(214, 12, 'G');
 export default {
   id: 'level1',
   name: 'Progetto 1 — Primo giorno',
+  career: 'junior',
   startGu: 20,
   map: g.toMap(),
   entities: [

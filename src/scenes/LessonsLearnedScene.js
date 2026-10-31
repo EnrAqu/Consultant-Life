@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION } from '../config/constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
+import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatGu, formatDuration } from '../core/format.js';
 
-const style = (size, color = '#111827') => ({ fontFamily: 'Arial, sans-serif', fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION, wordWrap: { width: 780 } });
+const style = (size, color = '#111827') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION, wordWrap: { width: 780 } });
 
 export default class LessonsLearnedScene extends Phaser.Scene {
   constructor() {
@@ -11,6 +12,8 @@ export default class LessonsLearnedScene extends Phaser.Scene {
   }
 
   create({ run, dominant, gu, guMax }) {
+    setupScreenCamera(this);
+    fadeIn(this);
     this.cameras.main.setBackgroundColor('#0b0d12');
     const x = 60;
     this.add.rectangle(40, 30, GAME_WIDTH - 80, GAME_HEIGHT - 60, 0xffffff).setOrigin(0, 0);
@@ -42,7 +45,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
 
     this.time.delayedCall(1000, () => {
       prompt.setText('Premi Spazio per passare al Progetto 2');
-      const next = () => this.scene.start('GameScene', { levelId: 'level2', pivotCause: dominant.cause });
+      const next = () => fadeTo(this, 'GameScene', { levelId: 'level2', pivotCause: dominant.cause });
       this.input.keyboard.once('keydown-SPACE', next);
       this.input.keyboard.once('keydown-ENTER', next);
     });

@@ -7,7 +7,7 @@ g.ground(0, 35).put(2, 14, 'P');
 // slotA — corridor 10–19, unreachable ledge (+5) with coffee
 g.fill(20, 26, 10, 10, '#').put(23, 9, 'o');
 // slotB — ledge 30–35, pit 36–46 with a single pillar at 41, landing 47+
-g.ground(41, 41).ground(47, 84);
+g.ground(41, 41).ground(47, 84).put(52, 14, 'C');
 // slotC — deck corridor 60–65 (pivoted: the floor becomes a pit via tile override)
 // slotD — spike pit 85–95 with a pillar at 90
 g.ground(85, 95);
@@ -20,6 +20,7 @@ const replyAllNormal = { triggerDx: -5, triggerWidth: 2, startDelayMs: 0, count:
 export default {
   id: 'level2',
   name: 'Progetto 2 — La rivincita',
+  career: 'consultant',
   startGu: 15,
   map: g.toMap(),
   entities: [

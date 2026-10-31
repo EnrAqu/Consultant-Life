@@ -19,6 +19,7 @@ export const EV = {
   NARRATE: 'narrate',
   TOAST: 'toast',
   FIRST_MOVE: 'first-move',
+  DEBUG: 'debug',
 };
 
 // Subscribe for the lifetime of a scene: listeners are removed on shutdown.
