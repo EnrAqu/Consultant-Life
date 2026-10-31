@@ -9,10 +9,10 @@ g.fill(20, 26, 10, 10, '#').put(23, 9, 'o');
 // slotB — ledge 30–35, pit 36–46 with a single pillar at 41, landing 47+
 g.ground(41, 41).ground(47, 84).put(52, 14, 'C');
 // slotC — deck corridor 60–65 (pivoted: the floor becomes a pit via tile override)
-// slotD — spike pit 85–95 with a pillar at 90
-g.ground(85, 95);
-for (let x = 85; x <= 95; x++) if (x !== 90) g.put(x, 14, '^');
-g.ground(90, 90, 14).ground(96, 109);
+// slotD — spike pit 85–94 with a 2-wide pillar at 89–90 (jumps of 4)
+g.ground(85, 94);
+for (let x = 85; x <= 94; x++) if (x !== 89 && x !== 90) g.put(x, 14, '^');
+g.ground(89, 90, 14).ground(95, 109);
 g.put(106, 14, 'G');
 
 const replyAllNormal = { triggerDx: -5, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 9, restRow: 14 };

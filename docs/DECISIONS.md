@@ -66,3 +66,4 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Rendering: canvas 1920×1080; HUD e schermate a zoom 2 (layout 960×540); **mondo a zoom 2,5** (vista 768×432 px di mondo, personaggio più grande); texture disegnate a **3×** — l'utente vuole il gioco più grande e nitido. Supersede i numeri di ITERATION_2 §1.
 - 2026-10-31 — Tile disegnati da una seconda tilemap HD scalata (il Blitter di Phaser ignora la scala); la tilemap a 32 px resta invisibile per le collisioni.
 - 2026-10-31 — Box del narratore in alto al centro, così non copre il pavimento dove si gioca.
+- 2026-10-31 — Livello 2, slot D: pilastro largo 2 (cols 89–90), salti da 4 invece di 5 — senza il KT verde il salto era al limite della fisica; l'utente ha scelto di ammorbidire (supersede la riga "geometria invariata").
