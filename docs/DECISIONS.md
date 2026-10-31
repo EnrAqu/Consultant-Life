@@ -51,3 +51,13 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Livello 2: scope creep pivotato lungo 17 (dalla sporgenza fino all'altra sponda) e a livello del pavimento (`dy: 1`), così non spinge il player; deck pivotato veloce (trigger 8 tile prima, caduta 20 tile/s) per non far cadere chi corre; KT dello slot D sospeso all'ingresso in entrambe le modalità (opzionale, non sul percorso).
 - 2026-10-31 — Niente `Goal.js`: il traguardo è un'immagine statica gestita da GameScene.
 - 2026-10-31 — Smoke test nel browser (puppeteer-core su Chrome locale) eseguito fuori dal repo; da decidere con l'utente se aggiungerlo al progetto (richiede una dipendenza di sviluppo).
+
+## Iterazione 2 (playtest #1)
+- 2026-10-31 — Fisica di movimento invariata — piace all'utente.
+- 2026-10-31 — Rendering HD: canvas 1920×1080, camera zoom 2, texture disegnate a 2× e scalate 0,5; coordinate di mondo e hitbox invariate — nitidezza senza toccare il gameplay.
+- 2026-10-31 — Resa del player separata dal corpo fisico (`PlayerView`), con animazioni e squash & stretch solo visivi — fluidità senza cambiare le hitbox.
+- 2026-10-31 — Outfit per livello di carriera: junior trasandato → consultant → manager → senior manager → partner "fa ciò che vuole"; salopette per il finale dei campi. Per ora solo estetici — richiesta utente.
+- 2026-10-31 — I percorsi normali di tutti i livelli usano la colonna "normale" della tabella dei salti; livello 2 con pilastri larghi 2 e un checkpoint — l'utente si bloccava allo slot D (supersede la scelta "rotta normal al limite" della review #11).
+- 2026-10-31 — Email come card leggibili (URGENTE, RE: RE: FW:, ...) con hitbox letale più grande — "non fanno paura".
+- 2026-10-31 — Nuova variante delle email `landing: 'solid'`: letali in caduta, poi restano come ponte su un fosso non saltabile; usata nel livello 1 (S6a) — idea dell'utente.
+- 2026-10-31 — Leaderboard: per ora solo locale (tempi migliori + Hall of Shame per morti); globale rimandata — richiesta utente ("anche temporanea").
