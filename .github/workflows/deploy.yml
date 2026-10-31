@@ -1,7 +1,6 @@
 name: Deploy to GitHub Pages
+# Manual only: GitHub Pages needs a public repo (or a paid plan). Run it from the Actions tab when publishing.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
