@@ -79,3 +79,12 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — "Hai 5 minuti?" pivotato: la scorciatoia scatta al contatto con il collega (flash + spostamento), non con ↑ — ↑ è già il salto.
 - 2026-10-31 — Il player ha blocchi dell'input per motivo (`kt`, `mm`, `five`): più sistemi possono bloccarlo insieme senza sbloccarsi a vicenda.
 - 2026-10-31 — Lessons Learned dopo ogni livello che ha un successivo (ordine in `levels/index.js`); la leaderboard locale registra ogni livello completato.
+
+## Review del codice (iterazioni 2–3)
+- 2026-10-31 — Micromanager: cattura solo a terra, mai sopra un burrone; non cammina sui burroni; "nascosto" = accanto a una pianta o pianta in mezzo; un player già bloccato non viene catturato — review #2–#4 ("non uccidono" deve essere vero).
+- 2026-10-31 — Collega dei 5 minuti: dopo una conversazione non ti riaggancia finché non ti allontani — review #13.
+- 2026-10-31 — Validatore con tabella `normal` (livelli 1 e 3); il livello 2 resta verificato con `hard` perché lo slot B ha volutamente il salto da 5 nel percorso normale (il pivot è l'alternativa) — review #5.
+- 2026-10-31 — Il pivot `fiveMinutes` è raggiungibile solo in debug finché le porte compaiono solo nel livello 3 (l'ultimo) — review #6.
+- 2026-10-31 — Divergenze dal piano accettate: classifica finale top 3 (non 5) per spazio; squash & stretch con costante 40 ms (più reattivo di 120); i "!" del micromanager pivotato al posto di `revealHint()`; `mm_catch_3` senza condizione (il MM non uccide); card email larga 54 per leggere i titoli — review #14.
+- 2026-10-31 — Le partite con override di debug non entrano nella leaderboard — review #11.
+- 2026-10-31 — Smoke test nel browser salvati in `scripts/smoke/`; per eseguirli serve `puppeteer-core` (dipendenza di sviluppo): **in attesa della decisione dell'utente**.

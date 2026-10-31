@@ -1,5 +1,6 @@
 import { TILE, DEPTH, TEXTURE_SCALE, TEXT_RESOLUTION, UI_FONT, COLORS } from '../../config/constants.js';
 import MicromanagerBrain from '../../core/MicromanagerBrain.js';
+import { TILE_EMPTY } from '../../core/LevelParser.js';
 
 const BASE = 1 / TEXTURE_SCALE;
 const BUBBLE_MS = 1800;
@@ -19,7 +20,16 @@ export default class Micromanager {
     const plants = level.plants
       .filter((pl) => pl.x >= p.zoneFrom && pl.x <= p.zoneTo)
       .map((pl) => ({ col: pl.x, row: pl.y }));
-    this.brain = new MicromanagerBrain({ ...p, plants }, mode);
+    // pits inside the zone: columns with no floor under his row
+    const floorRow = p.floorRow ?? 14;
+    const gaps = [];
+    for (let c = p.zoneFrom; c <= p.zoneTo; c++) {
+      if (level.tiles[floorRow + 1][c] !== TILE_EMPTY) continue;
+      const last = gaps[gaps.length - 1];
+      if (last && last[1] === c - 1) last[1] = c;
+      else gaps.push([c, c]);
+    }
+    this.brain = new MicromanagerBrain({ ...p, plants, gaps }, mode);
     this.floorY = (this.brain.p.floorRow + 1) * TILE;
   }
 
@@ -67,7 +77,7 @@ export default class Micromanager {
     const player = scene.player;
     const body = player.body;
     this.t += dt;
-    const actions = this.brain.update(dt, { x: body.center.x, y: body.bottom, vx: body.velocity.x });
+    const actions = this.brain.update(dt, { x: body.center.x, y: body.bottom, vx: body.velocity.x, grounded: player.grounded, locked: player.inputLocked });
     for (const a of actions) this.handle(a);
 
     // view

@@ -35,8 +35,8 @@ export default class FiveMinutesBrain {
     return this.isOut ? 1 : 0;
   }
 
-  // distTiles: |player - door| in tiles; touching: player overlaps the colleague.
-  update(dt, { distTiles, touching }) {
+  // distTiles: |player - door| in tiles; touching: player overlaps the colleague; locked: player already frozen.
+  update(dt, { distTiles, touching, locked = false }) {
     const actions = [];
     this.timer += dt;
     switch (this.state) {
@@ -49,7 +49,7 @@ export default class FiveMinutesBrain {
         break;
       case 'stepping':
       case 'out':
-        if (touching) {
+        if (touching && !locked) {
           if (this.mode === 'pivoted') {
             if (!this.offered) {
               this.offered = true;
@@ -64,7 +64,11 @@ export default class FiveMinutesBrain {
         else if (this.state === 'out' && this.timer >= this.p.standMs) this.enter('back', actions, { type: 'goBack' });
         break;
       case 'hooked':
-        if (this.timer >= this.p.hookMs) this.enter('back', actions, { type: 'release' }, { type: 'goBack' });
+        if (this.timer >= this.p.hookMs) this.enter('done', actions, { type: 'release' }, { type: 'goBack' });
+        break;
+      case 'done':
+        // after a conversation he waits until you have walked away before trying again
+        if (distTiles > this.p.noticeDist) this.enter('closed', actions);
         break;
       case 'back':
         if (this.timer >= this.p.rearmMs) this.enter('closed', actions);

@@ -126,6 +126,10 @@ export default class GameScene extends Phaser.Scene {
       this.physics.add.existing(zone, true);
       this.spikes.add(zone);
     }
+    // plants: hiding spots from the micromanager, drawn in front of the player
+    for (const pl of level.plants) {
+      this.add.image(pl.x * TILE + 16, (pl.y + 1) * TILE, 'plant').setOrigin(0.5, 1).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.player + 1);
+    }
     this.pickups = level.pickups.map((p) => new Pickup(this, p.x, p.y));
     this.checkpoints = level.checkpoints.map((c) => new Checkpoint(this, c));
     this.goal = this.physics.add.staticImage(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 32, 'goal').setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects).refreshBody();
@@ -400,7 +404,8 @@ export default class GameScene extends Phaser.Scene {
     this.stats.completeRun();
     this.narrate('levelComplete');
     const run = this.stats.getRun();
-    const ranks = leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
+    // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
+    const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
     const next = nextLevel(this.levelId);
     const payload = { levelId: this.levelId, next, run, ranks, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
     bus.emit(EV.LEVEL_COMPLETE, payload);

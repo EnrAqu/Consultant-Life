@@ -33,7 +33,13 @@ export default {
   map: g.toMap(),
   entities: [
     { id: 'sign1', type: 'sign', x: 4, y: 13, text: 'Promosso Manager! Ora hai un capo in più.' },
-    { id: 'mmA', type: 'micromanager', x: 14, y: 14, params: { zoneFrom: 14, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } } },
+    {
+      id: 'mmA', type: 'micromanager', x: 14, y: 14, slot: true,
+      params: {
+        normal: { zoneFrom: 14, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
+        pivoted: { zoneFrom: 14, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
+      },
+    },
     { id: 'five1', type: 'fiveMinutes', x: 47, y: 14, params: {} },
     { id: 'five2', type: 'fiveMinutes', x: 56, y: 14, params: {} },
     {
@@ -44,7 +50,13 @@ export default {
       },
     },
     { id: 'five3', type: 'fiveMinutes', x: 84, y: 14, params: {} },
-    { id: 'mmB', type: 'micromanager', x: 86, y: 14, params: { zoneFrom: 86, zoneTo: 110, floorRow: 14, demoJump: null } },
+    {
+      id: 'mmB', type: 'micromanager', x: 86, y: 14, slot: true,
+      params: {
+        normal: { zoneFrom: 86, zoneTo: 110, floorRow: 14, demoJump: null },
+        pivoted: { zoneFrom: 86, zoneTo: 110, floorRow: 14, demoJump: null },
+      },
+    },
     {
       id: 'slotC', type: 'deckCollapse', x: 96, y: 14, slot: true,
       params: {

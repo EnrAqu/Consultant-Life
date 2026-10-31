@@ -1,12 +1,14 @@
 import { TILE_SOLID, TILE_ONEWAY } from './LevelParser.js';
 
-// Max gap (empty columns between take-off and landing cell) by rise in tiles (+ = up). Table §14.3, "difficile".
-export function maxGap(rise) {
+// Max gap (empty columns between take-off and landing cell) by rise in tiles (+ = up). Table §14.3.
+// 'hard' = everything the physics allows; 'normal' = what a mandatory path may require.
+export function maxGap(rise, table = 'hard') {
   if (rise >= 4) return -1;
-  if (rise === 3) return 2;
-  if (rise === 2) return 4;
-  if (rise <= -2) return 6;
-  return 5;
+  const hard = table === 'hard';
+  if (rise === 3) return hard ? 2 : 1;
+  if (rise === 2) return hard ? 4 : 3;
+  if (rise <= -2) return hard ? 6 : 5;
+  return hard ? 5 : 4;
 }
 
 // Solid cells created by pivoted (or static) trap parts, in tile coordinates.
@@ -42,7 +44,7 @@ export function trapSurfaces(entity) {
   return cells;
 }
 
-export function validateLevel(parsed) {
+export function validateLevel(parsed, { table = 'hard' } = {}) {
   const errors = [];
   const { width, height } = parsed;
   const solid = parsed.tiles.map((row) => row.map((t) => t === TILE_SOLID));
@@ -92,7 +94,7 @@ export function validateLevel(parsed) {
         if (seen.has(key(x2, y2)) || !standable(x2, y2)) continue;
         const rise = y - y2;
         const gap = Math.max(0, Math.abs(dx) - 1);
-        if (gap > maxGap(rise)) continue;
+        if (gap > maxGap(rise, table)) continue;
         if (!clearArc(x, y, x2, y2)) continue;
         seen.add(key(x2, y2));
         queue.push({ x: x2, y: y2 });

@@ -17,7 +17,7 @@ export const MM_DEFAULTS = {
   cooldownMs: 4000,
   respawnMs: 3000,
   guideAhead: 3,
-  guideSpeed: 160,
+  guideSpeed: 300,
   floorRow: 14,
 };
 
@@ -29,6 +29,8 @@ export default class MicromanagerBrain {
     this.maxX = this.p.zoneTo * T + 16;
     // feet of the micromanager: the zone floor (row the player stands on)
     this.floorY = (this.p.floorRow + 1) * T;
+    // walkable floor spans of the zone (pits listed in p.gaps as [fromCol, toCol]); he never walks over a pit
+    this.spans = this.computeSpans(this.p.gaps ?? []);
     this.reset();
   }
 
@@ -43,6 +45,21 @@ export default class MicromanagerBrain {
     this.guided = false;
   }
 
+  computeSpans(gaps) {
+    const spans = [];
+    let start = this.p.zoneFrom;
+    for (const [from, to] of [...gaps].sort((a, c) => a[0] - c[0])) {
+      if (from > start) spans.push([start * T + 16, (from - 1) * T + 16]);
+      start = to + 1;
+    }
+    if (start <= this.p.zoneTo) spans.push([start * T + 16, this.p.zoneTo * T + 16]);
+    return spans;
+  }
+
+  spanOf(x) {
+    return this.spans.find(([a, c]) => x >= a - 1 && x <= c + 1) ?? this.spans[0];
+  }
+
   inZone(px) {
     return px >= this.p.zoneFrom * T && px < (this.p.zoneTo + 1) * T;
   }
@@ -50,18 +67,21 @@ export default class MicromanagerBrain {
   moveToward(target, speed, dt) {
     const step = (speed * dt) / 1000;
     const dx = target - this.x;
+    const [lo, hi] = this.spanOf(this.x);
     if (Math.abs(dx) <= step) this.x = target;
     else this.x += Math.sign(dx) * step;
-    this.x = Math.min(this.maxX, Math.max(this.minX, this.x));
+    this.x = Math.min(hi, Math.max(lo, this.x));
     if (dx !== 0) this.facing = Math.sign(dx);
   }
 
+  // Hidden = standing at a plant (either side) or with a plant between him and you, on the same floor.
   hiddenBehindPlant(player) {
     const lo = Math.min(this.x, player.x);
     const hi = Math.max(this.x, player.x);
     return this.p.plants.some((pl) => {
       const px = pl.col * T + 16;
-      return px > lo && px < hi && Math.abs((pl.row + 1) * T - player.y) <= T;
+      const sameFloor = Math.abs((pl.row + 1) * T - player.y) <= T;
+      return sameFloor && (Math.abs(px - player.x) <= T || (px > lo && px < hi));
     });
   }
 
@@ -73,7 +93,7 @@ export default class MicromanagerBrain {
     return !this.hiddenBehindPlant(player);
   }
 
-  // player: { x, y (feet), vx }. Returns actions for the view.
+  // player: { x, y (feet), vx, grounded, locked }. Returns actions for the view.
   update(dt, player) {
     const actions = [];
     const present = this.inZone(player.x);
@@ -82,9 +102,15 @@ export default class MicromanagerBrain {
     switch (this.state) {
       case 'idle':
         this.moveToward(this.facing > 0 ? this.maxX : this.minX, this.p.walkSpeed, dt);
-        if (this.x === this.maxX) this.facing = -1;
-        if (this.x === this.minX) this.facing = 1;
-        if (present) this.enter('watch');
+        {
+          const [lo, hi] = this.spanOf(this.x);
+          if (this.x >= hi) this.facing = -1;
+          if (this.x <= lo) this.facing = 1;
+        }
+        if (present) {
+          this.checkTimer = 0;
+          this.enter('watch');
+        }
         break;
       case 'watch': {
         if (!present) {
@@ -105,22 +131,32 @@ export default class MicromanagerBrain {
       case 'tell':
         this.timer += dt;
         if (this.timer >= this.p.tellMs) {
-          const busy = Math.abs(player.vx) >= this.p.busySpeed;
+          // running = "looks busy"; a player already frozen (KT call…) is left alone
+          const busy = Math.abs(player.vx) >= this.p.busySpeed || player.locked;
           if (present && !busy && this.sees(player)) this.enter('dash');
           else this.enter('watch');
         }
         break;
-      case 'dash':
-        if (!present) {
+      case 'dash': {
+        if (!present || player.locked) {
           this.enter('watch');
           break;
         }
+        const before = this.x;
         this.moveToward(player.x, this.p.dashSpeed, dt);
-        if (Math.abs(player.x - this.x) <= this.p.catchDist) {
+        const close = Math.abs(player.x - this.x) <= this.p.catchDist;
+        // never stop someone mid-air: wait until they land (a stop over a pit would kill)
+        const onFloor = player.grounded && Math.abs(player.y - this.floorY) <= 8;
+        if (!close && this.x === before) {
+          this.enter('watch'); // a pit is in the way
+          break;
+        }
+        if (close && onFloor) {
           this.enter('explain');
           actions.push({ type: 'catch', cost: this.p.explainCost });
         }
         break;
+      }
       case 'explain':
         this.timer += dt;
         if (this.timer >= this.p.explainMs) {
@@ -128,6 +164,8 @@ export default class MicromanagerBrain {
           this.demos += 1;
           const kind = this.p.demoJump ? 'jump' : 'sit';
           this.demoSuccess = kind === 'sit' || this.demos % 2 === 1;
+          // the jump demo always starts from the edge of his pit
+          if (this.p.demoJump) this.x = this.p.demoJump.fromCol * T + 16;
           this.demoFrom = this.x;
           this.enter('demo');
           actions.push({ type: 'demoStart', success: this.demoSuccess, kind });
@@ -156,7 +194,11 @@ export default class MicromanagerBrain {
         break;
       case 'cooldown':
         this.timer += dt;
-        if (this.timer >= this.p.cooldownMs) this.enter(present ? 'watch' : 'idle');
+        if (this.timer >= this.p.cooldownMs) {
+          // after a successful jump demo he hops back to his side of the pit
+          if (this.p.demoJump && this.x === this.p.demoJump.toCol * T + 16) this.x = this.p.demoJump.fromCol * T + 16;
+          this.enter(present ? 'watch' : 'idle');
+        }
         break;
       default:
         break;

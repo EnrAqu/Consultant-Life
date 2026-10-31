@@ -29,3 +29,8 @@ export const DEBUG = {
   god: q.get('god') === '1',
   outfit: q.get('outfit'),
 };
+
+// True when any gameplay-changing override is active (such runs stay out of the leaderboard).
+DEBUG.anyOverride = Boolean(
+  DEBUG.level || DEBUG.pivot || DEBUG.standupOff || DEBUG.gu || DEBUG.clock !== null || DEBUG.clockSpeed !== 1 || DEBUG.cp || DEBUG.god || DEBUG.outfit,
+);

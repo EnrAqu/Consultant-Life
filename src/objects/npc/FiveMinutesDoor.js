@@ -62,7 +62,7 @@ export default class FiveMinutesDoor {
   update(dt) {
     const player = this.scene.player;
     this.t += dt;
-    const actions = this.brain.update(dt, { distTiles: tilesBetween(player.body.center.x, this.x), touching: this.touching() });
+    const actions = this.brain.update(dt, { distTiles: tilesBetween(player.body.center.x, this.x), touching: this.touching(), locked: player.inputLocked });
     for (const a of actions) this.handle(a);
 
     this.npc.setAlpha(this.brain.outAmount);

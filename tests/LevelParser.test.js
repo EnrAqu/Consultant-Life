@@ -44,10 +44,30 @@ describe('pivot', () => {
 });
 
 describe('LevelValidator', () => {
-  it('jump table', () => {
+  it('jump tables', () => {
     expect(maxGap(0)).toBe(5);
     expect(maxGap(3)).toBe(2);
     expect(maxGap(4)).toBe(-1);
+    expect(maxGap(0, 'normal')).toBe(4);
+    expect(maxGap(2, 'normal')).toBe(3);
+    expect(maxGap(-2, 'normal')).toBe(5);
+  });
+
+  it('a gap of 5 is "hard" but not "normal"', () => {
+    const p = parseLevel({ id: 't', map: rows(['P.....G', '#.....#']) });
+    expect(validateLevel(p).ok).toBe(true);
+    expect(validateLevel(p, { table: 'normal' }).ok).toBe(false);
+  });
+
+  it('levels 1 and 3 need only "normal" jumps on their mandatory path', () => {
+    expect(validateLevel(parseLevel(resolveLevel(LEVELS.level1, null)), { table: 'normal' }).errors).toEqual([]);
+    for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes']) {
+      expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, pivot)), { table: 'normal' }).errors, String(pivot)).toEqual([]);
+    }
+  });
+
+  it('level 2 checkpoint is reachable', () => {
+    expect(validateLevel(parseLevel(resolveLevel(LEVELS.level2, null))).reachable.has('52:14')).toBe(true);
   });
 
   it('a gap of 7 is not reachable', () => {

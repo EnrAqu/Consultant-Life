@@ -11,6 +11,12 @@ export function fadeIn(scene) {
 
 // Fade out, then start another scene (cosmetic only, never used for trap logic).
 export function fadeTo(scene, key, data) {
+  // guard: two keys pressed together must not start the next scene twice
+  if (scene.leaving) return;
+  scene.leaving = true;
+  scene.events.once('shutdown', () => {
+    scene.leaving = false;
+  });
   const cam = scene.cameras.main;
   cam.once('camerafadeoutcomplete', () => scene.scene.start(key, data));
   cam.fadeOut(FADE_MS, 0, 0, 0);
