@@ -56,7 +56,7 @@ export default {
     },
     {
       id: 'sc2', type: 'scopeCreep', x: 157, y: 14,
-      params: { direction: 'left', baseLength: 1, maxLength: 6, triggerDx: -4, triggerWidth: 3, armDelayMs: 450, extendSpeed: 5, pitRect: { dx: -10, dy: 1, w: 4, h: 2 } },
+      params: { direction: 'left', baseLength: 1, maxLength: 7, triggerDx: -4, triggerWidth: 3, armDelayMs: 450, extendSpeed: 5, pitRect: { dx: -10, dy: 1, w: 4, h: 2 } },
     },
   ],
 };

@@ -42,3 +42,12 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Il playbook `review` gira in un contesto separato — revisione indipendente, richiesta utente.
 - 2026-10-31 — Un solo modello per tutti i playbook — accettato dall'utente.
 - 2026-10-31 — Toolbox: oltre ai playbook, solo strumenti che danno verifiche automatiche: validatore di livelli (raggiungibilità) e parametri di debug via URL. Niente editor di livelli per ora — utili all'agente per verificare senza giocare a mano.
+
+## Implementazione (prima versione)
+- 2026-10-31 — Vite 6.4.5 e Vitest 4.1.12 invece di 6.3.5 / 3.2.4 — le versioni del piano avevano vulnerabilità note (npm audit: 0 dopo l'aggiornamento). Workflow su Node 22.
+- 2026-10-31 — Mappe scritte con un piccolo helper (`src/levels/builder.js`) che produce le stesse 17 righe ASCII — più facile da modificare che 17 stringhe da 220 caratteri.
+- 2026-10-31 — ReplyAll: trigger 5 tile prima del corridoio (non 2) — con 2 tile chi corre passava prima che le email arrivassero all'altezza del corpo (calcolo + test nel browser).
+- 2026-10-31 — Deck: le slide sono ancorate per il bordo sinistro alla colonna `x + dx`; trigger all'ingresso del corridoio (dx 0); ordine di caduta dall'uscita (dx 4, 2, 0).
+- 2026-10-31 — Livello 2: scope creep pivotato lungo 17 (dalla sporgenza fino all'altra sponda) e a livello del pavimento (`dy: 1`), così non spinge il player; deck pivotato veloce (trigger 8 tile prima, caduta 20 tile/s) per non far cadere chi corre; KT dello slot D sospeso all'ingresso in entrambe le modalità (opzionale, non sul percorso).
+- 2026-10-31 — Niente `Goal.js`: il traguardo è un'immagine statica gestita da GameScene.
+- 2026-10-31 — Smoke test nel browser (puppeteer-core su Chrome locale) eseguito fuori dal repo; da decidere con l'utente se aggiungerlo al progetto (richiede una dipendenza di sviluppo).

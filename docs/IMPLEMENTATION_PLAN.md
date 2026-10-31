@@ -1058,3 +1058,10 @@ Il blocco parte dal muro (col 55) e si allunga a destra fino a `maxLength` 6 →
 
 ### 14.9 Esito delle domande aperte
 Confermati: un checkpoint nel livello 1 (col ~110 dopo il riscalamento); `R` costa 0,5 GU; orologio che corre durante lo standup; livello 2 con 15 GU nuove; niente audio, con toast dello standup grande e arancione al centro-alto e bordo schermo arancione lampeggiante nei 3 s di warning.
+
+---
+
+## 15. Stato
+
+- [x] M0–M13: prima versione giocabile (2026-10-31). Verifica automatica: 31 test Vitest, `npm run build`, smoke test nel browser (trappole, morte/respawn, KT, standup, budget sforato, Lessons Learned, livello 2 con tutti i pivot). Scostamenti in `docs/DECISIONS.md` § Implementazione.
+- [ ] Verifica manuale (utente): feeling dei salti, difficoltà e durata del livello 1, leggibilità degli indizi.

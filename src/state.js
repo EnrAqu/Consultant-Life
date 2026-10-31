@@ -1,0 +1,12 @@
+import { createStorage } from './core/Storage.js';
+import StatsTracker, { STATS_KEY } from './core/StatsTracker.js';
+import Narrator from './core/Narrator.js';
+import { NARRATOR_LINES } from './data/narratorLines.js';
+import { DEBUG } from './config/debug.js';
+
+// Page-lifetime singletons shared by all scenes.
+export const storage = createStorage();
+if (DEBUG.resetStats) storage.remove(STATS_KEY);
+export const stats = new StatsTracker(storage);
+export const narrator = new Narrator(NARRATOR_LINES);
+export const session = { titleShown: false };
