@@ -72,6 +72,13 @@ describe('LevelValidator', () => {
     }
   });
 
+  it('betraying goals: the client side and the carried position are reachable', () => {
+    // level 2 is validated with the 'hard' table (slot B keeps its 5-tile jump, see DECISIONS)
+    const r = validateLevel(parseLevel(resolveLevel(LEVELS.level2, null)));
+    expect(r.reachable.has('107:14')).toBe(true);
+    expect(r.reachable.has('120:14')).toBe(true);
+  });
+
   it('level 2 checkpoint is reachable', () => {
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level2, null))).reachable.has('52:14')).toBe(true);
   });

@@ -1,4 +1,4 @@
-# RageBait (nome provvisorio) — Playbook di progetto
+# Consultant Life — Playbook di progetto
 
 Platformer 2D browser, genere "rage game", a tema consulenza. Costo zero: sito statico, nessun backend.
 Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in **inglese**.

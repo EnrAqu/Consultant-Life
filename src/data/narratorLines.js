@@ -83,4 +83,10 @@ export const NARRATOR_LINES = [
   { id: 'five_hook_2', event: 'fiveHook', text: 'Ti ha chiesto un parere. Ne voleva tre.' },
   { id: 'five_shortcut_1', event: 'fiveShortcut', text: 'Il collega dei cinque minuti conosce una scorciatoia. Ovviamente.' },
   { id: 'start_level3_1', event: 'levelStart', when: { levelId: 'level3' }, text: 'Promosso! Ora hai le responsabilità del Partner e lo stipendio di prima.' },
+
+  // iteration 4: the betraying goal
+  { id: 'goal_troll_1', event: 'goalTroll', text: 'Il cliente ha cambiato idea. Succede. Soprattutto a lui.' },
+  { id: 'goal_troll_2', event: 'goalTroll', text: 'Un altro fornitore. Più economico. Più giovane. Più disponibile.' },
+  { id: 'goal_hint_1', event: 'goalTrollHint', text: 'Il cliente riceve solo dal suo lato. Era nella SOW.' },
+  { id: 'goal_right_1', event: 'goalRight', text: 'Consegnato dal lato del cliente. Finalmente hai capito come funziona.' },
 ];

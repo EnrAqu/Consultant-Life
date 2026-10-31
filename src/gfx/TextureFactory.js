@@ -350,6 +350,15 @@ export function generateAll(scene) {
     p.line(3, COLORS.green).seg(8, 11, 13, 16).seg(13, 16, 24, 5);
   });
 
+  // betraying sign: the board faces the client (right); from the left you see its grey back
+  make(scene, 'goalTroll', 32, 64, (p) => {
+    p.fill(0x9ca3af).rect(14, 18, 4, 46);
+    p.fill(0x6b7280).round(0, 0, 32, 22, 3);
+    p.fill(0x4b5563).rect(3, 3, 26, 2).rect(3, 8, 20, 2).rect(3, 13, 24, 2);
+    p.fill(0xffffff).round(27, 1, 5, 20, 2);
+    p.line(1.5, COLORS.green).seg(28, 11, 29.5, 13).seg(29.5, 13, 31.5, 8);
+  });
+
   make(scene, 'glow', 32, 32, (p) => {
     for (let r = 16; r > 0; r -= 1.5) p.fill(0xffffff, 0.06).circle(16, 16, r);
   });

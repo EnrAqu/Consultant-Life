@@ -1,6 +1,6 @@
 import { createGrid } from './builder.js';
 
-const W = 110;
+const W = 125;
 const g = createGrid(W);
 
 g.ground(0, 35).put(2, 14, 'P');
@@ -17,8 +17,10 @@ g.put(57, 14, 'p');
 // slotD — spike pit 85–94 with a 2-wide pillar at 89–90 (jumps of 4)
 g.ground(85, 94);
 for (let x = 85; x <= 94; x++) if (x !== 89 && x !== 90) g.put(x, 14, '^');
-g.ground(89, 90, 14).ground(95, 109);
+g.ground(89, 90, 14).ground(95, 110);
 g.put(106, 14, 'G');
+// beyond the betraying goal: a fast CR on a step over a pit, then where the sign gets carried (col 120)
+g.ground(111, 114, 13).ground(118, W - 1);
 
 const replyAllNormal = { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 };
 
@@ -26,9 +28,14 @@ export default {
   id: 'level2',
   name: 'Progetto 2 — La rivincita',
   career: 'consultant',
+  goal: { trolls: true, carryCols: 14 },
   startGu: 15,
   map: g.toMap(),
   entities: [
+    {
+      id: 'scEnd', type: 'scopeCreep', x: 111, y: 12,
+      params: { direction: 'right', baseLength: 1, maxLength: 4, triggerDx: 1, triggerWidth: 2, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 4, dy: 1, w: 3, h: 4 } },
+    },
     {
       id: 'mm1', type: 'micromanager', x: 54, y: 14,
       params: { zoneFrom: 54, zoneTo: 66, floorRow: 14, demoJump: null },

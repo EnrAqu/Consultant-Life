@@ -101,3 +101,5 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Micromanager del livello 2: zona 54–66 (dopo il checkpoint, così al respawn non sei nella torcia).
 - 2026-10-31 — puppeteer-core 25.14.0 (non la 24.x: vulnerabilità; non l'ultima 25.16: ha meno di due settimane).
 - 2026-10-31 — Livello 1 ridotto a 195 colonne: zona caffè 73–96 (2 caffè), finale con CR veloce su un gradino e mini-valanga di 5 email prima del cartello; livello 2: tre spine tra deck e KT. Regola dei 12 tratti "vuoti" verificata da test per tutti i livelli.
+- 2026-10-31 — **Nome del gioco: "Consultant Life"** — scelto dall'utente. Titolo della pagina, schermata iniziale e `package.json` aggiornati; le chiavi di `localStorage` restano `ragebait.*` per non perdere statistiche e classifica già salvate. Il nome della cartella locale non cambia.
+- 2026-10-31 — Traguardo che tradisce implementato (`GoalBrain` + `Goal`): livello 2 con `goal: { trolls: true, carryCols: 14 }`, esteso a 125 colonne con una CR veloce oltre il cartello. Causa `clientSwitch` (incidente, non pivotabile).

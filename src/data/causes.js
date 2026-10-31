@@ -27,6 +27,7 @@ export const CAUSES = {
     pivotable: true,
     lesson: 'Il micromanager ora ti precede e ti indica le trappole.',
   },
+  clientSwitch: { label: 'il cliente che cambia idea', pivotable: false },
   fiveMinutes: {
     label: 'i "hai 5 minuti?"',
     pivotable: true,

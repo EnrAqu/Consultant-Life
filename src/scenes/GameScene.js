@@ -16,6 +16,7 @@ import { OUTFITS } from '../data/outfits.js';
 import { fadeIn, fadeTo } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
 import Checkpoint from '../objects/Checkpoint.js';
+import Goal from '../objects/Goal.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
 import { NPC_CLASSES } from '../objects/npc/index.js';
 
@@ -132,11 +133,7 @@ export default class GameScene extends Phaser.Scene {
     }
     this.pickups = level.pickups.map((p) => new Pickup(this, p.x, p.y));
     this.checkpoints = level.checkpoints.map((c) => new Checkpoint(this, c));
-    this.goal = this.physics.add.staticImage(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 32, 'goal').setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects).refreshBody();
-    this.add
-      .text(level.goal.x * TILE + 16, (level.goal.y + 1) * TILE - 80, 'Consegna al cliente', { fontFamily: UI_FONT, fontSize: '12px', color: '#e5e7eb', resolution: TEXT_RESOLUTION * 2 })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.objects);
+    this.goal = new Goal(this, level.goal.x, level.goal.y, this.def.goal);
     for (const e of level.entities.filter((en) => en.type === 'sign')) {
       const t = this.add
         .text(e.x * TILE, e.y * TILE, e.text, { fontFamily: UI_FONT, fontSize: '12px', color: '#111827', backgroundColor: '#f8fafc', padding: { x: 6, y: 4 }, resolution: TEXT_RESOLUTION * 2 })
@@ -186,7 +183,7 @@ export default class GameScene extends Phaser.Scene {
         this.narrate('checkpoint');
       });
     }
-    this.physics.add.overlap(player, this.goal, () => this.completeLevel());
+    this.physics.add.overlap(player, this.goal.sprite, () => !player.isDead && this.goal.onTouch());
 
     for (const trap of this.traps) {
       const objects = trap.objectGroup;
@@ -296,6 +293,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.update(dt, input);
     for (const trap of this.traps) trap.update(dt);
     for (const npc of this.npcs) npc.update(dt);
+    this.goal.update(dt);
     for (const p of this.pickups) p.update(dt);
 
     if (this.player.y > this.worldH + 64) this.die('pit');
@@ -352,6 +350,7 @@ export default class GameScene extends Phaser.Scene {
     player.isDead = true;
     for (const trap of this.traps) trap.cancelCall();
     for (const npc of this.npcs) npc.cancelCall();
+    this.goal.cancelCall();
     this.playerView.onDeath();
     this.cameras.main.shake(120, 0.006);
     const fx = this.add
@@ -386,6 +385,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.pause();
     for (const trap of this.traps) trap.cancelCall();
     for (const npc of this.npcs) npc.cancelCall();
+    this.goal.cancelCall();
   }
 
   budgetOver() {
