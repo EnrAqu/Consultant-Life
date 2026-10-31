@@ -53,6 +53,18 @@ export default class FiveMinutesDoor {
     this.say('');
   }
 
+  delegateTarget() {
+    if (this.mode !== 'normal' || this.brain.isOut || this.brain.state === 'occupied' || this.brain.state === 'hooked') return null;
+    return { x: this.x, kind: 'fiveMinutes' };
+  }
+
+  onDelegate() {
+    this.brain.occupy();
+    this.door.setTexture('doorAjar');
+    this.say('Ehi, tu! Hai 5 minuti? Ottimo, entra.');
+    return {};
+  }
+
   touching() {
     if (!this.brain.isOut) return false;
     const b = this.scene.player.body;

@@ -90,6 +90,16 @@ export default class ReplyAllAvalanche extends BaseTrap {
     if (this.scene.debugMode) this.logImpacts();
   }
 
+  delegateTarget() {
+    if (!this.armed || this.pivoted) return null;
+    return { x: (this.tx + this.p.triggerDx + 1) * TILE, kind: 'replyAll' };
+  }
+
+  onDelegate() {
+    this.onTrigger();
+    return {};
+  }
+
   logImpacts() {
     const p = this.p;
     const lines = this.emails.map((_, i) => `col ${p.columns[i % p.columns.length]}: ${Math.round(p.startDelayMs + i * p.intervalMs + this.fallMs)}ms`);

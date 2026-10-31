@@ -62,6 +62,19 @@ export default class FakeKT extends BaseTrap {
     bus.emit(EV.KT_CALL_START, { pivoted: this.pivoted, durationMs: this.p.callMs });
   }
 
+  delegateTarget() {
+    if (this.collected || this.pivoted) return null;
+    return { x: this.baseX, kind: 'fakeKT' };
+  }
+
+  // The junior attends the endless call instead of you: no GU lost.
+  onDelegate() {
+    this.collected = true;
+    this.sprite.disableBody(true, true);
+    this.glow.setVisible(false);
+    return {};
+  }
+
   cancelCall() {
     if (!this.inCall) return;
     this.inCall = false;

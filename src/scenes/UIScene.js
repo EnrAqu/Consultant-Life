@@ -44,8 +44,9 @@ export default class UIScene extends Phaser.Scene {
       .setVisible(false);
     // level name
     this.levelText = text(this, 16, 54, '', { fontSize: '14px', color: '#9ca3af' });
+    this.teamText = text(this, 16, 74, '', { fontSize: '14px', color: '#fde68a' });
 
-    this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText]);
+    this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText]);
     this.debugText = text(this, 16, GAME_HEIGHT - 44, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
 
     // warning border, standup overlay, KT overlay, title
@@ -108,6 +109,7 @@ export default class UIScene extends Phaser.Scene {
       [EV.BUDGET_OVER]: () => this.hideAll(),
       [EV.FIRST_MOVE]: () => this.hideTitle(),
       [EV.DEBUG]: (s) => this.debugText.setText(s),
+      [EV.TEAM_CHANGED]: ({ count }) => this.showTeam(count),
     });
     bus.emit(EV.UI_READY);
   }
@@ -128,12 +130,21 @@ export default class UIScene extends Phaser.Scene {
     this.standup.setVisible(false);
     this.kt.setVisible(false);
     this.levelText.setText(e.career ? `${e.career} — ${e.name}` : e.name ?? '');
+    this.showTeam(e.team);
     this.refreshDeaths(stats.getRun().deaths);
     if (e.levelId === 'level1' && !session.titleShown) {
       session.titleShown = true;
       this.title.setVisible(true).setAlpha(1);
       this.time.delayedCall(5000, () => this.hideTitle());
     }
+  }
+
+  showTeam(count) {
+    if (count === null || count === undefined) {
+      this.teamText.setText('');
+      return;
+    }
+    this.teamText.setText(`Team: ${'● '.repeat(count)}${count === 0 ? 'nessuno' : ''}   [E] delega`);
   }
 
   hideTitle() {

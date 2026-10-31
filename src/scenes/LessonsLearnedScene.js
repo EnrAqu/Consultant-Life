@@ -12,7 +12,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     super('LessonsLearnedScene');
   }
 
-  create({ levelId, next, run, ranks, dominant, gu, guMax }) {
+  create({ levelId, next, run, ranks, team, dominant, gu, guMax }) {
     setupScreenCamera(this);
     fadeIn(this);
     this.cameras.main.setBackgroundColor('#0b0d12');
@@ -33,6 +33,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     }
     bullets.push(`Azione correttiva: ${cause.lesson}`);
     bullets.push(`Morti totali nel progetto: ${run.deaths} — Tempo: ${formatDuration(run.timeMs)} — GU residue: ${formatGu(gu)} / ${guMax}`);
+    if (team) bullets.push(`Team arrivato alla consegna: ${team.count}/${team.size}${team.count < team.size ? ' (gli altri sono stati "valorizzati" altrove)' : ''}`);
     if (ranks?.timeRank) bullets.push(`Record personale: #${ranks.timeRank} per tempo.`);
     if (ranks?.shameRank === 1 && run.deaths > 0) bullets.push('Hall of Shame: nuovo record di morti. Complimenti, credo.');
 

@@ -10,7 +10,7 @@ const server = spawn('npx', ['vite', 'preview', '--port', '4173', '--strictPort'
 await new Promise((r) => setTimeout(r, 2500));
 let failed = false;
 try {
-  for (const script of ['smoke.mjs', 'smoke3.mjs']) {
+  for (const script of ['smoke.mjs', 'smoke3.mjs', 'smoke4.mjs']) {
     const out = execSync(`node ${join(here, script)}`, { encoding: 'utf8' });
     process.stdout.write(out);
     if (/^FAIL/m.test(out) || !/ERRORS:\nnone/.test(out)) failed = true;

@@ -89,4 +89,11 @@ export const NARRATOR_LINES = [
   { id: 'goal_troll_2', event: 'goalTroll', text: 'Un altro fornitore. Più economico. Più giovane. Più disponibile.' },
   { id: 'goal_hint_1', event: 'goalTrollHint', text: 'Il cliente riceve solo dal suo lato. Era nella SOW.' },
   { id: 'goal_right_1', event: 'goalRight', text: 'Consegnato dal lato del cliente. Finalmente hai capito come funziona.' },
+
+  // iteration 4: team & delegation
+  { id: 'delegate_1', event: 'delegate', text: 'Ottima delega. Il junior ha imparato molto.' },
+  { id: 'delegate_2', event: 'delegate', text: 'Delegare è un\'arte. Anche sacrificare, a quanto pare.' },
+  { id: 'team_loss_1', event: 'teamLoss', text: 'Il junior ha imparato molto. Troppo.' },
+  { id: 'team_loss_2', event: 'teamLoss', text: 'Un junior in meno. Lo segniamo come "turnover fisiologico".' },
+  { id: 'intern_1', event: 'intern', text: 'Nuovo stagista. Non pagato, ma motivatissimo.' },
 ];

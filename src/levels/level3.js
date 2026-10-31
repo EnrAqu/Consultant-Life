@@ -29,15 +29,20 @@ export default {
   id: 'level3',
   name: 'Progetto 3 — Il primo team',
   career: 'manager',
+  team: { size: 3 },
   startGu: 15,
   map: g.toMap(),
   entities: [
-    { id: 'sign1', type: 'sign', x: 4, y: 13, text: 'Promosso Manager! Ora hai un capo in più.' },
+    { id: 'sign1', type: 'sign', x: 3, y: 13, text: 'Promosso Manager! Ora hai un team. E un capo in più.' },
+    // first delegation: the gate needs someone on the plate (col 8) — press E
+    { id: 'intern1', type: 'intern', x: 5, y: 14 },
+    { id: 'gate1', type: 'approvalGate', x: 12, y: 14, params: { plateDx: -4 } },
+    { id: 'sign2', type: 'sign', x: 7, y: 9, text: 'E = delega a un junior' },
     {
-      id: 'mmA', type: 'micromanager', x: 14, y: 14, slot: true,
+      id: 'mmA', type: 'micromanager', x: 16, y: 14, slot: true,
       params: {
-        normal: { zoneFrom: 14, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
-        pivoted: { zoneFrom: 14, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
+        normal: { zoneFrom: 16, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
+        pivoted: { zoneFrom: 16, zoneTo: 40, floorRow: 14, demoJump: { fromCol: 26, toCol: 30 } },
       },
     },
     { id: 'five1', type: 'fiveMinutes', x: 47, y: 14, params: {} },

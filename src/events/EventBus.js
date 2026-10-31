@@ -20,6 +20,7 @@ export const EV = {
   TOAST: 'toast',
   FIRST_MOVE: 'first-move',
   DEBUG: 'debug',
+  TEAM_CHANGED: 'team-changed',
 };
 
 // Subscribe for the lifetime of a scene: listeners are removed on shutdown.

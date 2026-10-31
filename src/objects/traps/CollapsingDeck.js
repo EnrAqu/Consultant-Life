@@ -63,6 +63,16 @@ export default class CollapsingDeck extends BaseTrap {
     this.elapsed = 0;
   }
 
+  delegateTarget() {
+    if (this.state !== 'idle' || this.pivoted) return null;
+    return { x: (this.tx + 2) * TILE + 16, kind: 'deckCollapse' };
+  }
+
+  onDelegate() {
+    this.onTrigger();
+    return {};
+  }
+
   update(dt) {
     const p = this.p;
     this.t += dt;

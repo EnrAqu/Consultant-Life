@@ -60,4 +60,14 @@ export default class BaseTrap {
   onTrigger() {}
   onSolidContact() {}
   cancelCall() {}
+
+  // Delegation (ITERATION_4 §4.2): where a junior goes to take this trap on for you, or null.
+  delegateTarget() {
+    return null;
+  }
+
+  // Returns { stay: true } when the junior stays there (e.g. on a plate).
+  onDelegate() {
+    return {};
+  }
 }

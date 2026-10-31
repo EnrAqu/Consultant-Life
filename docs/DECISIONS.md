@@ -105,3 +105,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Traguardo che tradisce implementato (`GoalBrain` + `Goal`): livello 2 con `goal: { trolls: true, carryCols: 14 }`, esteso a 125 colonne con una CR veloce oltre il cartello. Causa `clientSwitch` (incidente, non pivotabile).
 - 2026-10-31 — Repo GitHub privata **EnrAqu/Consultant-Life** (richiesta utente). CI (test + build) a ogni push; deploy su Pages solo manuale, perché Pages richiede una repo pubblica o un piano a pagamento.
 - 2026-10-31 — Repo resa **pubblica** e GitHub Pages attivato (sorgente: GitHub Actions), deploy automatico a ogni push su main — richiesta utente.
+- 2026-10-31 — Team & delega implementati: `TeamTrail` e `DelegateTargeting` (puri, testati), `Team`, `ApprovalGate`, `InternDesk`; livello 3 si apre con il varco "Approvazione richiesta" (tutorial della delega: E), stagista a col 5; micromanager della zona A spostato a col 16 per non trovarselo addosso appena superato il varco.
+- 2026-10-31 — Il tasto delega ascolta l'evento keydown (un tocco brevissimo non va perso: Phaser azzera `JustDown` al rilascio nello stesso frame).
+- 2026-10-31 — La delega al KT finto, al collega e al micromanager "consuma" il junior come le trappole (persi per sempre, coerente con la Q3).

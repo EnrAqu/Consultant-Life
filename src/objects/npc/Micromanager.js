@@ -166,6 +166,17 @@ export default class Micromanager {
     }
   }
 
+  delegateTarget() {
+    if (this.mode !== 'normal' || !this.brain.lightOn) return null;
+    return { x: this.brain.x, kind: 'micromanager' };
+  }
+
+  onDelegate() {
+    this.brain.occupy(8000);
+    this.say('Ah, perfetto. Spiegami tu, allora. Con calma.', 3000);
+    return { stay: true, staySeconds: 8 };
+  }
+
   // Pivoted: mark each trap he walks past with a "!" (cosmetic hint).
   pointAtTraps(x) {
     for (const trap of this.scene.traps) {

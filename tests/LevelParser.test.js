@@ -79,6 +79,11 @@ describe('LevelValidator', () => {
     expect(r.reachable.has('120:14')).toBe(true);
   });
 
+  it('level 3: the approval gate really needs a delegation', () => {
+    expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, null)), { gatesClosed: true }).ok).toBe(false);
+    expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, null))).ok).toBe(true);
+  });
+
   it('level 2 checkpoint is reachable', () => {
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level2, null))).reachable.has('52:14')).toBe(true);
   });

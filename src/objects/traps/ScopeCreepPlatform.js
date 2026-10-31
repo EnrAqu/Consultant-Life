@@ -89,11 +89,26 @@ export default class ScopeCreepPlatform extends BaseTrap {
     this.armedMs = 0;
     this.playerOnTrigger = false;
     this.lastContactAt = -Infinity;
+    this.forceArm = false;
     this.setHead(this.startHeadCol);
   }
 
   onTrigger() {
     this.playerOnTrigger = true;
+  }
+
+  delegateTarget() {
+    if (this.state !== 'idle' || this.pivoted) return null;
+    return { x: (this.tx + this.p.triggerDx + 1) * TILE + 16, kind: 'scopeCreep' };
+  }
+
+  // The junior stands on the trigger: the CR fires right away and pushes them off.
+  onDelegate() {
+    this.armedMs = this.p.armDelayMs;
+    this.state = 'idle';
+    this.playerOnTrigger = false;
+    this.forceArm = true;
+    return {};
   }
 
   onSolidContact() {
@@ -103,7 +118,7 @@ export default class ScopeCreepPlatform extends BaseTrap {
   update(dt) {
     const p = this.p;
     if (this.state === 'idle') {
-      if (this.playerOnTrigger && this.scene.player.grounded) this.armedMs += dt;
+      if ((this.playerOnTrigger && this.scene.player.grounded) || this.forceArm) this.armedMs += dt;
       if (this.armedMs > 0) {
         const jitter = Math.floor(this.armedMs / 50) % 2 === 0 ? 1 : -1;
         this.head.body.reset(this.startHeadCol * TILE + jitter, this.y);

@@ -14,4 +14,5 @@ if (DEBUG.resetStats) {
 export const stats = new StatsTracker(storage);
 export const narrator = new Narrator(NARRATOR_LINES);
 export const leaderboard = new Leaderboard(storage);
-export const session = { titleShown: false };
+// team: juniors carried over between levels (ITERATION_4 §4.1); null until the first team level
+export const session = { titleShown: false, team: null };

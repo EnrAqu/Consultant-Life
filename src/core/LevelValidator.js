@@ -44,7 +44,8 @@ export function trapSurfaces(entity) {
   return cells;
 }
 
-export function validateLevel(parsed, { table = 'hard' } = {}) {
+// gatesClosed: treat 'Approvazione richiesta' barriers as walls (nobody delegated to their plate).
+export function validateLevel(parsed, { table = 'hard', gatesClosed = false } = {}) {
   const errors = [];
   const { width, height } = parsed;
   const solid = parsed.tiles.map((row) => row.map((t) => t === TILE_SOLID));
@@ -54,7 +55,9 @@ export function validateLevel(parsed, { table = 'hard' } = {}) {
 
   for (const e of parsed.entities) {
     if (e.x < 0 || e.x >= width || e.y < 2 || e.y >= height) errors.push(`entity ${e.id} out of bounds or in HUD rows`);
-    for (const c of trapSurfaces(e)) {
+    const cells = trapSurfaces(e);
+    if (gatesClosed && e.type === 'approvalGate' && e.mode !== 'pivoted') for (let r = 0; r < 4; r++) cells.push({ x: e.x, y: e.y - r });
+    for (const c of cells) {
       if (c.x < 0 || c.x >= width || c.y < 2 || c.y >= height) errors.push(`entity ${e.id} surface out of bounds`);
       else solid[c.y][c.x] = true;
     }
@@ -124,6 +127,10 @@ function entityColumns(e) {
       return [p.zoneFrom, p.zoneTo];
     case 'fiveMinutes':
       return [e.x - 6, e.x + 1];
+    case 'approvalGate':
+      return [e.x + (p.plateDx ?? -4), e.x];
+    case 'intern':
+      return [e.x - 1, e.x + 1];
     default:
       return null;
   }

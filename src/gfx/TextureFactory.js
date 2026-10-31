@@ -359,6 +359,23 @@ export function generateAll(scene) {
     p.line(1.5, COLORS.green).seg(28, 11, 29.5, 13).seg(29.5, 13, 31.5, 8);
   });
 
+  // "Approvazione richiesta": a glass barrier tile, the pressure plate, the intern hiring desk
+  make(scene, 'gateTile', 32, 32, (p) => {
+    p.fill(0x93c5fd, 0.35).rect(2, 0, 28, 32);
+    p.fill(0xbfdbfe, 0.6).rect(2, 0, 2, 32).rect(28, 0, 2, 32);
+    p.fill(0xffffff, 0.35).rect(8, 4, 3, 24);
+  });
+  make(scene, 'plate', 32, 8, (p) => {
+    p.fill(0x374151).round(0, 2, 32, 6, 2);
+    p.fill(0xfacc15).round(4, 0, 24, 4, 1);
+  });
+  make(scene, 'internDesk', 32, 40, (p) => {
+    p.fill(0x1f2937).round(0, 14, 32, 26, 3);
+    p.fill(0x22c55e).round(4, 18, 24, 8, 2);
+    p.fill(0xffffff).round(8, 0, 16, 12, 2);
+    p.fill(0x22c55e).rect(14, 3, 4, 6).rect(13, 5, 6, 2);
+  });
+
   make(scene, 'glow', 32, 32, (p) => {
     for (let r = 16; r > 0; r -= 1.5) p.fill(0xffffff, 0.06).circle(16, 16, r);
   });

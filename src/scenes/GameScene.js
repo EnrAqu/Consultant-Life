@@ -9,7 +9,7 @@ import StandupSchedule from '../core/StandupSchedule.js';
 import { formatGu } from '../core/format.js';
 import { CAUSES } from '../data/causes.js';
 import { bus, EV, listen } from '../events/EventBus.js';
-import { stats, narrator, leaderboard } from '../state.js';
+import { stats, narrator, leaderboard, session } from '../state.js';
 import Player from '../objects/Player.js';
 import PlayerView from '../objects/PlayerView.js';
 import { OUTFITS } from '../data/outfits.js';
@@ -17,6 +17,7 @@ import { fadeIn, fadeTo } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
 import Checkpoint from '../objects/Checkpoint.js';
 import Goal from '../objects/Goal.js';
+import Team from '../objects/team/Team.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
 import { NPC_CLASSES } from '../objects/npc/index.js';
 
@@ -54,6 +55,10 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
     this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : def.career ?? 'junior';
     this.playerView = new PlayerView(this, this.player, this.outfit);
+    this.levelTiles = level.tiles;
+    // team of juniors from level 3 on; lost juniors stay lost across levels (minimum 1)
+    this.teamAtStart = def.team ? Math.max(1, session.team ?? def.team.size) : 0;
+    this.team = def.team ? new Team(this, this.teamAtStart) : null;
     this.buildNpcs(def, level);
     this.registerColliders();
 
@@ -68,7 +73,14 @@ export default class GameScene extends Phaser.Scene {
     this.events.on('postupdate', syncView);
     this.events.once('shutdown', () => this.events.off('postupdate', syncView));
 
-    this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,A,D,W,Z,SPACE,R');
+    this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,A,D,W,Z,SPACE,R,E,SHIFT');
+    // delegation listens to the keydown event: a very quick tap (down + up in one frame) is never lost
+    this.delegateQueued = false;
+    const queueDelegate = () => {
+      this.delegateQueued = true;
+    };
+    this.input.keyboard.on('keydown-E', queueDelegate);
+    this.input.keyboard.on('keydown-SHIFT', queueDelegate);
 
     this.budget = new Budget(DEBUG.gu ?? def.startGu);
     this.schedule = new StandupSchedule(STANDUP, {
@@ -179,6 +191,7 @@ export default class GameScene extends Phaser.Scene {
       this.physics.add.overlap(player, c.sprite, () => {
         if (!c.activate()) return;
         this.spawnPoint = c.spawn;
+        this.team?.snapshot();
         bus.emit(EV.TOAST, { text: 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
         this.narrate('checkpoint');
       });
@@ -203,7 +216,7 @@ export default class GameScene extends Phaser.Scene {
   // ---------- state helpers ----------
 
   emitSnapshot() {
-    bus.emit(EV.LEVEL_START, { levelId: this.levelId, name: this.def.name, career: OUTFITS[this.outfit].title, startGu: this.budget.max, pivotCause: this.pivotCause });
+    bus.emit(EV.LEVEL_START, { levelId: this.levelId, name: this.def.name, career: OUTFITS[this.outfit].title, startGu: this.budget.max, pivotCause: this.pivotCause, team: this.team ? this.team.count : null });
     bus.emit(EV.GU_CHANGED, { gu: this.budget.gu, max: this.budget.max, delta: 0, reason: 'snapshot' });
     bus.emit(EV.CLOCK_TICK, { label: this.schedule.clockLabel, warning: this.schedule.isWarning });
     if (this.lastNarration) bus.emit(EV.NARRATE, this.lastNarration);
@@ -268,6 +281,7 @@ export default class GameScene extends Phaser.Scene {
       jumpPressed,
       jumpHeld: k.SPACE.isDown || k.UP.isDown || k.W.isDown || k.Z.isDown,
       restart: JD(k.R),
+      delegate: this.delegateQueued,
     };
   }
 
@@ -279,6 +293,7 @@ export default class GameScene extends Phaser.Scene {
     for (const ev of this.schedule.update(dt)) this.handleSchedule(ev);
 
     const input = this.readInput();
+    this.delegateQueued = false;
     if (this.pauseReasons.size > 0) return;
 
     if (input.restart) {
@@ -294,6 +309,7 @@ export default class GameScene extends Phaser.Scene {
     for (const trap of this.traps) trap.update(dt);
     for (const npc of this.npcs) npc.update(dt);
     this.goal.update(dt);
+    this.team?.update(dt, input.delegate);
     for (const p of this.pickups) p.update(dt);
 
     if (this.player.y > this.worldH + 64) this.die('pit');
@@ -373,6 +389,8 @@ export default class GameScene extends Phaser.Scene {
     for (const npc of this.npcs) npc.reset();
     this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
     this.playerView.onRespawn();
+    this.team?.restore();
+    for (const o of [...this.traps, ...this.npcs]) o.delegateReserved = false;
     this.cameras.main.centerOn(this.player.x, this.player.y);
     this.input.keyboard.resetKeys();
     this.idleMs = 0;
@@ -407,7 +425,9 @@ export default class GameScene extends Phaser.Scene {
     // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
     const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
     const next = nextLevel(this.levelId);
-    const payload = { levelId: this.levelId, next, run, ranks, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
+    const team = this.team ? { count: this.team.count, size: this.teamAtStart } : null;
+    if (team) session.team = Math.max(1, team.count);
+    const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
       fadeTo(this, next ? 'LessonsLearnedScene' : 'MvpEndScene', payload);

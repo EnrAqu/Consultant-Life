@@ -79,6 +79,12 @@ export default class FiveMinutesBrain {
     return actions;
   }
 
+  // Delegation (ITERATION_4 §4.2): a junior keeps him busy until the next respawn.
+  occupy() {
+    this.state = 'occupied';
+    this.timer = 0;
+  }
+
   enter(state, actions, ...events) {
     this.state = state;
     this.timer = 0;

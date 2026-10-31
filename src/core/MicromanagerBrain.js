@@ -199,6 +199,12 @@ export default class MicromanagerBrain {
     this.timer = 0;
   }
 
+  // Delegation (ITERATION_4 §4.2): a junior lets him explain to them instead; light off for `ms`.
+  occupy(ms = 8000) {
+    this.enter('cooldown');
+    this.timer = this.p.cooldownMs - ms;
+  }
+
   // 0..1 progress of the current demo (for the view)
   get demoProgress() {
     return this.state === 'demo' ? Math.min(1, this.timer / this.p.demoMs) : 0;

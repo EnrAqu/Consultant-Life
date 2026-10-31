@@ -1,7 +1,8 @@
 import puppeteer from 'puppeteer-core';
+import { fileURLToPath } from 'node:url';
 
 const BASE = 'http://localhost:4173/';
-const OUT = new URL('./shots/', import.meta.url).pathname;
+const OUT = fileURLToPath(new URL('./shots/', import.meta.url));
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   headless: 'new',
