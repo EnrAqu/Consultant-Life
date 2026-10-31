@@ -1,6 +1,6 @@
 # Iterazione 3 — Nuove sfide: Micromanager, "Hai 5 minuti?", Livello 3
 
-> Stato: **solo piano, da non sviluppare finché l'utente non lo chiede** (2026-10-31).
+> Stato: **in sviluppo** — richiesto dall'utente il 2026-10-31, insieme al resto dell'iterazione 2.
 > Si applica sopra `ITERATION_2.md`. Regole invariate: trappole e NPC deterministici (niente `Math.random`, niente tween o timer di Phaser per la logica), logica pura in `src/core/` con test, tempi in ms accumulati in `update(dt)`.
 > Prerequisito consigliato: chiudere prima il resto dell'iterazione 2 (ponte di email, battute, leaderboard).
 

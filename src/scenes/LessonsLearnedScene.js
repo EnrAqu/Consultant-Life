@@ -3,6 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/con
 import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatGu, formatDuration } from '../core/format.js';
+import { projectNumber } from '../levels/index.js';
 
 const style = (size, color = '#111827') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION, wordWrap: { width: 780 } });
 
@@ -11,14 +12,14 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     super('LessonsLearnedScene');
   }
 
-  create({ run, dominant, gu, guMax }) {
+  create({ levelId, next, run, ranks, dominant, gu, guMax }) {
     setupScreenCamera(this);
     fadeIn(this);
     this.cameras.main.setBackgroundColor('#0b0d12');
     const x = 60;
     this.add.rectangle(40, 30, GAME_WIDTH - 80, GAME_HEIGHT - 60, 0xffffff).setOrigin(0, 0);
     this.add.rectangle(40, 30, GAME_WIDTH - 80, 64, 0x1d4ed8).setOrigin(0, 0);
-    this.add.text(x, 46, 'Lessons Learned — Progetto 1', style(30, '#ffffff'));
+    this.add.text(x, 46, `Lessons Learned — Progetto ${projectNumber(levelId)}`, style(30, '#ffffff'));
 
     const cause = CAUSES[dominant.cause];
     const bullets = [];
@@ -32,6 +33,8 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     }
     bullets.push(`Azione correttiva: ${cause.lesson}`);
     bullets.push(`Morti totali nel progetto: ${run.deaths} — Tempo: ${formatDuration(run.timeMs)} — GU residue: ${formatGu(gu)} / ${guMax}`);
+    if (ranks?.timeRank) bullets.push(`Record personale: #${ranks.timeRank} per tempo.`);
+    if (ranks?.shameRank === 1 && run.deaths > 0) bullets.push('Hall of Shame: nuovo record di morti. Complimenti, credo.');
 
     let y = 130;
     for (const b of bullets) {
@@ -44,10 +47,15 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     const prompt = this.add.text(GAME_WIDTH - 60, GAME_HEIGHT - 74, '', style(16, '#1d4ed8')).setOrigin(1, 0);
 
     this.time.delayedCall(1000, () => {
-      prompt.setText('Premi Spazio per passare al Progetto 2');
-      const next = () => fadeTo(this, 'GameScene', { levelId: 'level2', pivotCause: dominant.cause });
-      this.input.keyboard.once('keydown-SPACE', next);
-      this.input.keyboard.once('keydown-ENTER', next);
+      prompt.setText(`Premi Spazio per passare al Progetto ${projectNumber(next)}`);
+      let gone = false;
+      const go = () => {
+        if (gone) return;
+        gone = true;
+        fadeTo(this, 'GameScene', { levelId: next, pivotCause: dominant.cause });
+      };
+      this.input.keyboard.once('keydown-SPACE', go);
+      this.input.keyboard.once('keydown-ENTER', go);
     });
   }
 }

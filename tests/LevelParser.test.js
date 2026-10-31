@@ -55,6 +55,11 @@ describe('LevelValidator', () => {
     expect(validateLevel(p).ok).toBe(false);
   });
 
+  it('level1 can only be completed thanks to the email bridge', () => {
+    const withoutBridge = { ...LEVELS.level1, entities: LEVELS.level1.entities.filter((e) => e.id !== 'ra2') };
+    expect(validateLevel(parseLevel(resolveLevel(withoutBridge, null))).ok).toBe(false);
+  });
+
   it('level1 is completable', () => {
     const r = validateLevel(parseLevel(resolveLevel(LEVELS.level1, null)));
     expect(r.errors).toEqual([]);

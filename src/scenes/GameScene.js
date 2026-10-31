@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
-import { LEVELS } from '../levels/index.js';
+import { LEVELS, nextLevel } from '../levels/index.js';
 import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
 import { resolveLevel } from '../core/pivot.js';
 import Budget from '../core/Budget.js';
@@ -9,7 +9,7 @@ import StandupSchedule from '../core/StandupSchedule.js';
 import { formatGu } from '../core/format.js';
 import { CAUSES } from '../data/causes.js';
 import { bus, EV, listen } from '../events/EventBus.js';
-import { stats, narrator } from '../state.js';
+import { stats, narrator, leaderboard } from '../state.js';
 import Player from '../objects/Player.js';
 import PlayerView from '../objects/PlayerView.js';
 import { OUTFITS } from '../data/outfits.js';
@@ -384,10 +384,12 @@ export default class GameScene extends Phaser.Scene {
     this.stats.completeRun();
     this.narrate('levelComplete');
     const run = this.stats.getRun();
-    const payload = { levelId: this.levelId, run, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
+    const ranks = leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
+    const next = nextLevel(this.levelId);
+    const payload = { levelId: this.levelId, next, run, ranks, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
-      fadeTo(this, this.levelId === 'level1' ? 'LessonsLearnedScene' : 'MvpEndScene', payload);
+      fadeTo(this, next ? 'LessonsLearnedScene' : 'MvpEndScene', payload);
     });
   }
 }

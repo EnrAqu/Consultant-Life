@@ -11,7 +11,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/DECISIONS.md` | Registro delle decisioni prese, con data e motivo. **Fonte di verità** in caso di conflitto | Ogni volta che si decide qualcosa |
 | `docs/IMPLEMENTATION_PLAN.md` | Piano tecnico dell'MVP: struttura, interfacce, formati dati, milestone M0–M13 con criteri di accettazione | Playbook `plan` |
 | `docs/ITERATION_2.md` | Piano dell'iterazione 2 (dal playtest #1): prevale su `IMPLEMENTATION_PLAN.md` dove lo modifica | Playbook `plan` |
-| `docs/ITERATION_3.md` | Piano dell'iterazione 3 (micromanager, "Hai 5 minuti?", livello 3): **solo pianificato, non sviluppare senza richiesta** | Playbook `plan` |
+| `docs/ITERATION_3.md` | Piano dell'iterazione 3 (micromanager, "Hai 5 minuti?", livello 3): in sviluppo | Playbook `plan` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |

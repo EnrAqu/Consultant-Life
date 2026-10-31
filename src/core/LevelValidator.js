@@ -21,8 +21,7 @@ export function trapSurfaces(entity) {
     const start = p.direction === 'left' ? x - len + 1 : x;
     rect(start, y + (p.dy ?? 0), len, 1);
   }
-  if (mode !== 'pivoted') return cells;
-  if (type === 'replyAll') {
+  if (type === 'replyAll' && (mode === 'pivoted' || p.landing === 'solid')) {
     const perColumn = {};
     for (let i = 0; i < p.count; i++) {
       const dx = p.columns[i % p.columns.length];
@@ -33,6 +32,7 @@ export function trapSurfaces(entity) {
       rect(x + Number(dx), p.restRow - h + 1, 1, h);
     }
   }
+  if (mode !== 'pivoted') return cells;
   if (type === 'deckCollapse') {
     for (const t of p.targets) rect(x + t.dx, t.row, 2, 1);
   }

@@ -44,10 +44,10 @@ describe('Narrator', () => {
     for (const cause of ['pit', 'spike', 'replyAll', 'scopeCreep', 'deckCollapse', 'selfRestart']) {
       expect(n.pick('death', { cause }).id).toContain('death_');
     }
-    for (const ev of ['levelStart', 'levelStartPivot', 'ktFake', 'ktReal', 'standupStart', 'standupOverrun', 'budgetLow', 'checkpoint', 'idle', 'budgetOver', 'levelComplete']) {
+    for (const ev of ['levelStart', 'levelStartPivot', 'ktFake', 'ktReal', 'standupStart', 'standupOverrun', 'budgetLow', 'checkpoint', 'idle', 'budgetOver', 'levelComplete', 'emailBridge', 'mmCatch', 'mmDemoOk', 'mmDemoFail', 'mmPivot', 'fiveHook', 'fiveShortcut']) {
       expect(n.pick(ev, {})).not.toBe(null);
     }
-    expect(NARRATOR_LINES.length).toBeGreaterThanOrEqual(30);
+    expect(NARRATOR_LINES.length).toBeGreaterThanOrEqual(55);
     expect(new Set(NARRATOR_LINES.map((l) => l.id)).size).toBe(NARRATOR_LINES.length);
   });
 });
