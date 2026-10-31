@@ -36,7 +36,8 @@ Flusso tipico: `plan` → `review` → `plan` (applica i fix) → `implement` (u
 - La logica pura sta in `src/core/` (senza Phaser) e ha test Vitest.
 - `localStorage` sempre dentro try/catch; il gioco deve funzionare anche senza.
 - Nessuna dipendenza nuova senza versione esatta (niente `^`/`~`).
-- Git solo locale: niente creazione di repo remoti né push senza richiesta esplicita dell'utente.
+- Niente push né modifiche al repo remoto senza richiesta esplicita dell'utente.
+- Commit a nome dell'utente con l'email noreply di GitHub (già in `git config` locale); **nessuna** riga `Co-Authored-By: Claude` o `Claude-Session` nei messaggi di commit.
 
 ## Comandi
 

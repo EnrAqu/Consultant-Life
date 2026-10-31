@@ -57,7 +57,9 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Rendering HD: canvas 1920×1080, camera zoom 2, texture disegnate a 2× e scalate 0,5; coordinate di mondo e hitbox invariate — nitidezza senza toccare il gameplay.
 - 2026-10-31 — Resa del player separata dal corpo fisico (`PlayerView`), con animazioni e squash & stretch solo visivi — fluidità senza cambiare le hitbox.
 - 2026-10-31 — Outfit per livello di carriera: junior trasandato → consultant → manager → senior manager → partner "fa ciò che vuole"; salopette per il finale dei campi. Per ora solo estetici — richiesta utente.
-- 2026-10-31 — I percorsi normali di tutti i livelli usano la colonna "normale" della tabella dei salti; livello 2 con pilastri larghi 2 e un checkpoint — l'utente si bloccava allo slot D (supersede la scelta "rotta normal al limite" della review #11).
+- 2026-10-31 — Livello 2: geometria invariata, si aggiunge solo un checkpoint (col 52). L'utente ha scoperto che lo slot D si passa prendendo il KT verde: la difficoltà va bene — supersede ITERATION_2 §4 (pilastri larghi e tabella "normale" non si applicano).
+- 2026-10-31 — KT finto **rosso**, KT vero **verde**: distinzione netta invece del dettaglio del calendario — all'utente piace l'idea "verde utile, rosso inutile".
+- 2026-10-31 — Priorità dell'iterazione 2: prima nitidezza, fluidità e outfit (ITERATION_2 §1–3), poi il resto — richiesta utente.
 - 2026-10-31 — Email come card leggibili (URGENTE, RE: RE: FW:, ...) con hitbox letale più grande — "non fanno paura".
 - 2026-10-31 — Nuova variante delle email `landing: 'solid'`: letali in caduta, poi restano come ponte su un fosso non saltabile; usata nel livello 1 (S6a) — idea dell'utente.
 - 2026-10-31 — Leaderboard: per ora solo locale (tempi migliori + Hall of Shame per morti); globale rimandata — richiesta utente ("anche temporanea").
