@@ -104,3 +104,4 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — **Nome del gioco: "Consultant Life"** — scelto dall'utente. Titolo della pagina, schermata iniziale e `package.json` aggiornati; le chiavi di `localStorage` restano `ragebait.*` per non perdere statistiche e classifica già salvate. Il nome della cartella locale non cambia.
 - 2026-10-31 — Traguardo che tradisce implementato (`GoalBrain` + `Goal`): livello 2 con `goal: { trolls: true, carryCols: 14 }`, esteso a 125 colonne con una CR veloce oltre il cartello. Causa `clientSwitch` (incidente, non pivotabile).
 - 2026-10-31 — Repo GitHub privata **EnrAqu/Consultant-Life** (richiesta utente). CI (test + build) a ogni push; deploy su Pages solo manuale, perché Pages richiede una repo pubblica o un piano a pagamento.
+- 2026-10-31 — Repo resa **pubblica** e GitHub Pages attivato (sorgente: GitHub Actions), deploy automatico a ogni push su main — richiesta utente.
