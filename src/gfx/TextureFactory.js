@@ -156,6 +156,11 @@ function drawPerson(p, o, pose) {
     arm(7, pose.armL);
     arm(22, pose.armR);
   }
+  if (o.mug) {
+    p.fill(0xffffff).round(23, 22 + b + pose.armR, 5, 6, 1);
+    p.line(1, 0xffffff).strokeRound(27, 23 + b + pose.armR, 2, 3, 1);
+    p.fill(0x78350f).rect(23.5, 22.5 + b + pose.armR, 4, 1.5);
+  }
 
   // head
   p.fill(o.skin).circle(16, 8 + b, 6);
@@ -166,8 +171,7 @@ function drawPerson(p, o, pose) {
   if (o.strawHat) p.fill(0xfacc15).round(7, 2 + b, 18, 2, 1).round(11, -2 + b, 10, 5, 2);
 }
 
-function makePlayerSheet(scene, id, o) {
-  const key = `player_${id}`;
+function makePlayerSheet(scene, id, o, key = `player_${id}`) {
   make(scene, key, PLAYER_FRAME_W * PLAYER_FRAMES.length, PLAYER_FRAME_H, (_, g) => {
     PLAYER_FRAMES.forEach((name, i) => drawPerson(pen(g, i * PLAYER_FRAME_W, 1), o, POSES[name]));
   });
@@ -209,6 +213,25 @@ function ktCoin(p, base, rim) {
 
 export function generateAll(scene) {
   for (const [id, o] of Object.entries(OUTFITS)) makePlayerSheet(scene, id, o);
+  // NPCs reuse the character drawing: the micromanager (manager + mug) and the "5 minutes" colleague
+  makePlayerSheet(scene, 'micromanager', { ...OUTFITS.manager, hair: 0x6b7280, mug: true }, 'npc_micromanager');
+  makePlayerSheet(scene, 'colleague', { ...OUTFITS.consultant, top: 0xfde68a, topDark: 0xfcd34d, mug: true }, 'npc_colleague');
+
+  make(scene, 'plant', 24, 48, (p) => {
+    p.fill(0x166534).ellipse(12, 14, 20, 22).ellipse(6, 22, 12, 14).ellipse(18, 22, 12, 14);
+    p.fill(0x22c55e).ellipse(10, 12, 10, 12).ellipse(16, 18, 8, 10);
+    p.fill(0x92400e).round(5, 32, 14, 16, 2);
+    p.fill(0xb45309).rect(4, 32, 16, 3);
+  });
+  const door = (p, ajar) => {
+    p.fill(0x1f2937).rect(0, 0, 32, 56);
+    p.fill(ajar ? 0x0b0d12 : 0x7c5a3a).rect(3, 3, 26, 53);
+    if (ajar) p.fill(0x7c5a3a).rect(3, 3, 18, 53).fill(0x000000, 0.4).ellipse(24, 30, 6, 16);
+    p.fill(0xfbbf24).circle(ajar ? 18 : 25, 30, 1.5);
+    p.fill(0xffffff, 0.8).round(8, 10, 14, 6, 1);
+  };
+  make(scene, 'door', 32, 56, (p) => door(p, false));
+  make(scene, 'doorAjar', 32, 56, (p) => door(p, true));
 
   // invisible physics holder for the player body (logical size, not HD)
   const hb = scene.make.graphics({ add: false });

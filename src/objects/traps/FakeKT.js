@@ -56,7 +56,7 @@ export default class FakeKT extends BaseTrap {
     this.inCall = true;
     this.callLeft = this.p.callMs;
     this.player = player;
-    player.lockInput(true);
+    player.lockInput('kt', true);
     player.stopMotion();
     player.body.setAllowGravity(false);
     bus.emit(EV.KT_CALL_START, { pivoted: this.pivoted, durationMs: this.p.callMs });
@@ -65,7 +65,7 @@ export default class FakeKT extends BaseTrap {
   cancelCall() {
     if (!this.inCall) return;
     this.inCall = false;
-    this.player.lockInput(false);
+    this.player.lockInput('kt', false);
     this.player.body.setAllowGravity(true);
     this.scene.input.keyboard.resetKeys();
     bus.emit(EV.KT_CALL_END, { pivoted: this.pivoted });

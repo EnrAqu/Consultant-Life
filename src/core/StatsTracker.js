@@ -102,7 +102,12 @@ export default class StatsTracker {
 
   recordFakeKT() {
     this.run.pickups.fakeKT += 1;
-    this.touchIncident('fakeKT', INCIDENT_WEIGHT.fakeKT);
+    this.recordIncident('fakeKT');
+  }
+
+  // Non-lethal incidents (fake KT, micromanager, colleague) count for the Lessons Learned.
+  recordIncident(cause) {
+    this.touchIncident(cause, INCIDENT_WEIGHT[cause] ?? 1);
   }
 
   recordPickup(kind) {

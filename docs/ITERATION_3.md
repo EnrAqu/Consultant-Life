@@ -182,3 +182,9 @@ Regole: percorsi obbligatori solo con salti della colonna "normale" (gap ≤ 4 a
 
 ## 7. Domande aperte
 - Nessuna bloccante. Da confermare in playtest: frequenza dei controlli del micromanager (6 s) e durata dell'aggancio (3 s).
+
+## 8. Stato
+
+- [x] I3-M1…M6 sviluppate il 2026-10-31: incidenti e cause nuove, `MicromanagerBrain` e `FiveMinutesBrain` (logica pura con test), NPC in Phaser, micromanager nel livello 2 (zona 47–66, pianta a col 57), livello 3 completo, Lessons Learned dopo ogni livello, nuove frasi.
+- Verifica: 60 test Vitest (validatore: livello 3 completabile con tutte e 7 le combinazioni di pivot), build, smoke test nel browser (33 + 12 controlli) senza errori in console.
+- [ ] I3-M7: review del codice + playtest utente.

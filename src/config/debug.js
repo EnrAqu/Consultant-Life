@@ -1,6 +1,6 @@
 import { parseClock } from '../core/format.js';
 
-const PIVOTS = ['replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT'];
+const PIVOTS = ['replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes'];
 
 function readParams() {
   try {
@@ -18,7 +18,7 @@ const num = (key) => {
 
 export const DEBUG = {
   debug: q.get('debug') === '1',
-  level: ['level1', 'level2'].includes(q.get('level')) ? q.get('level') : null,
+  level: ['level1', 'level2', 'level3'].includes(q.get('level')) ? q.get('level') : null,
   pivot: PIVOTS.includes(q.get('pivot')) ? q.get('pivot') : null,
   standupOff: q.get('standup') === 'off',
   resetStats: q.get('resetStats') === '1',

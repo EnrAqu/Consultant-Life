@@ -72,6 +72,19 @@ describe('LevelValidator', () => {
     });
   }
 
+  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes']) {
+    it(`level3 is completable with pivot=${pivot}`, () => {
+      const r = validateLevel(parseLevel(resolveLevel(LEVELS.level3, pivot)));
+      expect(r.errors).toEqual([]);
+    });
+  }
+
+  it('plants are parsed and are not solid', () => {
+    const p = parseLevel(resolveLevel(LEVELS.level2, null));
+    expect(p.plants).toEqual([{ x: 57, y: 14 }]);
+    expect(p.tiles[14][57]).toBe(-1);
+  });
+
   it('level2 slotA ledge is reachable only when replyAll is pivoted', () => {
     const ledge = '23:9';
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level2, null))).reachable.has(ledge)).toBe(false);

@@ -8,6 +8,8 @@ g.ground(0, 35).put(2, 14, 'P');
 g.fill(20, 26, 10, 10, '#').put(23, 9, 'o');
 // slotB — ledge 30–35, pit 36–46 with a single pillar at 41, landing 47+
 g.ground(41, 41).ground(47, 84).put(52, 14, 'C');
+// micromanager zone 47–66: the plant at 57 is where you can wait for the deck in peace
+g.put(57, 14, 'p');
 // slotC — deck corridor 60–65 (pivoted: the floor becomes a pit via tile override)
 // slotD — spike pit 85–94 with a 2-wide pillar at 89–90 (jumps of 4)
 g.ground(85, 94);
@@ -24,6 +26,10 @@ export default {
   startGu: 15,
   map: g.toMap(),
   entities: [
+    {
+      id: 'mm1', type: 'micromanager', x: 47, y: 14,
+      params: { zoneFrom: 47, zoneTo: 66, floorRow: 14, demoJump: null },
+    },
     {
       id: 'slotA', type: 'replyAll', x: 10, y: 14, slot: true,
       params: {

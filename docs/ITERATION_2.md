@@ -258,5 +258,5 @@ Ordine scelto: prima gameplay e contenuti (piccoli, testabili), poi la parte gra
 - [x] §3 Outfit (6, `?outfit=<id>`) — 2026-10-31
 - [x] KT rosso/verde, checkpoint nel livello 2 — 2026-10-31
 - [x] §5 Email come card leggibili (parziale: card, badge, ombra che cresce, detriti, shake) — 2026-10-31
-- [ ] §5 resto, §6 ponte di email, §7 battute, §8 leaderboard
+- [x] §6 ponte di email (livello 1, S6a), §7 battute, §8 leaderboard locale — 2026-10-31
 - Verifica: 33 test Vitest, build, smoke test nel browser (28 controlli) senza errori in console.

@@ -15,8 +15,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setMaxVelocityY(PLAYER.maxFallSpeed);
     this.setCollideWorldBounds(true);
     this.isDead = false;
-    this.inputLocked = false;
+    this.locks = new Set();
     this.resetTimers();
+  }
+
+  // Several things can freeze the player at once (KT call, micromanager, colleague): one lock per reason.
+  get inputLocked() {
+    return this.locks.size > 0;
   }
 
   resetTimers() {
@@ -63,8 +68,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     body.setGravityY(body.velocity.y > 0 ? PLAYER.fallGravityExtra : 0);
   }
 
-  lockInput(locked) {
-    this.inputLocked = locked;
+  lockInput(reason, locked) {
+    if (locked) this.locks.add(reason);
+    else this.locks.delete(reason);
   }
 
   // Used by the standup and the KT call: stop dead, fall from still afterwards.
@@ -78,7 +84,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setAllowGravity(true);
     this.setFlipX(false);
     this.isDead = false;
-    this.inputLocked = false;
+    this.locks.clear();
     this.resetTimers();
   }
 }

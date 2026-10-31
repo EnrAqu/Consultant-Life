@@ -17,6 +17,7 @@ import { fadeIn, fadeTo } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
 import Checkpoint from '../objects/Checkpoint.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
+import { NPC_CLASSES } from '../objects/npc/index.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -52,6 +53,7 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
     this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : def.career ?? 'junior';
     this.playerView = new PlayerView(this, this.player, this.outfit);
+    this.buildNpcs(def, level);
     this.registerColliders();
 
     const cam = this.cameras.main;
@@ -138,6 +140,16 @@ export default class GameScene extends Phaser.Scene {
         .setDepth(DEPTH.objects);
       t.setY((e.y + 1) * TILE - 40);
     }
+  }
+
+  buildNpcs(def, level) {
+    this.npcs = def.entities
+      .filter((e) => NPC_CLASSES[e.type])
+      .map((e) => {
+        const npc = new NPC_CLASSES[e.type](this, e, e.mode, level);
+        npc.build();
+        return npc;
+      });
   }
 
   buildTraps(def) {
@@ -279,6 +291,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.player.update(dt, input);
     for (const trap of this.traps) trap.update(dt);
+    for (const npc of this.npcs) npc.update(dt);
     for (const p of this.pickups) p.update(dt);
 
     if (this.player.y > this.worldH + 64) this.die('pit');
@@ -334,6 +347,7 @@ export default class GameScene extends Phaser.Scene {
     const player = this.player;
     player.isDead = true;
     for (const trap of this.traps) trap.cancelCall();
+    for (const npc of this.npcs) npc.cancelCall();
     this.playerView.onDeath();
     this.cameras.main.shake(120, 0.006);
     const fx = this.add
@@ -353,6 +367,7 @@ export default class GameScene extends Phaser.Scene {
   respawn() {
     if (this.ended) return;
     for (const trap of this.traps) trap.reset();
+    for (const npc of this.npcs) npc.reset();
     this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
     this.playerView.onRespawn();
     this.cameras.main.centerOn(this.player.x, this.player.y);
@@ -366,6 +381,7 @@ export default class GameScene extends Phaser.Scene {
     this.ended = true;
     this.physics.pause();
     for (const trap of this.traps) trap.cancelCall();
+    for (const npc of this.npcs) npc.cancelCall();
   }
 
   budgetOver() {

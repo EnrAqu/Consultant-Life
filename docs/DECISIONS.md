@@ -76,3 +76,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Livello 3 "Manager" con Lessons Learned anche dopo il livello 2 — piano iterazione 3.
 - 2026-10-31 — Iterazione 3 solo pianificata: non sviluppare finché l'utente non lo chiede.
 - 2026-10-31 — L'utente chiede di sviluppare: prima il resto dell'iterazione 2 (battute, ponte di email, leaderboard), poi l'iterazione 3, infine una review del codice in contesto separato. Repo **solo locale**, nessun remoto per ora — utente.
+- 2026-10-31 — "Hai 5 minuti?" pivotato: la scorciatoia scatta al contatto con il collega (flash + spostamento), non con ↑ — ↑ è già il salto.
+- 2026-10-31 — Il player ha blocchi dell'input per motivo (`kt`, `mm`, `five`): più sistemi possono bloccarlo insieme senza sbloccarsi a vicenda.
+- 2026-10-31 — Lessons Learned dopo ogni livello che ha un successivo (ordine in `levels/index.js`); la leaderboard locale registra ogni livello completato.

@@ -73,3 +73,14 @@ describe('Storage', () => {
     expect(() => s.recordDeath({ cause: 'pit', x: 0, y: 0 })).not.toThrow();
   });
 });
+
+describe('StatsTracker incidents', () => {
+  it('non-lethal incidents can win the Lessons Learned', () => {
+    const s = new StatsTracker(memStorage());
+    s.startRun('level2');
+    s.recordIncident('micromanager');
+    s.recordIncident('micromanager');
+    s.recordDeath({ cause: 'replyAll', x: 0, y: 0 });
+    expect(s.dominantPivotCause()).toMatchObject({ cause: 'micromanager', incidents: 2, deaths: 0 });
+  });
+});

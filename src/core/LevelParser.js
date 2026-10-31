@@ -4,7 +4,7 @@ export const TILE_EMPTY = -1;
 export const TILE_SOLID = 0;
 export const TILE_ONEWAY = 2;
 
-const KNOWN = new Set(['.', '#', '=', '^', 'P', 'C', 'G', 'o']);
+const KNOWN = new Set(['.', '#', '=', '^', 'P', 'C', 'G', 'o', 'p']);
 
 export function parseLevel(def) {
   const { map } = def;
@@ -21,6 +21,7 @@ export function parseLevel(def) {
     checkpoints: [],
     goal: null,
     pickups: [],
+    plants: [],
     entities: def.entities ?? [],
   };
   let spawns = 0;
@@ -43,6 +44,7 @@ export function parseLevel(def) {
         out.goal = { x, y };
       }
       if (ch === 'o') out.pickups.push({ x, y });
+      if (ch === 'p') out.plants.push({ x, y });
     });
     out.tiles.push(tileRow);
   });
