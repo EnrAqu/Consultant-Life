@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseLevel, TILE_SOLID, TILE_ONEWAY } from '../src/core/LevelParser.js';
 import { resolveLevel, resolveMode } from '../src/core/pivot.js';
-import { validateLevel, maxGap } from '../src/core/LevelValidator.js';
+import { validateLevel, maxGap, longestQuietStretch } from '../src/core/LevelValidator.js';
 import { LEVELS } from '../src/levels/index.js';
 
 const rows = (body) => [...Array(17 - body.length).fill('.'.repeat(body[0].length)), ...body];
@@ -63,6 +63,12 @@ describe('LevelValidator', () => {
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level1, null)), { table: 'normal' }).errors).toEqual([]);
     for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes']) {
       expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, pivot)), { table: 'normal' }).errors, String(pivot)).toEqual([]);
+    }
+  });
+
+  it('pacing: no mandatory stretch longer than 12 quiet columns', () => {
+    for (const id of Object.keys(LEVELS)) {
+      expect(longestQuietStretch(parseLevel(resolveLevel(LEVELS[id], null))), id).toBeLessThanOrEqual(12);
     }
   });
 

@@ -107,3 +107,55 @@ export function validateLevel(parsed, { table = 'hard' } = {}) {
   }
   return { ok: errors.length === 0, errors, reachable: seen };
 }
+
+// Columns an entity makes "active" (something to do or to watch out for).
+function entityColumns(e) {
+  const p = e.params ?? {};
+  switch (e.type) {
+    case 'replyAll':
+      return [e.x + (p.triggerDx ?? 0), e.x + Math.max(...(p.columns ?? [0]))];
+    case 'deckCollapse':
+      return [e.x + Math.min(0, p.triggerDx ?? 0), e.x + 6];
+    case 'scopeCreep':
+      return p.direction === 'left' ? [e.x - (p.maxLength ?? 1), e.x] : [e.x, e.x + (p.maxLength ?? 1)];
+    case 'fakeKT':
+      return [e.x - 1, e.x + 1];
+    case 'micromanager':
+      return [p.zoneFrom, p.zoneTo];
+    case 'fiveMinutes':
+      return [e.x - 6, e.x + 1];
+    default:
+      return null;
+  }
+}
+
+// Longest run of consecutive "quiet" columns between spawn and goal (ITERATION_4 §1): no trap, NPC, pickup,
+// checkpoint, spike, pit or step. The pacing rule asks for at most 12.
+export function longestQuietStretch(parsed) {
+  const { width, height, tiles } = parsed;
+  const active = new Array(width).fill(false);
+  const mark = (a, b) => {
+    for (let x = Math.max(0, a); x <= Math.min(width - 1, b); x++) active[x] = true;
+  };
+  for (const e of parsed.entities) {
+    const cols = entityColumns(e);
+    if (cols) mark(cols[0], cols[1]);
+  }
+  for (const o of [...parsed.spikes, ...parsed.pickups, ...parsed.checkpoints]) mark(o.x - 1, o.x + 1);
+  const floorTop = (x) => {
+    for (let y = 2; y < height; y++) if (tiles[y][x] !== -1) return y;
+    return null;
+  };
+  for (let x = 0; x < width; x++) {
+    const top = floorTop(x);
+    if (top === null) mark(x - 1, x + 1); // pit
+    else if (x > 0 && floorTop(x - 1) !== null && floorTop(x - 1) !== top) mark(x - 1, x); // step
+  }
+  let longest = 0;
+  let run = 0;
+  for (let x = parsed.spawn.x + 4; x < parsed.goal.x - 2; x++) {
+    run = active[x] ? 0 : run + 1;
+    longest = Math.max(longest, run);
+  }
+  return longest;
+}

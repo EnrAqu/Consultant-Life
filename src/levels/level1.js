@@ -1,6 +1,6 @@
 import { createGrid } from './builder.js';
 
-const W = 220;
+const W = 195;
 const g = createGrid(W);
 
 // S0 — spawn, flat
@@ -12,20 +12,19 @@ g.put(32, 12, '^').put(33, 12, '^').put(34, 12, '^').put(36, 12, 'o');
 g.ground(38, 54);
 // S3 — ScopeCreep right: ledge 55–60, pit 61–64, landing 65–72
 g.ground(55, 60, 13).ground(65, 72, 13);
-// S4 — respite: coffees on desks, fake KT next to the third coffee, checkpoint
-g.ground(73, 131).ground(138, 146);
+// S4 — short respite: two coffees on desks, fake KT next to the second one, checkpoint
+g.ground(73, 117).ground(124, 132);
 g.fill(78, 80, 12, 12, '=').put(79, 11, 'o');
-g.fill(86, 88, 12, 12, '=').put(87, 11, 'o');
-g.fill(94, 98, 12, 12, '=').put(94, 11, 'o');
-g.put(108, 14, 'C');
-// S5 — CollapsingDeck corridor (cols 114–119)
-// S6a — escalation bridge: pit 132–137 (6, not jumpable) filled by falling emails, then spikes
-g.put(140, 14, '^').put(141, 14, '^').put(142, 14, '^');
-// S6b — ScopeCreep left: pit 147–150, ledge 151–157, wall 158–160
-g.ground(151, 157).ground(158, 160, 12);
-// S7 — final run: gap of 4 over a pit, ramp, goal
-g.ground(161, 175).put(170, 14, 'o').ground(180, 190).ground(191, 219, 13);
-g.put(214, 12, 'G');
+g.fill(85, 89, 12, 12, '=').put(85, 11, 'o');
+g.put(95, 14, 'C');
+// S5 — CollapsingDeck corridor (cols 100–105)
+// S6a — escalation bridge: pit 118–123 (6, not jumpable) filled by falling emails, then spikes
+g.put(126, 14, '^').put(127, 14, '^').put(128, 14, '^');
+// S6b — ScopeCreep left: pit 133–136, ledge 137–143, wall 144–146
+g.ground(137, 143).ground(144, 146, 12);
+// S7 — "one last round of comments": gap of 4, fast CR on a step over a pit, mini avalanche, goal
+g.ground(147, 160).put(150, 14, 'o').ground(165, 172).ground(173, 178, 13).ground(182, W - 1);
+g.put(191, 14, 'G');
 
 export default {
   id: 'level1',
@@ -43,22 +42,30 @@ export default {
       id: 'sc1', type: 'scopeCreep', x: 55, y: 12,
       params: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 6, dy: 1, w: 4, h: 4 } },
     },
-    { id: 'kt1', type: 'fakeKT', x: 97, y: 11, params: { callMs: 4000 } },
+    { id: 'kt1', type: 'fakeKT', x: 88, y: 11, params: { callMs: 4000 } },
     {
-      id: 'dk1', type: 'deckCollapse', x: 114, y: 14,
+      id: 'dk1', type: 'deckCollapse', x: 100, y: 14,
       params: {
         slideCount: 6, stackRow: 9, triggerDx: 0, triggerWidth: 1, corridorWidth: 6, wobbleMs: 350, dropIntervalMs: 120, fallSpeed: 14,
         targets: [{ dx: 4, row: 14 }, { dx: 2, row: 14 }, { dx: 0, row: 14 }, { dx: 4, row: 13 }, { dx: 2, row: 13 }, { dx: 0, row: 13 }],
       },
     },
     {
-      id: 'ra2', type: 'replyAll', x: 132, y: 14,
+      id: 'ra2', type: 'replyAll', x: 118, y: 14,
       params: { triggerDx: -6, triggerWidth: 2, startDelayMs: 0, count: 12, intervalMs: 100, columns: [0, 1, 2, 3, 4, 5], spawnHeight: 7, fallSpeed: 14, restRow: 15, landing: 'solid' },
     },
-    { id: 'sign2', type: 'sign', x: 122, y: 13, text: 'In attesa di riscontro dal cliente...' },
+    { id: 'sign2', type: 'sign', x: 108, y: 13, text: 'In attesa di riscontro dal cliente...' },
     {
-      id: 'sc2', type: 'scopeCreep', x: 157, y: 14,
+      id: 'sc2', type: 'scopeCreep', x: 143, y: 14,
       params: { direction: 'left', baseLength: 1, maxLength: 7, triggerDx: -4, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: -10, dy: 1, w: 4, h: 2 } },
+    },
+    {
+      id: 'sc3', type: 'scopeCreep', x: 173, y: 12,
+      params: { direction: 'right', baseLength: 1, maxLength: 6, triggerDx: 1, triggerWidth: 3, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 6, dy: 1, w: 3, h: 4 } },
+    },
+    {
+      id: 'ra3', type: 'replyAll', x: 184, y: 14,
+      params: { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 5, intervalMs: 120, columns: [0, 1, 2, 3, 4], spawnHeight: 6, fallSpeed: 14, restRow: 14 },
     },
   ],
 };

@@ -8,6 +8,8 @@ g.ground(0, 35).put(2, 14, 'P');
 g.fill(20, 26, 10, 10, '#').put(23, 9, 'o');
 // slotB — ledge 30–35, pit 36–46 with a single pillar at 41, landing 47+
 g.ground(41, 41).ground(47, 84).put(52, 14, 'C');
+// three spikes between the deck and the KT pit, so the stretch is never quiet
+g.put(74, 14, '^').put(75, 14, '^').put(76, 14, '^');
 // micromanager zone 54–66 (starts after the checkpoint, so you never respawn in his light);
 // the plant at 57 blocks his light: wait for the deck behind it
 g.put(57, 14, 'p');
