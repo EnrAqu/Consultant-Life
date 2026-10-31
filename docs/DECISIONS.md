@@ -88,3 +88,11 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Divergenze dal piano accettate: classifica finale top 3 (non 5) per spazio; squash & stretch con costante 40 ms (più reattivo di 120); i "!" del micromanager pivotato al posto di `revealHint()`; `mm_catch_3` senza condizione (il MM non uccide); card email larga 54 per leggere i titoli — review #14.
 - 2026-10-31 — Le partite con override di debug non entrano nella leaderboard — review #11.
 - 2026-10-31 — Smoke test nel browser salvati in `scripts/smoke/`; per eseguirli serve `puppeteer-core` (dipendenza di sviluppo): **in attesa della decisione dell'utente**.
+
+## Iterazione 4 (pianificata, non sviluppata)
+- 2026-10-31 — Email più veloci (14 tile/s, trigger ricalcolato a −3) e CR molto più veloci (12 tile/s, attivazione 250 ms) — playtest #2.
+- 2026-10-31 — Nessun tratto obbligatorio con più di 12 colonne "vuote", verificato dal validatore; livello 1 accorciato (S4 e S7) — playtest #2 ("noioso alla fine del livello 1").
+- 2026-10-31 — Traguardo che tradisce solo nei livelli 2 e 4: da sinistra il cliente cambia idea (−5 GU) e il cartello viene portato avanti (una volta); **da destra si vince subito** — utente.
+- 2026-10-31 — Team = A+B: i junior ti seguono ripetendo il tuo percorso e puoi delegarne uno (sacrificio) a una trappola o a un NPC; sfide con sacrificio obbligatorio ("Approvazione richiesta") con stagista di riserva per evitare blocchi — utente (A+B, sfide con sacrifici), dettagli proposti nel piano.
+- 2026-10-31 — Livello 4 "Senior Manager" confermato: arrivista, bonus AI, porte "5 minuti" come slot, team, traguardo che tradisce, niente micromanager — utente.
+- 2026-10-31 — Iterazione 4 solo pianificata: non sviluppare finché l'utente non lo chiede.
