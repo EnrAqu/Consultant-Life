@@ -126,7 +126,7 @@ function check(name, ok, info) {
 
   // Fake KT
   const before = (await state(page)).gu;
-  await teleport(page, 97, 11);
+  await teleport(page, 88, 11);
   await sleep(500);
   const s5 = await state(page);
   check('fake KT burns 3 GU and locks input', s5.gu === before - 3 && s5.locked === true, s5);
@@ -136,13 +136,13 @@ function check(name, ok, info) {
   check('KT call ends after 4s', s5b.locked === false, s5b);
 
   // Deck: run into corridor
-  await teleport(page, 109, 14);
+  await teleport(page, 95, 14);
   await sleep(200);
   await hold(page, 'ArrowRight', 1300);
   await sleep(400);
   const s6 = await state(page);
   check('running into the deck corridor dies by deckCollapse', (s6.byCause.deckCollapse ?? 0) >= 1, s6);
-  await teleport(page, 112, 14);
+  await teleport(page, 98, 14);
   await page.keyboard.down('ArrowRight');
   await sleep(150);
   await page.keyboard.up('ArrowRight');
@@ -152,13 +152,13 @@ function check(name, ok, info) {
   await page.screenshot({ path: OUT + 'shot-deck.png' });
 
   // ScopeCreep left
-  await teleport(page, 154, 14);
+  await teleport(page, 140, 14);
   await sleep(2500);
   const s7 = await state(page);
   check('scope creep left pushes into the pit behind', (s7.byCause.scopeCreep ?? 0) >= 2, s7);
 
   // Goal → Lessons Learned
-  await teleport(page, 213, 12);
+  await teleport(page, 189, 14);
   await hold(page, 'ArrowRight', 300);
   await sleep(1300);
   const s8 = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
@@ -230,6 +230,8 @@ for (const pivot of ['', 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT']) {
     check('pivoted scope creep bridge lets you walk across', s2.tile[0] >= 47 && s2.deaths === 0, s2);
   }
   if (pivot === 'deckCollapse') {
+    // keep the level 2 micromanager busy: this check is about the bridge
+    await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'mm1').brain.occupy(20000));
     await teleport(page, 50, 14);
     await sleep(200);
     await hold(page, 'ArrowRight', 2600);

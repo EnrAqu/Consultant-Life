@@ -96,10 +96,16 @@ export default class MicromanagerBrain {
     return Math.max(0, reach);
   }
 
+  // Standing at a plant: hidden, even when he walks right past you.
+  atPlant(player) {
+    return (this.p.plants ?? []).some((pl) => Math.abs(pl.col * T + 16 - player.x) <= 16);
+  }
+
   // Player standing (feet on his floor) inside the light.
   inLight(player) {
     if (!this.lightOn || !player.grounded || player.locked) return false;
     if (Math.abs(player.y - this.floorY) > 8) return false;
+    if (this.atPlant(player)) return false;
     const d = (player.x - this.x) * this.facing;
     return d >= -8 && d <= this.lightReach();
   }

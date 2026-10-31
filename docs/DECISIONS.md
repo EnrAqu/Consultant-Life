@@ -108,3 +108,7 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Team & delega implementati: `TeamTrail` e `DelegateTargeting` (puri, testati), `Team`, `ApprovalGate`, `InternDesk`; livello 3 si apre con il varco "Approvazione richiesta" (tutorial della delega: E), stagista a col 5; micromanager della zona A spostato a col 16 per non trovarselo addosso appena superato il varco.
 - 2026-10-31 — Il tasto delega ascolta l'evento keydown (un tocco brevissimo non va perso: Phaser azzera `JustDown` al rilascio nello stesso frame).
 - 2026-10-31 — La delega al KT finto, al collega e al micromanager "consuma" il junior come le trappole (persi per sempre, coerente con la Q3).
+- 2026-10-31 — Micromanager: chi sta **alla pianta** è nascosto anche quando lui ci passa accanto pattugliando (bug trovato dagli smoke test).
+- 2026-10-31 — Il "!" del micromanager pivotato resta un semplice punto esclamativo, senza testo — utente.
+- 2026-10-31 — Livello 4 "Il cliente strategico" implementato: arrivista (×2: il primo si ferma al varco, il secondo corre al cartello e costa 2 GU se arriva prima), bonus AI con 2 piattaforme allucinate su 5, 2 varchi con stagista, porta "5 minuti" come slot (pivot ora raggiungibile dal livello 3), traguardo che tradisce. Validato con salti "normali" per tutte le combinazioni di pivot.
+- 2026-10-31 — Gli smoke test nel browser aspettano in tempo reale: vanno eseguiti a macchina scarica (sotto carico Phaser rallenta il gioco invece di saltare frame e i controlli a tempo falliscono).

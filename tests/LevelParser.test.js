@@ -79,6 +79,19 @@ describe('LevelValidator', () => {
     expect(r.reachable.has('120:14')).toBe(true);
   });
 
+  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes']) {
+    it(`level4 is completable with "normal" jumps, pivot=${pivot}`, () => {
+      const r = validateLevel(parseLevel(resolveLevel(LEVELS.level4, pivot)), { table: 'normal' });
+      expect(r.errors).toEqual([]);
+      expect(r.reachable.has('177:14')).toBe(true); // the client side of the betraying goal
+      expect(r.reachable.has('190:14')).toBe(true); // where the sign gets carried
+    });
+  }
+
+  it('level 4: both approval gates really need a delegation', () => {
+    expect(validateLevel(parseLevel(resolveLevel(LEVELS.level4, null)), { gatesClosed: true }).ok).toBe(false);
+  });
+
   it('level 3: the approval gate really needs a delegation', () => {
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, null)), { gatesClosed: true }).ok).toBe(false);
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, null))).ok).toBe(true);

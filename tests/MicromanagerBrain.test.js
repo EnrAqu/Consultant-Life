@@ -52,6 +52,11 @@ describe('MicromanagerBrain (flashlight)', () => {
     expect(caught(run(pit, 500, at(22)))).toBe(false);
   });
 
+  it('standing at a plant hides you even while he patrols right past you', () => {
+    const b = make({ gaps: [], plants: [{ col: 15, row: 14 }] });
+    expect(caught(run(b, 30000, at(15)))).toBe(false);
+  });
+
   it('the light is 5 tiles long', () => {
     const b = make({ gaps: [] });
     expect(caught(run(b, 20, at(10 + MM_DEFAULTS.sightRange + 1)))).toBe(false);

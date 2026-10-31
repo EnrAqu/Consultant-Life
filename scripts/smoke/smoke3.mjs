@@ -28,19 +28,19 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
 // email bridge (level 1, S6a)
 {
   const page = await open('?debug=1&standup=off&resetStats=1');
-  await teleport(page, 121, 14); await sleep(200);
+  await teleport(page, 107, 14); await sleep(200);
   await hold(page, 'ArrowRight', 2200); await sleep(400);
   const s1 = await state(page);
   check('running into the escalation pit dies', s1.deaths >= 1, s1);
-  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.spawnPoint = { x: 121 * 32 + 16, y: 15 * 32 - 16 }; });
-  await teleport(page, 124, 14); await sleep(200);
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.spawnPoint = { x: 107 * 32 + 16, y: 15 * 32 - 16 }; });
+  await teleport(page, 110, 14); await sleep(200);
   await hold(page, 'ArrowRight', 350); await hold(page, 'ArrowLeft', 500);
   await sleep(3200);
   await page.screenshot({ path: OUT + 'i3-bridge.png' });
   const before = await state(page);
   await hold(page, 'ArrowRight', 1800); await sleep(300);
   const s2 = await state(page);
-  check('waiting for the emails builds a bridge you can walk on', s2.tile[0] >= 138 && s2.deaths === before.deaths, { before, s2 });
+  check('waiting for the emails builds a bridge you can walk on', s2.tile[0] >= 124 && s2.deaths === before.deaths, { before, s2 });
   await page.close();
 }
 
@@ -83,7 +83,8 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
 // level 2 → Lessons Learned 2 → level 3, leaderboard
 {
   const page = await open('?debug=1&standup=off&level=level2');
-  await teleport(page, 105, 14); await hold(page, 'ArrowRight', 300); await sleep(1500);
+  // the level 2 sign betrays from the left: deliver from the client side
+  await teleport(page, 108, 14); await hold(page, 'ArrowLeft', 250); await sleep(1500);
   const scenes = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
   check('level 2 complete opens Lessons Learned', scenes.includes('LessonsLearnedScene'), scenes);
   await sleep(800);
@@ -94,10 +95,18 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   const lb = await page.evaluate(() => JSON.parse(localStorage.getItem('ragebait.leaderboard.v1')));
   check('debug runs stay out of the leaderboard', !lb?.entries?.some((e) => e.levelId === 'level2'), lb);
   await teleport(page, 175, 14); await hold(page, 'ArrowRight', 200); await sleep(1500);
+  const ll3 = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
+  check('level 3 complete opens Lessons Learned 3', ll3.includes('LessonsLearnedScene'), ll3);
+  await sleep(800);
+  await page.screenshot({ path: OUT + 'i3-ll3.png' });
+  await page.keyboard.press('Space'); await sleep(900);
+  const s4 = await state(page);
+  check('Lessons Learned 3 leads to level 4 (Senior Manager)', s4.level === 'level4' && s4.outfit === 'seniorManager', s4);
+  await teleport(page, 178, 14); await hold(page, 'ArrowLeft', 250); await sleep(1500);
   const end = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
-  check('level 3 complete opens the end screen', end.includes('MvpEndScene'), end);
+  check('level 4 (from the client side) opens the end screen', end.includes('MvpEndScene'), end);
   await sleep(500);
-  await page.screenshot({ path: OUT + 'i3-end.png' });
+  await page.screenshot({ path: OUT + 'i4-end.png' });
   await page.close();
 }
 

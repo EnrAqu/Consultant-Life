@@ -25,6 +25,18 @@ const state = (page) => page.evaluate(() => {
 });
 const teleport = (page, tx, ty) => page.evaluate(([tx, ty]) => globalThis.__game.scene.getScene('GameScene').player.body.reset(tx * 32 + 16, (ty + 1) * 32 - 16), [tx, ty]);
 async function hold(page, key, ms) { await page.keyboard.down(key); await sleep(ms); await page.keyboard.up(key); }
+// hold a key until a condition on the game state is true (robust when the machine is slow)
+async function holdUntil(page, key, cond, timeoutMs = 4000) {
+  await page.keyboard.down(key);
+  const t0 = Date.now();
+  let s = await state(page);
+  while (!cond(s) && Date.now() - t0 < timeoutMs) {
+    await sleep(50);
+    s = await state(page);
+  }
+  await page.keyboard.up(key);
+  return s;
+}
 const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}${info !== undefined ? ' — ' + JSON.stringify(info) : ''}`);
 const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
 
@@ -51,7 +63,10 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   check('the sign is carried 14 columns ahead', s2.goalX === 120 && !s2.locks.includes('goal'), s2);
   await page.close();
   const p2 = await open('?debug=1&standup=off&level=level2');
-  await teleport(p2, 108, 14); await hold(p2, 'ArrowLeft', 250); await sleep(1200);
+  await teleport(p2, 108, 14);
+  await p2.keyboard.down('ArrowLeft');
+  await p2.waitForFunction(() => globalThis.__game.scene.isActive('LessonsLearnedScene'), { timeout: 4000 }).catch(() => {});
+  await p2.keyboard.up('ArrowLeft');
   const sc = await scenes(p2);
   check('reaching the sign from the right wins right away', sc.includes('LessonsLearnedScene'), sc);
   await p2.close();
@@ -70,15 +85,30 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   const open1 = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((t) => t.def.id === 'gate1').open);
   check('E sends a junior to the plate: gate open, team 2', s1.team === 2 && open1 === true, { ...s1, open1 });
   await page.screenshot({ path: OUT + 'i4-gate.png' });
-  await hold(page, 'ArrowRight', 1000); await sleep(200);
-  const s2 = await state(page);
+  const s2 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] > 12);
   check('you can walk through the open gate', s2.tile[0] > 12, s2);
   // delegate the "hai 5 minuti?" colleague at door 47
   await teleport(page, 41, 14); await sleep(400);
-  await page.keyboard.press('KeyE'); await sleep(1200);
-  await hold(page, 'ArrowRight', 1300); await sleep(200);
-  const s3 = await state(page);
+  await page.keyboard.press('KeyE');
+  // wait for the junior to reach the door, then walk past it
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.state === 'occupied', { timeout: 4000 }).catch(() => {});
+  const s3 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] >= 50 || s.locks.includes('five'));
   check('a delegated colleague never hooks you', !(s3.incidents.fiveMinutes > 0) && s3.team === 1, s3);
+  await page.close();
+}
+
+// level 4: arrivista and AI draft
+{
+  const page = await open('?debug=1&standup=off&level=level4');
+  const s0 = await state(page);
+  check('level 4 starts with a team', s0.team === 3 && s0.level === 'level4', s0);
+  await teleport(page, 10, 14); await sleep(600);
+  const rival = await page.evaluate(() => { const r = globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'rival1'); return { state: r.brain.state, col: Math.floor(r.brain.x / 32) }; });
+  check('the arrivista starts running when you pass him', rival.state === 'running' && rival.col > 6, rival);
+  await teleport(page, 82, 11); await sleep(400);
+  const ai = await page.evaluate(() => { const t = globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'ai1'); return { taken: t.taken, visible: t.platforms.filter((p) => p.ts.visible).length }; });
+  await page.screenshot({ path: OUT + 'i4-ai.png' });
+  check('the AI chip draws a shortcut of 5 platforms', ai.taken && ai.visible === 5, ai);
   await page.close();
 }
 

@@ -214,3 +214,9 @@ Mappa a sezioni (dettaglio ASCII in fase di implementazione, vincolato dal valid
 - **Q2 — Team dal livello 3 o dal 4?** Propongo il **3**: si chiama già "Il primo team" ed è il tuo primo livello da Manager. Il livello 3 riceverebbe un varco obbligatorio.
 - **Q3 — I junior persi sono persi per sempre** (passano al livello dopo) o il team si **ricompone a ogni livello**? Propongo "persi per sempre, minimo 1": rende la delega una scelta vera.
 - **Q4 — Smoke test nel repo:** serve `puppeteer-core` come dipendenza di sviluppo (domanda ancora aperta).
+
+## 8. Stato
+
+- [x] I4-M0 micromanager a torcia · M1 email/CR veloci · M2 ritmo (livello 1 a 195 colonne) · M3 traguardo che tradisce · M4/M5 team, delega, varco, stagista · M6 arrivista e bonus AI · M7 livello 4 — 2026-10-31.
+- Verifica: 100 test Vitest (tra cui livello 4 con salti "normali" per tutte le combinazioni di pivot e varchi obbligatori), build, smoke nel browser (`npm run smoke`, 3 suite): tutti verdi a macchina scarica; sotto carico alcuni controlli a tempo falliscono (vedi DECISIONS).
+- [ ] I4-M8: review del codice in contesto separato + playtest utente.

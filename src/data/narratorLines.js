@@ -96,4 +96,10 @@ export const NARRATOR_LINES = [
   { id: 'team_loss_1', event: 'teamLoss', text: 'Il junior ha imparato molto. Troppo.' },
   { id: 'team_loss_2', event: 'teamLoss', text: 'Un junior in meno. Lo segniamo come "turnover fisiologico".' },
   { id: 'intern_1', event: 'intern', text: 'Nuovo stagista. Non pagato, ma motivatissimo.' },
+  { id: 'rival_start_1', event: 'rivalStart', text: "L'arrivista è partito. Corre come se lo pagassero a cottimo." },
+  { id: 'rival_steal_1', event: 'rivalSteal', text: 'Ti ha "preso in prestito" un junior. Non te lo restituirà.' },
+  { id: 'rival_goal_1', event: 'rivalGoal', text: 'Ha presentato il tuo lavoro. Il cliente ha detto "finalmente qualcuno di sveglio".' },
+  { id: 'ai_draft_1', event: 'aiDraft', text: "L'AI ti ha fatto una draft in tre secondi. Ricontrollala in tre ore." },
+  { id: 'ai_fake_1', event: 'aiFake', text: 'Quella piattaforma era un\'allucinazione. Molto convincente, però.' },
+  { id: 'start_level4_1', event: 'levelStart', when: { levelId: 'level4' }, text: 'Senior Manager! Ora il cliente ti chiama per nome. Purtroppo.' },
 ];

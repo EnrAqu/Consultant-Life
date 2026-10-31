@@ -215,6 +215,7 @@ export function generateAll(scene) {
   for (const [id, o] of Object.entries(OUTFITS)) makePlayerSheet(scene, id, o);
   // NPCs reuse the character drawing: the micromanager (manager + mug) and the "5 minutes" colleague
   makePlayerSheet(scene, 'micromanager', { ...OUTFITS.manager, hair: 0x6b7280, mug: true }, 'npc_micromanager');
+  makePlayerSheet(scene, 'rival', { ...OUTFITS.manager, top: 0x7c3aed, topDark: 0x5b21b6, shirtV: 0xffffff, tie: 0xfacc15, hair: 0x111827 }, 'npc_rival');
   makePlayerSheet(scene, 'colleague', { ...OUTFITS.consultant, top: 0xfde68a, topDark: 0xfcd34d, mug: true }, 'npc_colleague');
 
   make(scene, 'plant', 24, 48, (p) => {
@@ -368,6 +369,12 @@ export function generateAll(scene) {
   make(scene, 'plate', 32, 8, (p) => {
     p.fill(0x374151).round(0, 2, 32, 6, 2);
     p.fill(0xfacc15).round(4, 0, 24, 4, 1);
+  });
+  make(scene, 'aiChip', 24, 24, (p) => {
+    p.fill(0x4c1d95).round(2, 2, 20, 20, 3);
+    p.fill(0xa78bfa).round(5, 5, 14, 14, 2);
+    p.fill(0x4c1d95).rect(0, 6, 2, 2).rect(0, 12, 2, 2).rect(22, 6, 2, 2).rect(22, 12, 2, 2).rect(6, 0, 2, 2).rect(12, 0, 2, 2).rect(6, 22, 2, 2).rect(12, 22, 2, 2);
+    p.fill(0xffffff).rect(8, 8, 2, 8).rect(8, 8, 4, 2).rect(11, 8, 2, 8).rect(8, 12, 4, 2).rect(15, 8, 2, 8);
   });
   make(scene, 'internDesk', 32, 40, (p) => {
     p.fill(0x1f2937).round(0, 14, 32, 26, 3);

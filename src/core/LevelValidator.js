@@ -131,6 +131,10 @@ function entityColumns(e) {
       return [e.x + (p.plateDx ?? -4), e.x];
     case 'intern':
       return [e.x - 1, e.x + 1];
+    case 'aiDraft':
+      return [e.x - 1, e.x + Math.max(0, ...(p.platforms ?? []).map((pl) => pl.dx + pl.w))];
+    case 'rival':
+      return [p.startCol, p.triggerCol];
     default:
       return null;
   }
