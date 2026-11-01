@@ -392,4 +392,35 @@ export function generateAll(scene) {
     p.fill(0x94a3b8).rect(2, 3, 6, 1).rect(2, 6, 5, 1).rect(2, 9, 6, 1);
   });
   make(scene, 'pixel', 4, 4, (p) => p.fill(0xffffff).rect(0, 0, 4, 4));
+
+  // Level 5 (ITERATION_5): worker scaffolding plank, crossed eye (you are watching), deal briefcase, bow mat, Board door
+  make(scene, 'scaffold', 32, 10, (p) => {
+    p.fill(0x92400e).rect(0, 2, 32, 8);
+    p.fill(0xb45309).rect(0, 2, 32, 2);
+    p.fill(COLORS.postit).rect(0, 0, 32, 2);
+    p.fill(0x111827).tri(4, 0, 8, 0, 6, 2).tri(14, 0, 18, 0, 16, 2).tri(24, 0, 28, 0, 26, 2);
+    p.fill(0x78350f).rect(15, 2, 2, 8);
+  });
+  make(scene, 'eyeOff', 16, 12, (p) => {
+    p.fill(0xffffff).ellipse(8, 6, 14, 9);
+    p.fill(0x1f2937).circle(8, 6, 2.5);
+    p.line(2, COLORS.red).seg(2, 11, 14, 1);
+  });
+  make(scene, 'deal', 24, 20, (p) => {
+    p.fill(0x78350f).round(8, 0, 8, 5, 1.5);
+    p.fill(0x92400e).round(0, 4, 24, 16, 2.5);
+    p.fill(0xb45309).rect(0, 10, 24, 2);
+    p.fill(COLORS.gold).rect(10, 9, 4, 4);
+    p.fill(COLORS.skin).round(4, 13, 7, 4, 1.5).round(13, 13, 7, 4, 1.5);
+  });
+  make(scene, 'mat', 32, 6, (p) => {
+    p.fill(0x991b1b).round(0, 0, 32, 6, 2);
+    p.fill(COLORS.gold).rect(2, 1, 28, 1).rect(2, 4, 28, 1);
+  });
+  make(scene, 'boardDoor', 40, 64, (p) => {
+    p.fill(0x1f2937).rect(0, 0, 40, 64);
+    p.fill(0x451a03).rect(3, 3, 34, 61);
+    p.fill(0x78350f).rect(6, 6, 13, 26).rect(21, 6, 13, 26).rect(6, 35, 13, 26).rect(21, 35, 13, 26);
+    p.fill(COLORS.gold).circle(31, 36, 2);
+  });
 }

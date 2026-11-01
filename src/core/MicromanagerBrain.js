@@ -1,5 +1,7 @@
 // Pure state machine of the micromanager "with the flashlight" (ITERATION_4 §0b). Pixels and ms; no Phaser.
 // He patrols his zone and turns around on a fixed rhythm; if you stand in his light, he stops you.
+import { inTorch } from './torch.js';
+
 const T = 32;
 
 export const MM_DEFAULTS = {
@@ -111,10 +113,8 @@ export default class MicromanagerBrain {
   // Player standing (feet on his floor) inside the light.
   inLight(player) {
     if (!this.lightOn || !player.grounded || player.locked) return false;
-    if (Math.abs(player.y - this.floorY) > 8) return false;
     if (this.atPlant(player)) return false;
-    const d = (player.x - this.x) * this.facing;
-    return d >= -8 && d <= this.lightReach();
+    return inTorch({ x: this.x, feetY: this.floorY, facing: this.facing }, { x: player.x, feetY: player.y }, { reach: this.lightReach(), above: 8, below: 8 });
   }
 
   // player: { x, y (feet), vx, grounded, locked }. Returns actions for the view.
