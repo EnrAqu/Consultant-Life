@@ -167,6 +167,11 @@ function drawPerson(p, o, pose) {
   p.fill(o.hair).round(10, 2 + b, 12, 4, 2);
   if (o.messyHair) p.fill(o.hair).tri(11, 3 + b, 13, -1 + b, 15, 3 + b).tri(15, 3 + b, 18, 0 + b, 20, 3 + b);
   p.fill(0x111827).circle(18, 8 + b, 0.9).circle(21, 8 + b, 0.9);
+  // burnout (docs/BURNOUT.md §6): eye bags at 50%, darker and with heavy eyelids at 80%
+  if (o.eyebags) {
+    p.fill(0x6b21a8, o.eyebags === 2 ? 0.75 : 0.45).round(16.9, 9.3 + b, 2.4, 1.1, 0.5).round(19.9, 9.3 + b, 2.4, 1.1, 0.5);
+    if (o.eyebags === 2) p.fill(o.skin).rect(16.9, 6.6 + b, 2.4, 1.1).rect(19.9, 6.6 + b, 2.4, 1.1);
+  }
   if (o.sunglasses) p.fill(0x111827).round(16, 6.5 + b, 7, 2.5, 1);
   if (o.strawHat) p.fill(0xfacc15).round(7, 2 + b, 18, 2, 1).round(11, -2 + b, 10, 5, 2);
 }
@@ -212,7 +217,12 @@ function ktCoin(p, base, rim) {
 }
 
 export function generateAll(scene) {
-  for (const [id, o] of Object.entries(OUTFITS)) makePlayerSheet(scene, id, o);
+  for (const [id, o] of Object.entries(OUTFITS)) {
+    makePlayerSheet(scene, id, o);
+    // tired variants for the burnout tiers
+    makePlayerSheet(scene, id, { ...o, eyebags: 1 }, `player_${id}_t1`);
+    makePlayerSheet(scene, id, { ...o, eyebags: 2 }, `player_${id}_t2`);
+  }
   // NPCs reuse the character drawing: the micromanager (manager + mug) and the "5 minutes" colleague
   makePlayerSheet(scene, 'micromanager', { ...OUTFITS.manager, hair: 0x6b7280, mug: true }, 'npc_micromanager');
   makePlayerSheet(scene, 'rival', { ...OUTFITS.manager, top: 0x7c3aed, topDark: 0x5b21b6, shirtV: 0xffffff, tie: 0xfacc15, hair: 0x111827 }, 'npc_rival');

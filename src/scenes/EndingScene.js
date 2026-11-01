@@ -8,7 +8,8 @@ import { pressLabel } from '../input/TouchControls.js';
 
 const style = (size, color = '#e5e7eb', align = 'center') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, align, resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
 
-// The endings (ITERATION_5 §6). 5A has the Partner one; product, fields and burnout come later.
+// The endings (ITERATION_5 §6). Partner (the Board) and burnout (docs/BURNOUT.md §5: you quit and become a farmer —
+// a placeholder until the farm level exists); the product company comes later.
 const ENDINGS = {
   partner: {
     title: 'Benvenuto nella partnership.',
@@ -16,6 +17,14 @@ const ENDINGS = {
     after: 'Il cliente vuole rifare tutto da capo.',
     restart: 'per ricominciare dal Progetto 1 (vestito da Partner)',
     outfit: 'partner',
+  },
+  burnout: {
+    title: 'Burnout.',
+    color: '#86efac',
+    after: 'Hai mollato tutto. Ora fai il contadino.\n(Il livello dei campi arriverà presto. Le galline sono in onboarding.)',
+    restart: 'per ricominciare dal Progetto 1 (da junior, riposato)',
+    outfit: null,
+    burnoutLine: true,
   },
 };
 
@@ -31,13 +40,13 @@ export default class EndingScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#0b0d12');
     const cx = GAME_WIDTH / 2;
     this.add.text(cx, 56, e.title, style(36, e.color)).setOrigin(0.5);
-    const after = this.add.text(cx, 100, e.after, style(18)).setOrigin(0.5).setAlpha(0);
+    const after = this.add.text(cx, e.burnoutLine ? 96 : 100, e.after, style(e.burnoutLine ? 16 : 18)).setOrigin(0.5).setAlpha(0);
     this.time.delayedCall(1500, () => this.tweens.add({ targets: after, alpha: 1, duration: 400 }));
     this.add
       .text(
         cx,
-        140,
-        `Progetto ${projectNumber(levelId)} — morti: ${run.deaths}   tempo: ${formatDuration(run.timeMs)}   GU residue: ${formatGu(gu)} / ${guMax}   ` +
+        e.burnoutLine ? 146 : 140,
+        `${e.burnoutLine ? `Burnout: 100% al Progetto ${projectNumber(levelId)}\n` : ''}Progetto ${projectNumber(levelId)} — morti: ${run.deaths}   tempo: ${formatDuration(run.timeMs)}   GU residue: ${formatGu(gu)} / ${guMax}   ` +
           `Ore non fatturabili (totale): ${stats.getPersistent().totalDeaths}`,
         style(14, '#9ca3af'),
       )

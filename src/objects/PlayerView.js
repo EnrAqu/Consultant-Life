@@ -10,7 +10,9 @@ export default class PlayerView {
   constructor(scene, player, outfit) {
     this.scene = scene;
     this.player = player;
-    this.key = `player_${outfit}`;
+    this.baseKey = `player_${outfit}`;
+    this.key = this.baseKey;
+    this.tier = 0;
     this.sprite = scene.add.image(player.x, player.body.bottom, this.key, 'idle0').setOrigin(0.5, 1).setScale(BASE).setDepth(DEPTH.player);
     this.anim = 'idle';
     this.frameTime = 0;
@@ -41,6 +43,14 @@ export default class PlayerView {
       gravityY: 700,
       emitting: false,
     }).setDepth(DEPTH.fx);
+  }
+
+  // burnout tier (docs/BURNOUT.md §6): 1 = eye bags, 2 = darker, hunched and shaking. Visual only.
+  setTier(tier) {
+    if (tier === this.tier) return;
+    this.tier = tier;
+    this.key = tier > 0 ? `${this.baseKey}_t${tier}` : this.baseKey;
+    this.sprite.setTexture(this.key, this.frameName());
   }
 
   setAnim(name) {
@@ -123,16 +133,25 @@ export default class PlayerView {
       }
     }
 
+    // at 80%+ burnout, standing still you slump: a little shorter, leaning forward
+    const slump = this.tier >= 2 && grounded && this.anim === 'idle';
+    const restSy = slump ? 0.95 : 1;
+    const restTilt = slump ? (player.flipX ? -4 : 4) : 0;
     const k = 1 - Math.exp(-dt / SQUASH_MS);
     this.sx += (1 - this.sx) * k;
-    this.sy += (1 - this.sy) * k;
-    this.tilt += (0 - this.tilt) * k;
+    this.sy += (restSy - this.sy) * k;
+    this.tilt += (restTilt - this.tilt) * k;
     this.fade = Math.min(1, this.fade + dt / RESPAWN_FADE_MS);
 
     this.sprite.setFrame(this.frameName());
     this.sprite.setScale(BASE * this.sx, BASE * this.sy);
     this.sprite.setAngle(this.tilt);
     this.sprite.setAlpha(this.fade);
+    // ...and your hands shake (deterministic, after the interpolation)
+    if (slump) {
+      this.shakeMs = (this.shakeMs ?? 0) + dt;
+      this.sprite.x += Math.sin(this.shakeMs / 35) * 0.5;
+    }
 
     this.prevGrounded = grounded;
     this.prevVy = vy;

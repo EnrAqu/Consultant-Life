@@ -110,7 +110,7 @@ export default class FiveMinutesDoor {
         player.stopMotion();
         this.hookedMs = 0;
         scene.stats.recordIncident('fiveMinutes');
-        if (scene.spendGu(a.cost, 'fiveMinutes')) return;
+        if (scene.addBurnout('fiveMinutes') || scene.spendGu(a.cost, 'fiveMinutes')) return;
         scene.narrate('fiveHook');
         break;
       case 'release':

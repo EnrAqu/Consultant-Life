@@ -3,7 +3,9 @@ import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/con
 import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatGu, formatDuration } from '../core/format.js';
-import { projectNumber } from '../levels/index.js';
+import { projectNumber, LEVEL_ORDER } from '../levels/index.js';
+import { nextStart } from '../core/Burnout.js';
+import { BURNOUT } from '../config/constants.js';
 import { pressLabel } from '../input/TouchControls.js';
 
 const style = (size, color = '#111827') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION, wordWrap: { width: 780 } });
@@ -13,7 +15,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     super('LessonsLearnedScene');
   }
 
-  create({ levelId, next, run, ranks, team, dominant, gu, guMax }) {
+  create({ levelId, next, run, ranks, team, dominant, gu, guMax, burnout = 0, clean = false }) {
     setupScreenCamera(this);
     fadeIn(this);
     this.cameras.main.setBackgroundColor('#0b0d12');
@@ -35,6 +37,10 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     bullets.push(`Azione correttiva: ${cause.lesson}`);
     bullets.push(`Morti totali nel progetto: ${run.deaths} — Tempo: ${formatDuration(run.timeMs)} — GU residue: ${formatGu(gu)} / ${guMax}`);
     if (team) bullets.push(`Team arrivato alla consegna: ${team.count}/${team.size}${team.count < team.size ? ' (gli altri sono stati "valorizzati" altrove)' : ''}`);
+    // where the next project starts, and why (docs/BURNOUT.md §6)
+    const start = nextStart(burnout, LEVEL_ORDER.indexOf(next), BURNOUT.levelMin, clean ? BURNOUT.relief.cleanLevel : 0);
+    const why = { minimum: ' (minimo del progetto)', carried: '', clean: ` (−${BURNOUT.relief.cleanLevel}%: progetto senza morti)` }[start.reason];
+    bullets.push(`Burnout: ${Math.floor(burnout)}% → il Progetto ${projectNumber(next)} parte dal ${Math.floor(start.value)}%${why}`);
     if (ranks?.timeRank) bullets.push(`Record personale: #${ranks.timeRank} per tempo.`);
     if (ranks?.shameRank === 1 && run.deaths > 0) bullets.push('Hall of Shame: nuovo record di morti. Complimenti, credo.');
 

@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD, CAMERA_LOOK_UP, CAMERA_LOOK_DOWN } from '../config/constants.js';
+import { TILE, DEPTH, BUDGET, BURNOUT, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD, CAMERA_LOOK_UP, CAMERA_LOOK_DOWN } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
 import { LEVELS, nextLevel, LEVEL_ORDER } from '../levels/index.js';
 import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
 import { resolveLevel } from '../core/pivot.js';
 import Budget from '../core/Budget.js';
+import Burnout from '../core/Burnout.js';
 import StandupSchedule from '../core/StandupSchedule.js';
 import { formatGu } from '../core/format.js';
 import { CAUSES } from '../data/causes.js';
@@ -33,6 +34,8 @@ export default class GameScene extends Phaser.Scene {
   init(data) {
     this.levelId = data?.levelId ?? 'level1';
     this.pivotCause = data?.pivotCause ?? null;
+    // retry after "Budget sforato": same level, the campaign goes on (docs/BURNOUT.md §3)
+    this.retry = data?.retry === true;
     this.stats = stats;
     this.debugMode = DEBUG.debug;
   }
@@ -64,8 +67,10 @@ export default class GameScene extends Phaser.Scene {
     this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : OUTFITS[session.outfitOverride] ? session.outfitOverride : def.career ?? 'junior';
     this.playerView = new PlayerView(this, this.player, this.outfit);
     this.levelTiles = level.tiles;
-    // a new campaign starts with a fresh team
-    if (this.levelId === LEVEL_ORDER[0]) session.team = null;
+    // a new campaign starts with a fresh team and no burnout (retrying level 1 is not a new campaign)
+    const newCampaign = this.levelId === LEVEL_ORDER[0] && !this.retry;
+    if (newCampaign) session.team = null;
+    this.startBurnout(newCampaign);
     // team of juniors from level 3 on; lost juniors stay lost across levels (minimum 1)
     this.teamAtStart = def.team ? Math.max(1, session.team ?? def.team.size) : 0;
     this.team = def.team ? new Team(this, this.teamAtStart) : null;
@@ -124,6 +129,9 @@ export default class GameScene extends Phaser.Scene {
     this.events.once('shutdown', () => touch.setVisible(false));
     this.emitSnapshot();
     this.narrate(this.pivotCause ? 'levelStartPivot' : 'levelStart', { pivotLabel: CAUSES[this.pivotCause]?.label });
+    this.playerView.setTier(this.burnout.tier);
+    // entering a level already cooked: say it once, after the level's opening line
+    if (this.burnout.tier === 2) this.time.delayedCall(3500, () => !this.ended && this.sayBurnoutHigh());
   }
 
   // ---------- building ----------
@@ -218,6 +226,7 @@ export default class GameScene extends Phaser.Scene {
         if (!p.collect()) return;
         this.stats.recordPickup('coffee');
         this.gainGu(BUDGET.coffeeBonus, 'coffee');
+        this.relieveBurnout('coffee');
         bus.emit(EV.TOAST, { text: `Caffè: +${formatGu(BUDGET.coffeeBonus)} GU`, durationMs: 1200 });
       });
     }
@@ -239,6 +248,7 @@ export default class GameScene extends Phaser.Scene {
         this.cpIndex = index;
         this.sycophant?.placeNearPlayer();
         this.spawnPoint = c.spawn;
+        if (this.chargeTeamLosses()) return;
         this.team?.snapshot();
         bus.emit(EV.TOAST, { text: 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
         this.narrate('checkpoint');
@@ -276,12 +286,82 @@ export default class GameScene extends Phaser.Scene {
     cam.setFollowOffset(-this.lookAhead, this.lookY);
   }
 
+  // ---------- burnout (docs/BURNOUT.md) ----------
+
+  startBurnout(newCampaign) {
+    // first level of the page (also ?level=…): the debug value applies once, then the session carries it;
+    // a later new campaign (after an ending) starts rested
+    if (session.burnout === null) session.burnout = DEBUG.burnout ?? 0;
+    else if (newCampaign) {
+      session.burnout = 0;
+      session.burnoutCleanBonus = false;
+    }
+    this.burnout = new Burnout(session.burnout);
+    this.burnout.startLevel(LEVEL_ORDER.indexOf(this.levelId), BURNOUT.levelMin);
+    if (session.burnoutCleanBonus && !this.retry) this.burnout.relieve('cleanLevel', BURNOUT.relief.cleanLevel);
+    session.burnoutCleanBonus = false;
+    session.burnout = this.burnout.value;
+    // one-shot reliefs (the real KT) that a respawn must not hand out again
+    this.relievedOnce = new Set();
+    this.burnoutHighSaid = false;
+  }
+
+  // Single entry point for burnout gains. Returns true if it ended the campaign.
+  addBurnout(cause, amount = BURNOUT.gain[cause]) {
+    if (DEBUG.god || this.ended) return false;
+    const tierBefore = this.burnout.tier;
+    const r = this.burnout.add(cause, amount);
+    if (r.delta === 0) return false;
+    session.burnout = r.value;
+    bus.emit(EV.BURNOUT_CHANGED, { value: r.value, delta: r.delta, reason: cause, tier: this.burnout.tier });
+    if (r.over) {
+      this.burnoutOver();
+      return true;
+    }
+    if (this.burnout.tier !== tierBefore) this.playerView.setTier(this.burnout.tier);
+    if (this.burnout.tier === 2) this.sayBurnoutHigh();
+    return false;
+  }
+
+  // `once`: given at most once per level (respawns reset the traps that hand it out)
+  relieveBurnout(reason, { once = false } = {}) {
+    if (this.ended || (once && this.relievedOnce.has(reason))) return;
+    if (once) this.relievedOnce.add(reason);
+    const r = this.burnout.relieve(reason, BURNOUT.relief[reason]);
+    if (r.delta === 0) return;
+    session.burnout = r.value;
+    bus.emit(EV.BURNOUT_CHANGED, { value: r.value, delta: r.delta, reason, tier: this.burnout.tier });
+    this.playerView.setTier(this.burnout.tier);
+  }
+
+  sayBurnoutHigh() {
+    if (this.burnoutHighSaid) return;
+    this.burnoutHighSaid = true;
+    this.narrate('burnoutHigh');
+  }
+
+  // juniors lost since the last checkpoint (or the level start); the ones a respawn gives back never count
+  chargeTeamLosses() {
+    const lost = this.team?.netLoss() ?? 0;
+    return lost > 0 ? this.addBurnout('teamLoss', lost * BURNOUT.gain.teamLoss) : false;
+  }
+
+  burnoutOver() {
+    if (this.ended) return;
+    this.endLevel();
+    this.narrate('burnoutOver');
+    const run = this.stats.getRun();
+    bus.emit(EV.BURNOUT_OVER, { levelId: this.levelId, run });
+    this.time.delayedCall(600, () => fadeTo(this, 'EndingScene', { ending: 'burnout', levelId: this.levelId, run, gu: this.budget.gu, guMax: this.budget.max }));
+  }
+
   // ---------- state helpers ----------
 
   emitSnapshot() {
     bus.emit(EV.LEVEL_START, { levelId: this.levelId, name: this.def.name, career: OUTFITS[this.outfit].title, startGu: this.budget.max, pivotCause: this.pivotCause, team: this.team ? this.team.count : null });
     bus.emit(EV.GU_CHANGED, { gu: this.budget.gu, max: this.budget.max, delta: 0, reason: 'snapshot' });
     bus.emit(EV.CLOCK_TICK, { label: this.schedule.clockLabel, warning: this.schedule.isWarning });
+    bus.emit(EV.BURNOUT_CHANGED, { value: this.burnout.value, delta: 0, reason: 'snapshot', tier: this.burnout.tier });
     if (this.lastNarration) bus.emit(EV.NARRATE, this.lastNarration);
     if (this.dealsRequired) bus.emit(EV.DEALS_CHANGED, { count: this.dealCount, required: this.dealsRequired });
     if (this.escalation) {
@@ -426,6 +506,7 @@ export default class GameScene extends Phaser.Scene {
       this.addPause('standup');
       bus.emit(EV.STANDUP_START, ev);
       this.narrate(ev.overrun ? 'standupOverrun' : 'standupStart');
+      if (ev.overrun) this.addBurnout('standupOverrun');
     }
     if (ev.type === 'end') {
       this.player.stopMotion();
@@ -455,11 +536,13 @@ export default class GameScene extends Phaser.Scene {
     this.escalation?.cancelCall();
     this.playerView.onDeath();
     this.cameras.main.shake(120, 0.006);
-    this.floatText(`-${formatGu(BUDGET.deathCost)} GU`, player.x, player.y - 24);
     this.addPause('death');
 
     const r = this.stats.recordDeath({ cause, x: player.x, y: Math.min(player.y, this.worldH) });
     bus.emit(EV.PLAYER_DIED, { cause, ...r });
+    // the burnout comes first: if it ends the campaign, it wins over the budget
+    if (this.addBurnout('death')) return;
+    this.floatText(`-${formatGu(BUDGET.deathCost)} GU`, player.x, player.y - 24);
     this.narrate('death', { cause, causeLabel: CAUSES[cause]?.label, spotCount: r.spotCount, causeDeaths: r.causeDeaths, runDeaths: r.deathsThisRun, totalDeaths: r.totalDeaths });
     if (this.spendGu(BUDGET.deathCost, cause)) return;
     this.time.delayedCall(DEATH_FREEZE_MS, () => this.respawn());
@@ -503,16 +586,20 @@ export default class GameScene extends Phaser.Scene {
 
   completeLevel(narration = 'levelComplete') {
     if (this.player.isDead || this.ended) return;
+    if (this.chargeTeamLosses()) return;
+    const next = nextLevel(this.levelId);
+    // a level without deaths: -5% on where the next one starts (docs/BURNOUT.md §4, review #12)
+    const clean = this.stats.getRun().deaths === 0 && next !== null;
+    session.burnoutCleanBonus = clean;
     this.endLevel();
     this.stats.completeRun();
     this.narrate(narration);
     const run = this.stats.getRun();
     // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
     const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
-    const next = nextLevel(this.levelId);
     const team = this.team ? { count: this.team.count, size: this.teamAtStart } : null;
     if (team) session.team = Math.max(1, team.count);
-    const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
+    const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max, burnout: this.burnout.value, clean };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
       fadeTo(this, next ? 'LessonsLearnedScene' : 'EndingScene', { ending: 'partner', ...payload });

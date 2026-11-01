@@ -15,6 +15,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/ITERATION_4.md` | Piano dell'iterazione 4 (ritmo, traguardo che tradisce, team & delega, livello 4): in sviluppo | Playbook `plan` |
 | `docs/ITERATION_5.md` | Piano dell'iterazione 5 (5A: livello 5 "Partner" verticale, escalation, lavoratori, leccapiedi, Board): in sviluppo | Playbook `plan` |
 | `docs/MOBILE.md` | Versione mobile: controlli su schermo (`src/input/TouchControls.js`) | Playbook `plan` / `implement` |
+| `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |

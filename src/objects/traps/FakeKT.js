@@ -43,6 +43,7 @@ export default class FakeKT extends BaseTrap {
     if (this.pivoted) {
       scene.stats.recordPickup('realKT');
       scene.gainGu(BUDGET.realKtBonus, 'realKT');
+      scene.relieveBurnout('realKT', { once: true });
       for (const h of this.hidden) {
         h.setVisible(true);
         h.body.enable = true;
@@ -50,7 +51,7 @@ export default class FakeKT extends BaseTrap {
       scene.narrate('ktReal');
     } else {
       scene.stats.recordFakeKT();
-      if (scene.spendGu(BUDGET.fakeKtCost, 'fakeKT')) return;
+      if (scene.addBurnout('fakeKT') || scene.spendGu(BUDGET.fakeKtCost, 'fakeKT')) return;
       scene.narrate('ktFake');
     }
     this.inCall = true;

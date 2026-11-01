@@ -63,6 +63,11 @@ export default class Team {
     this.savedCount = this.count;
   }
 
+  // juniors lost since the last checkpoint (or the level start): what the burnout charges for
+  netLoss() {
+    return Math.max(0, this.savedCount - this.count);
+  }
+
   restore() {
     this.setCount(this.savedCount);
     this.resetTrail();

@@ -16,4 +16,5 @@ export const narrator = new Narrator(NARRATOR_LINES);
 export const leaderboard = new Leaderboard(storage);
 // team: juniors carried over between levels (ITERATION_4 §4.1); null until the first team level
 // outfitOverride: set by the Partner ending, the next campaign is played dressed as a Partner
-export const session = { titleShown: false, team: null, outfitOverride: null };
+// burnout: carried between levels (docs/BURNOUT.md); null until the first level; burnoutCleanBonus: -5% owed to the next level
+export const session = { titleShown: false, team: null, outfitOverride: null, burnout: null, burnoutCleanBonus: false };

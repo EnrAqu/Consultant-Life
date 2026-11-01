@@ -30,7 +30,13 @@ export default class UIScene extends Phaser.Scene {
     // GU bar
     this.guBarBg = this.add.rectangle(16, 16, 200, 14, 0x111827).setOrigin(0, 0).setStrokeStyle(1, 0x6b7280);
     this.guBar = this.add.rectangle(16, 16, 200, 14, 0x22c55e).setOrigin(0, 0);
-    this.guText = text(this, 16, 34, '');
+    // burnout bar right under it (docs/BURNOUT.md §6): visible at 0% too, the value sits in the GU line
+    this.burnoutBarBg = this.add.rectangle(16, 34, 200, 6, 0x111827).setOrigin(0, 0).setStrokeStyle(1, 0x6b7280);
+    this.burnoutBar = this.add.rectangle(16, 34, 0, 6, 0xfacc15).setOrigin(0, 0);
+    this.guText = text(this, 16, 44, '');
+    this.gu = { gu: 0, max: 0 };
+    this.burnout = 0;
+    this.burnoutFlashLeft = 0;
     // clock
     this.clockText = text(this, GAME_WIDTH / 2, 10, '09:00', { fontSize: '24px', fontStyle: 'bold' }).setOrigin(0.5, 0);
     // deaths
@@ -40,17 +46,17 @@ export default class UIScene extends Phaser.Scene {
     this.narrBox = this.add.rectangle(GAME_WIDTH / 2, NARR_Y, 560, 40, 0x000000, 0.75).setOrigin(0.5, 0).setVisible(false);
     this.narrText = text(this, GAME_WIDTH / 2, NARR_Y + 10, '', { wordWrap: { width: 532 }, fontSize: '15px', align: 'center' }).setOrigin(0.5, 0).setVisible(false);
     // toast
-    this.toastText = text(this, GAME_WIDTH / 2, 44, '', { fontSize: '16px', backgroundColor: '#111827', padding: { x: 8, y: 4 } })
+    this.toastText = text(this, GAME_WIDTH / 2, 44, '', { fontSize: '16px', backgroundColor: '#111827', padding: { x: 8, y: 4 }, wordWrap: { width: 440 }, align: 'center' })
       .setOrigin(0.5, 0)
       .setVisible(false);
     // level name
-    this.levelText = text(this, 16, 54, '', { fontSize: '14px', color: '#9ca3af' });
-    this.teamText = text(this, 16, 74, '', { fontSize: '14px', color: '#fde68a' });
-    this.dealsText = text(this, 16, 94, '', { fontSize: '14px', color: '#fbbf24' });
+    this.levelText = text(this, 16, 64, '', { fontSize: '14px', color: '#9ca3af' });
+    this.teamText = text(this, 16, 84, '', { fontSize: '14px', color: '#fde68a' });
+    this.dealsText = text(this, 16, 104, '', { fontSize: '14px', color: '#fbbf24' });
     // level 5: the escalation tide comes from below, so its line sits at the bottom
     this.escalationText = text(this, GAME_WIDTH / 2, GAME_HEIGHT - 34, '', { fontSize: '16px', fontStyle: 'bold', color: '#fca5a5', backgroundColor: '#111827', padding: { x: 8, y: 3 } }).setOrigin(0.5, 0).setVisible(false);
 
-    this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText, this.dealsText, this.escalationText]);
+    this.hud.add([this.guBarBg, this.guBar, this.burnoutBarBg, this.burnoutBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText, this.dealsText, this.escalationText]);
     // above the escalation line (bottom centre)
     this.debugText = text(this, 16, GAME_HEIGHT - 84, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
 
@@ -112,6 +118,8 @@ export default class UIScene extends Phaser.Scene {
       },
       [EV.LEVEL_COMPLETE]: () => this.hideAll(),
       [EV.BUDGET_OVER]: () => this.hideAll(),
+      [EV.BURNOUT_OVER]: () => this.hideAll(),
+      [EV.BURNOUT_CHANGED]: this.onBurnout,
       [EV.FIRST_MOVE]: () => this.hideTitle(),
       [EV.DEBUG]: (s) => this.debugText.setText(s),
       [EV.TEAM_CHANGED]: ({ count, canDelegate }) => this.showTeam(count, canDelegate),
@@ -170,7 +178,23 @@ export default class UIScene extends Phaser.Scene {
     const ratio = Math.max(0, gu / max);
     this.guBar.width = 200 * ratio;
     this.guBar.fillColor = ratio > 0.5 ? 0x22c55e : ratio > 0.25 ? 0xfacc15 : 0xef4444;
-    this.guText.setText(`GU residue: ${formatGu(gu)} / ${max}`);
+    this.gu = { gu, max };
+    this.refreshGuLine();
+  }
+
+  onBurnout({ value, delta }) {
+    this.burnout = value;
+    this.burnoutBar.width = 2 * value;
+    this.burnoutBar.fillColor = value >= 80 ? 0xef4444 : value >= 50 ? 0xf97316 : 0xfacc15;
+    if (delta !== 0) {
+      this.burnoutFlashLeft = 400;
+      this.burnoutFlashColor = delta > 0 ? '#fb923c' : '#86efac';
+    }
+    this.refreshGuLine();
+  }
+
+  refreshGuLine() {
+    this.guText.setText(`GU residue: ${formatGu(this.gu.gu)} / ${this.gu.max} · Burnout ${Math.floor(this.burnout)}%`);
   }
 
   onClock({ label, warning }) {
@@ -221,6 +245,12 @@ export default class UIScene extends Phaser.Scene {
       const on = !this.escalationDanger || Math.floor(this.blink / 200) % 2 === 0;
       this.escalationText.setColor(on ? '#fca5a5' : '#ffffff');
     }
+    if (this.burnoutFlashLeft > 0) {
+      this.burnoutFlashLeft -= delta;
+      this.guText.setColor(this.burnoutFlashLeft > 0 ? this.burnoutFlashColor : '#e5e7eb');
+    }
+    // 90%+: the bar blinks
+    this.burnoutBar.setAlpha(this.burnout >= 90 && Math.floor(this.blink / 250) % 2 === 1 ? 0.35 : 1);
     if (this.standupLeft > 0) {
       this.standupLeft -= delta;
       this.standupCount.setText(`${Math.max(0, Math.ceil(this.standupLeft / 1000))}`);

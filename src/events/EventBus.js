@@ -23,6 +23,8 @@ export const EV = {
   TEAM_CHANGED: 'team-changed',
   ESCALATION: 'escalation',
   DEALS_CHANGED: 'deals-changed',
+  BURNOUT_CHANGED: 'burnout-changed',
+  BURNOUT_OVER: 'burnout-over',
 };
 
 // Subscribe for the lifetime of a scene: listeners are removed on shutdown.

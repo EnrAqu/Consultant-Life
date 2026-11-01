@@ -51,7 +51,7 @@ export default class Escalation {
         scene.cameras.main.shake(160, 0.006);
         scene.floatText(`-${ESCALATION_COST} GU`, player.x, player.y - 24, '#f87171');
         scene.stats.recordIncident('escalation');
-        if (scene.spendGu(ESCALATION_COST, 'escalation')) return;
+        if (scene.addBurnout('escalation') || scene.spendGu(ESCALATION_COST, 'escalation')) return;
         scene.narrate('escalationCatch');
       }
       if (a.type === 'released') {

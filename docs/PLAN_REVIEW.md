@@ -1,181 +1,120 @@
-# Review di `docs/ITERATION_5.md` (livello 5 "Partner")
+# Review di `docs/BURNOUT.md` (barra burnout)
 
 > Revisore: playbook `review`, contesto separato. Il piano e il codice non sono stati modificati.
-> Riferimenti: `CLAUDE.md`, `docs/DECISIONS.md`, `PLAN.md`, codice in `src/` (parser, validatore, `GameScene`, `Player`, `TeamTrail`, `DelegateTargeting`, `Checkpoint`).
-> Gravità: **bloccante** (così com'è non funziona, o l'esecutore deve inventare una parte essenziale), **importante** (porta quasi sicuramente a un risultato sbagliato o ingiusto), **minore** (incoerenza o rifinitura).
+> Riferimenti: `CLAUDE.md`, `docs/DECISIONS.md` (righe 130, 141, 142), codice reale in `src/` (`GameScene`, `UIScene`, `BudgetOverScene`, `EndingScene`, `BootScene`, `Escalation`, `Team`, `Rival`, `Micromanager`, `FiveMinutesDoor`, `FakeKT`, `Pickup`, `PlayerView`, `StandupSchedule`, `StatsTracker`, `config/debug.js`, `state.js`).
+> Gravità: **bloccante** (l'esecutore deve inventare una parte essenziale, oppure il risultato contraddice l'obiettivo dichiarato), **importante** (porta quasi sicuramente a un bug o a un risultato ingiusto), **minore** (incoerenza o rifinitura).
+
+## Conti di riferimento
+
+Costanti reali: morte −0,5 GU; `startGu` 20 (livello 1) e 15 (livelli 2–5); standup ogni 20 s reali, uno su 3 sfora (`overrunEvery: 3`) → **+1%/minuto di gioco**, inevitabile.
+
+- **Un "Budget sforato" vale circa +30%** (livelli 2–5: 15 / 0,5 = 30 morti; livello 1: +40%). Il burnout non torna indietro e si trascina nel retry.
+- **Il minimo conta solo per chi muore poco.** Si parte da `max(trascinato, minimo)`: il trascinato supera il minimo appena si fanno più di ~15 eventi netti a livello. Esempi:
+
+| Giocatore | L1 | L2 | L3 | L4 | L5 |
+|---|---|---|---|---|---|
+| Bravo: 10 eventi/livello, 1 caffè/livello | 0 → 8 | 15 → 23 | 30 → 38 | 45 → 53 | 60 → 100 dopo ~42 eventi |
+| Medio "rage": 20 morti + ~3 standup + ~2 junior, nessuno sforamento | 0 → 21 | 21 → 44 | 44 → 69 | 69 → 94 | **94: 6 eventi** |
+| Bloccato al livello 2 (come nel playtest #1) | 0 → 20 | 20 → +30 (sforato) → +30 (sforato) → 80 | **burnout a metà del livello 3** | – | – |
+
+In pratica la regola effettiva è "**circa 100 eventi in tutta la campagna** = burnout", non "~40 eventi nel livello 5" come dice l'esempio del §1.
 
 ---
 
-## 0. Conti fisici di riferimento
+## Problemi
 
-Costanti: `g = 1800`, gravità in caduta `2500`, `v_jump = 620`, `v_run = 260`, vista del mondo 768×432 px (24 × 13,5 tile).
+### 1. Il 100% arriva molto prima di quanto dice il piano — **bloccante (design, da portare all'utente)**
+- **Dove:** §1 "Esempio di margine", tabella delle regole (minimi + trascinamento + nessun ritorno con "Budget sforato").
+- **Problema:** l'esempio ("nel livello 5 parti almeno dal 60%, quindi ~40 eventi") vale solo per chi arriva al livello 5 avendo fatto ≤ 60 eventi netti nei livelli 1–4, cioè ≤ 15 morti a livello. In un rage game il giocatore medio arriva al livello 5 al 90%+ e chi sfora una volta il budget nei livelli 3–4 non vede il livello 5. Inoltre dopo un "Budget sforato" al livello 5 (60 + 30 = 90) il secondo tentativo ha ~10 eventi: il finale burnout diventa l'esito normale di chiunque sbagli il livello 5 una volta. Questo contraddice la citazione in testa al piano ("il burnout deve essere basso") e rende i minimi 0/15/30/45/60 quasi decorativi. Le decisioni registrate (+1% per evento, minimi, nessun ritorno con lo sforamento) non sono in discussione, ma la loro **combinazione** non è stata verificata con i conti.
+- **Fix proposto:** presentare all'utente la tabella sopra prima di B-M2 e chiedere una di queste correzioni (in ordine di semplicità):
+  a) **retry di "Budget sforato" = valore di inizio livello** (il tentativo fallito costa già il livello; il burnout ricorda solo i livelli finiti) — cambia la decisione del 2026-11-01 riga 142, che è ancora "da confermare nella review";
+  b) **tetto per livello**: in un livello il burnout non sale più di `+N` sopra il valore d'ingresso (es. +20), così il minimo del livello successivo torna a contare;
+  c) **trascinamento parziale**: `start = max(min, min + (trascinato − min) × 0,5)`.
+  In ogni caso aggiungere a `tests/Burnout.test.js` una simulazione dei tre giocatori della tabella, con l'esito atteso scritto nel test: così la taratura dopo il playtest cambia un numero e un'aspettativa, non il codice.
 
-| Grandezza | Calcolo | Valore |
-|---|---|---|
-| Apice del salto | 620² / 3600 | 106,8 px = **3,34 tile** (il piano: corretto) |
-| Tempo in aria (stessa quota) | 0,344 + 0,292 | 0,637 s |
-| Distanza a piena corsa | 260 · 0,637 | 165 px ≈ 5,2 tile |
-| Salita di +3 tile | margine verticale all'apice | **10,8 px**: è il limite fisico |
-| Salto del leccapiedi ×1,35 | 837² / 3600 | 194,6 px = **6,1 tile** sopra il punto di stacco; staccando dalla sua testa (≈ 1 tile) **≈ 7 tile** sopra il pavimento. Il piano dice "≈ 5,5" |
-| Blocco ambizioso allo stadio 4 | 1,4 s · 80 px/s | 112 px = 3,5 righe (il piano: corretto) |
-| Margine per piano | v_player < v_tide · 960 / 1216 | 0,79 × marea (il piano: corretto) |
-| Attesa massima SteerCo | ciclo 3 × 2,4 s | 7,2 s → 504 px di marea allo stadio 3 (15,7 righe) |
-| Scorrimento SteerCo | 6–19 colonne in 300 ms | **640–2000 px/s** (2,5–8 × la corsa del player) |
+### 2. KT vero: −3% a ogni respawn, il burnout (e le GU) si "farmano" — **importante**
+- **Dove:** §4, riga "KT vero → `FakeKT.js:45`".
+- **Problema:** `GameScene.respawn()` chiama `trap.reset()` e `FakeKT.reset()` rimette `collected = false`. Con il KT pivotato (livello 2 slot D col 83, livello 3 slot D col 164) il ciclo "prendo il KT vero → R (selfRestart, +1%) → riprendo il KT (−3%)" vale **−2% a giro** (e già oggi +0,5 GU a giro). È deterministico e ripetibile fino a 0%.
+- **Fix proposto:** il sollievo del KT vero si dà **una volta per livello** (flag in `GameScene`, es. `this.burnoutRelieved = new Set()`, non azzerato da `respawn`), come il caffè che "non torna al respawn" (`Pickup.js:3`). Test: due prese del KT vero nello stesso livello → un solo −3. Segnalare a parte che anche il +1 GU del KT è farmabile (fuori scope del burnout).
 
----
+### 3. `addBurnout` e `relieveBurnout` senza guardia su `this.ended` → doppio finale possibile — **importante**
+- **Dove:** §4, firma di `addBurnout`/`relieveBurnout`; `burnoutOver()`.
+- **Problema:** alcuni +1 arrivano **dopo** la fine del livello: il junior delegato a una trappola diventa `doomed` e viene perso in un `delayedCall(450)` (`Team.js:215`); `hitByTraps` può perdere più junior nello stesso frame; uno standup può partire durante la pausa di morte (`handleSchedule` gira prima del controllo `pauseReasons`). Se il livello è appena finito (`completeLevel` o `budgetOver` hanno già programmato un `fadeTo`) e il burnout è a 99%, `burnoutOver` lancia un secondo `fadeTo` verso `EndingScene`. Il piano dice "come `budgetOver()`", ma non dice di copiarne la guardia `if (this.ended) return`.
+- **Fix proposto:** `addBurnout`: `if (DEBUG.god || this.ended) return false;`. `burnoutOver`: `if (this.ended) return;` come prima riga. `relieveBurnout('cleanLevel')` va chiamato in `completeLevel` **prima** di `endLevel()` (altrimenti la guardia lo blocca) e prima di costruire il `payload`. Test smoke: delega a una trappola + traguardo nello stesso secondo con `?burnout=99` → una sola scena finale.
 
-## 1. Problemi
+### 4. Debug `?burnout=N` riapplicato a ogni `create` — **importante**
+- **Dove:** §3, `new Burnout(DEBUG.burnout ?? session.burnout ?? 0)`; §7 B-M4.
+- **Problema:** `GameScene.create` gira a ogni livello, a ogni retry e a ogni nuova campagna. Con `?burnout=50` il valore torna a 50 ogni volta: il trascinamento non si vede, lo smoke "retry da Budget sforato non azzera" passa anche se il codice è sbagliato, e lo smoke "nuova campagna dal finale riparte da 0" **fallisce sempre** (con `?burnout=99` si ricomincia al 99%). Inoltre `num()` in `debug.js` rifiuta 0 (va bene) ma non esclude valori > 100.
+- **Fix proposto:** applicare `DEBUG.burnout` una sola volta, quando `session.burnout === null` (primo `create` della pagina), e solo dopo il reset della nuova campagna; da lì vale `session.burnout`. Aggiungere `burnout` al calcolo di `DEBUG.anyOverride` (già previsto) e `'burnout'` all'elenco ammesso di `DEBUG.ending` (`debug.js` accetta oggi solo `'partner'`; il piano lo dà per scontato).
 
-### 1. Con la presa innocua + il guinzaglio, l'escalation non ha alcuna conseguenza (anzi, farsi prendere conviene)
-- **Gravità:** bloccante (di design; tocca la decisione Q3, quindi serve l'utente)
-- **Dove:** §2 "Guinzaglio", "Presa", "Verifica dei tempi"; §4 "Tempi"; I5-M3, I5-M7
-- **Problema:** il guinzaglio tiene già la marea a ≤ 8 righe sotto il player. La presa la riporta **esattamente** a 8 righe sotto e la ferma 1,5 s: farsi prendere equivale a guadagnare 1,5 s di pausa, senza costo (niente morte, niente GU, e l'incidente registrato non serve a nulla perché dopo il livello 5 non c'è una Lessons Learned). La "sfida principale" del livello (DECISIONS 2026-11-01) è decorazione. Di conseguenza tutti i vincoli di tempo del piano (margine ≥ 3 righe, ambiziosi dove il margine è ≥ 5, corsa di riferimento) sono lavoro senza effetto. Inoltre ogni caduta dentro la torre (che è voluta e frequente) produce una presa → flash + battuta + toast ripetuti.
-- **Fix proposto:** chiedere all'utente una penalità "innocua ma reale" che rispetti Q3 (niente morte né GU). Opzioni: (a) **dentro la marea sei rallentato** (corsa ×0,6, salto ×0,85) finché non ne esci, e la marea **non** si riabbassa né si ferma: costa tempo, non vite (consigliata); (b) almeno togliere la pausa di 1,5 s e il riabbassamento, così la presa non è un premio. Finché la penalità non è decisa, ridurre I5-M3 a una versione semplice (marea + stadi + indicatore) e rimandare la corsa di riferimento e i vincoli di margine. Battuta della presa al massimo una volta ogni N secondi.
-
-### 2. Il trampolino del leccapiedi non si può realizzare con `TeamTrail`, e i numeri sono sbagliati
-- **Gravità:** bloccante
-- **Dove:** §5 "Ti segue", "Inchino-trampolino"; §9 piano 4 e lobby
-- **Problema:** `TeamTrail.positionFor` restituisce la posizione esatta del player di 500 ms prima: appena ti fermi, dopo 0,5 s il leccapiedi è **sovrapposto a te**, quindi non puoi saltargli in testa (e i junior, a 300/600 ms, gli stanno addosso). Il leccapiedi è un'immagine senza corpo: manca un "piano" su cui atterrare. Il salto ×1,35 vale ≈ 6,1 tile (≈ 7 dalla testa), non 5,5; inoltre il taglio del salto (`jumpCutMultiplier` al rilascio del tasto) renderebbe l'altezza casuale per chi rilascia presto. Il passaggio obbligatorio del piano 4 dipende da tutto questo.
-- **Fix proposto:** comportamento proprio, non la scia: segue la scia ma **si ferma 1,5 tile dietro** il player (lato opposto a `facing`) quando il player è fermo; testa = zona di overlap 16×6 px attiva solo se il player scende (`vy > 0`) e i piedi sono sopra la testa. Al rimbalzo: `vy = −k·620` con `jumpCutApplied = true` (altezza fissa, indipendente dal tasto). Scegliere `k` dai conti: per un'altezza di 5 tile dalla testa serve `v = √(2·1800·160) = 759` → **k ≈ 1,22**. Aggiornare la tabella `sycophant` del validatore con la formula, non a occhio.
-
-### 3. Il trampolino, disponibile "ovunque tranne in aria", rompe le sfide obbligatorie
-- **Gravità:** importante
-- **Dove:** §9 vincoli del validatore; §3 "la sfida è obbligatoria"
-- **Problema:** il validatore verifica che "senza lavoratori il piano 1 non si sale" con la tabella `normal`, ma il giocatore ha **sempre** il leccapiedi: con 6–7 tile di salto scavalca le scale dei lavoratori, la stanza SteerCo e magari i varchi. Il piano verifica il trampolino solo dove serve, non dove fa danni. Inoltre il leccapiedi esce dalla finestra e dà il trampolino anche nella scala antincendio.
-- **Fix proposto:** tutte le verifiche "X è obbligatorio" girano con la tabella `sycophant` attiva; oppure il trampolino funziona solo su **tappetini marcati** (carattere mappa, es. `T`, o entità `bowSpot`): leggibile, verificabile, e il resto della torre resta progettabile. Consiglio la seconda: è anche un indizio migliore ("qui serve il leccapiedi").
-
-### 4. SteerCo: il validatore del livello non può attraversare la stanza, e la fisica descritta non regge
-- **Gravità:** bloccante
-- **Dove:** §6; §9 "validatore normal dalla lobby al Board"; I5-M5, I5-M7
+### 5. Junior persi: contati due volte per lo stesso tratto e in modo incoerente tra le vie di perdita — **importante**
+- **Dove:** §4, riga "Junior perso → `Team.lose` (anche `quiet`)" e nota sotto la tabella.
 - **Problema:**
-  1. `validateLevel` è statico; il piano non dice come rappresentare le piattaforme mobili (un layout? l'unione? nessuna?). L'unione dei layout darebbe collegamenti che non esistono mai insieme; nessuna superficie rende il Board irraggiungibile. Il criterio di I5-M7 così non è soddisfacibile.
-  2. Piattaforme a 3 righe l'una dall'altra (e la prima a 3 righe dal pavimento): +3 tile è il limite fisico (10,8 px di margine) e con tabella `normal` il gap massimo è 1, cioè piattaforme quasi sovrapposte in orizzontale → il player sbatte la testa sotto la piattaforma superiore se il corpo è solido da tutti i lati. Nel codice non esiste ancora nessun corpo mobile one-way.
-  3. Scorrimenti di 6–19 colonne in 300 ms = 640–2000 px/s: chi ci sta sopra viene sparato, chi sta atterrando trova la piattaforma sparita. Non è "crudele ma giusto".
-  4. Il trasporto: in Arcade funziona solo se il corpo si muove **a velocità** (`moves = true`, `immovable`, `allowGravity = false`) con `friction.x = 1` (default); con tween/`setPosition` il player resta indietro. Il piano lo intuisce ma non lo specifica.
-- **Fix proposto:** righe a **2** tile di distanza (gap `normal` fino a 3); corpi con `checkCollision.down/left/right = false` (one-way come `=`); velocità di scorrimento fissa (es. 400 px/s, durata = distanza/velocità, ≤ 1,5 × la corsa del player) al posto dei 300 ms; nel validatore la stanza è una **scatola nera**: `trapSurfaces('steerCo')` restituisce zero celle, ma il validatore aggiunge un arco "ingresso → uscita" se il test del brain passa (grafo sugli stati piattaforma×layout). Scriverlo nel piano.
+  - **Doppio conteggio per ciclo di morte:** dopo una morte `Team.restore()` riporta i junior del checkpoint; il junior colpito dalle email (+1) e poi la tua morte (+1) costano +2 per un tratto che alla fine non ti è costato nessun junior; il ciclo si ripete a ogni tentativo. Idem il **Rival** che ruba un junior (`Rival.js:123`, `lose(m, true)`) a ogni passaggio.
+  - **Delega = sacrificio obbligatorio:** la delega a trappole/porta "5 minuti" passa da `doomed` → `lose(m, true)` → +1%. È la meccanica centrale dei livelli 3–4: punire con il burnout l'uso corretto della delega va deciso esplicitamente (DECISIONS riga 130 dice "junior persi", non "junior delegati").
+  - **Incoerenza:** la delega al **micromanager** (`stay: true, staySeconds: 8`) termina con `m.state = 'gone'` dentro `Team.update` **senza** passare da `lose()` → nessun burnout; il varco "Approvazione richiesta" (`stay: true` senza timeout) idem. Eppure DECISIONS riga 110 dice che la delega al micromanager "consuma" il junior come le trappole.
+- **Fix proposto:** scegliere una regola e scriverla nel piano. La più semplice e senza doppi conteggi: **contare le perdite nette al checkpoint e a fine livello** (`savedCount` precedente − `count` attuale quando si attiva un checkpoint o in `completeLevel`), non in `Team.lose`. Così i junior "restituiti" dal respawn non costano e tutte le vie (lose, gone, staying) sono coperte. In alternativa: contare in `Team.lose` **solo** se `!quiet` (trappole che colpiscono chi ti segue) e decidere con l'utente se delega e rival contano. Registrare la scelta in `DECISIONS.md`.
 
-### 5. Gli ambiziosi, come descritti, non si possono evitare saltando
-- **Gravità:** importante
-- **Dove:** §4 "Presa", "Come evitarli"
-- **Problema:** la presa scatta appena l'ambizioso entra nella **tua** torcia (5 tile davanti) mentre sei a terra. Correndo verso di lui, a 5 tile sei preso prima di poter saltare; un salto da 6 tile copre ≈ 5,2 tile e atterri davanti a lui, di nuovo nella torcia. "Arrivare da dietro le sue spalle" non ha senso con questa regola: conta dove guardi tu, non lui. L'indizio a 7 tile dà 2 tile = 0,25 s a piena corsa.
-- **Fix proposto:** stato `noticed` di 400 ms ("Partner!") all'ingresso nella torcia: se in quel tempo salti o esci dalla torcia, niente presa. Oppure portata 3 tile per gli ambiziosi. Togliere "da dietro le spalle" o definire il suo `facing` nella regola. Aggiungere un test del brain: "corsa a 260 px/s + salto all'indizio → nessuna presa".
+### 6. Ganci "prima di `spendGu`" senza `return` per micromanager e "5 minuti" — **minore**
+- **Dove:** §4, righe Micromanager e "Hai 5 minuti?".
+- **Problema:** per morte ed escalation il piano scrive `if (…addBurnout(…)) return;`, per micromanager e porta solo `addBurnout('…')`. Senza `return`, dopo il finale burnout parte comunque `spendGu` → `GU_CHANGED`, `recordGuLoss`, eventuale `narrate('budgetLow')` su una scena già finita. Numeri di riga: oggi sono `Micromanager.js:153` e `FiveMinutesDoor.js:113`.
+- **Fix proposto:** uniformare: `if (scene.addBurnout('micromanager')) return;` e `if (scene.addBurnout('fiveMinutes')) return;`. Citare i ganci per nome del `case` (`'catch'`, `'hook'`) invece che per numero di riga.
 
-### 6. I lavoratori si sfruttano saltellando sul posto
-- **Gravità:** importante
-- **Dove:** §3
-- **Problema:** la torcia è spenta in aria e in aria passi ≈ 0,64 s per salto, quasi il 100 % del tempo se salti di continuo (jump buffer). Saltellare guardando il lavoratore = il lavoratore lavora. La battuta "girati dall'altra parte" sparisce. Inoltre "direzione `up`" produce una colonna piena (un muro, non una scala: nel gioco non esistono scale a pioli); il piano non dice cosa succede se la cella da costruire è occupata dal player o dal junior (incastro nel corpo solido), né se il costruito resta dopo una morte o un respawn al checkpoint.
-- **Fix proposto:** per i lavoratori la torcia vale **anche in aria** (la regola "in aria è spenta" resta solo per gli ambiziosi) oppure `resumeMs ≥ 800` (più dell'intera fase di volo). Sostituire `up` con `stairs` (gradini da 1 riga, 2 colonne ciascuno) con forma esplicita; la costruzione salta (aspetta) se la cella interseca il player; il costruito resta fino al checkpoint successivo e al respawn riparte dallo stato salvato al checkpoint.
+### 7. `burnoutOver` lascia l'HUD visibile e sporca le statistiche — **minore**
+- **Dove:** §4, `burnoutOver()` "come `budgetOver()`".
+- **Problema:** `UIScene` nasconde l'HUD su `EV.LEVEL_COMPLETE` e `EV.BUDGET_OVER`; il piano non dice quale evento emette `burnoutOver`, quindi l'HUD resta durante la dissolvenza. `stats.failRun()` incrementa `budgetOvers` del livello: un burnout verrebbe registrato come sforamento.
+- **Fix proposto:** nuovo `EV.BURNOUT_OVER` gestito da `UIScene` con `hideAll()`; non chiamare `failRun()` (o aggiungere un contatore `burnouts` separato, ma è fuori scope §8). Il `floatText("-0,5 GU")` di `die` viene mostrato prima del gancio anche quando la morte finisce la campagna: accettabile, ma meglio spostare il gancio prima del `floatText` o mostrare `+1% burnout`.
 
-### 7. Il leccapiedi complimenta proprio quando le altre meccaniche ti chiedono di aspettare
-- **Gravità:** importante
-- **Dove:** §5 "Complimento" contro §3 (attesa dei lavoratori) e §6 (attesa del layout)
-- **Problema:** ti segue sempre, quindi qualunque sosta > 0,8 s finisce con un blocco di 1 s. Davanti al lavoratore (aspetti 1–2 s per forza) e nello SteerCo (aspetti fino a 7,2 s) il blocco arriva quasi sempre, e nello SteerCo può cadere esattamente sulla finestra del layout giusto → altri 7,2 s. È deterministico, ma punisce l'unico comportamento che il livello stesso richiede: è "crudele", non "giusto".
-- **Fix proposto:** il complimento non scatta su piattaforme mobili, nel raggio di un lavoratore attivo, né durante il preavviso SteerCo; oppure una sola volta per piano. In alternativa tagliare il complimento (vedi #15).
+### 8. Ordine burnout/budget sullo stesso evento: corretto per la morte, da precisare per il resto — **minore**
+- **Dove:** §1 riga "100%", §4.
+- **Problema:** con il gancio prima di `spendGu` il burnout vince sempre (bene, coerente con la decisione). Però quando **solo** il budget finisce, il +1 è già stato salvato in `session.burnout` e il retry riparte con quel +1: va bene, ma va scritto (il §1 dice "riparti col valore che avevi quando hai sforato", che è ambiguo: prima o dopo l'ultimo evento?).
+- **Fix proposto:** scrivere "compreso l'evento che ha sforato il budget" e aggiungere il caso al test di B-M4.
 
-### 8. Porta Recruiter: la conferma con ↑ è anche un salto
-- **Gravità:** importante
-- **Dove:** §8 tabella, riga "Società prodotto"
-- **Problema:** ↑ (come W, Z, Spazio) è il salto. DECISIONS 2026-10-31 ha già escluso ↑ per il pivot dei "5 minuti" esattamente per questo motivo. Premere ↑ davanti alla porta = salti e accetti insieme; ← → per "no" ti fanno anche camminare.
-- **Fix proposto:** conferma con **↓ / S** (tasti oggi liberi in `GameScene.keys`), "no" = allontanarsi dalla porta. Registrare la scelta in DECISIONS.
+### 9. Nuova campagna vs retry del livello 1: giusto, ma il dato va letto in `init` — **minore**
+- **Dove:** §3, "`GameScene.create(data)`".
+- **Problema:** in `GameScene` i dati arrivano in `init(data)` (`levelId`, `pivotCause`); `create()` oggi non ha parametri. Phaser passa `data` anche a `create`, ma l'esecutore dovrebbe seguire lo schema esistente. Le vie verso il livello 1 sono tre: `BootScene` (primo avvio o `?level=level1`), `EndingScene` (nuova campagna) e `BudgetOverScene` (retry): con `retry: true` solo nell'ultima la regola funziona. Va bene anche che la stessa condizione azzeri `session.team` (riga 68), ma è un secondo posto che decide "nuova campagna": meglio un solo `const newCampaign = …` usato da entrambi.
+- **Fix proposto:** `this.retry = data?.retry === true` in `init`; in `create` un solo `newCampaign` per team e burnout.
 
-### 9. Scala antincendio: discesa alla cieca e marea sopra di te
-- **Gravità:** importante
-- **Dove:** §1 "Camera", §2 "Si ferma", §8 "Il sentiero dei campi"
+### 10. HUD: barretta attaccata alla barra GU e illeggibile su telefono — **importante**
+- **Dove:** §6 HUD.
 - **Problema:**
-  1. La camera verticale mostra ≈ 8,5 righe sopra e ≈ 5 sotto il player, pensata per salire. Una discesa di 148 righe con salti precisi e monete "dove atterri naturalmente" vista con 5 righe sotto è un salto alla cieca: non è giusto. Vale anche per le cadute nella torre.
-  2. La marea si ferma alla quota del Board, ma è una fascia larga quanto il mondo: le colonne 33–40 ne sarebbero coperte dalla riga ~20 in giù. Si scende dentro le email.
-  3. Una moneta toccata riporta alla finestra: fino a 148 righe da rifare, senza checkpoint.
-  4. Il validatore controlla solo le celle di atterraggio: una caduta lunga che **attraversa** una moneta a mezz'aria passa la BFS ma nel gioco ti rimanda su.
-- **Fix proposto:** `followOffset.y` dipende dalla direzione verticale (−70 quando `vy > 300` o nella zona della scala antincendio); la marea è limitata alle colonne della torre (0–31); un pianerottolo-checkpoint ogni ~30 righe (la moneta riporta all'ultimo); nel validatore le monete sono celle `blocked` anche per le colonne attraversate dall'arco (estendere `clearArc` a tutto l'intervallo verticale per i salti con `rise ≤ −2`).
+  - La barra GU occupa y 16–30 con bordo di 1 px (fino a 30,5): una barretta a **y = 31** è attaccata e si legge come parte della barra GU. Non ha sfondo né bordo specificati: a 0% è invisibile.
+  - Su telefono il canvas 960×540 viene ridotto (circa 0,7× su un 6"): 11 px → ~7–8 px reali, 5 px → ~3,5 px. L'etichetta `burnout 23%` non si legge.
+  - Spostamenti: `guText` 34→40 (alto ~18 px, finisce a 58), `levelText` 54→60, `teamText` 74→80, `dealsText` 94→100: nessuna sovrapposizione nuova con il riquadro del narratore (y 96, x 200–760) né con i controlli touch (tutti in basso). Resta però una **sovrapposizione già esistente** tra il toast (y 44–72, centrato; i toast lunghi come "[Calendario] … (si è aggiunto il cliente)" sono larghi ~530 px, quindi x ≈ 215–745) e `levelText` lungo ("Senior Manager — Il cliente strategico", x 16–~290): scendendo di 6 px la sovrapposizione verticale aumenta.
+- **Fix proposto:** barretta a y = 34 (gap di 3 px), 200×6, con sfondo `0x111827` e bordo come la barra GU; etichetta a 13 px (come le righe di sinistra) o scritta dentro la riga GU (`GU residue: 12 / 15 · burnout 23%`); tutte le righe sotto spostate di 8 px. Spostare il toast a y ≥ 120 (sotto il narratore) oppure limitarne la larghezza a 480 px. Criterio verificabile: screenshot smoke a 960×540 e a 640×360 con toast lungo, narratore e team visibili insieme.
 
-### 10. Il finale dei campi si chiude per sempre alla prima opportunità raccolta
-- **Gravità:** importante
-- **Dove:** §7 "Restano raccolte anche dopo una morte", §8 "pipeline 0/3", Q1
-- **Problema:** chi raccoglie anche un solo `$` non può più aprire la finestra in quella partita, e non c'è modo di ricominciare il livello 5 (R = respawn al checkpoint; il finale Partner riporta al Progetto 1). Per provare il segreto bisogna rigiocare i livelli 1–4. Per un segreto "che si capisce senza spiegarlo" il costo di un tentativo è sproporzionato.
-- **Fix proposto:** in `EndingScene` (tutti i finali tranne i campi) un'opzione "Riprova il Progetto 5" (stesso team e pivot); oppure un modo esplicito di "restituire" le opportunità. Decidere con l'utente; Q1 resta valida.
+### 11. Personaggio stanco: due dettagli che non funzionano come descritti — **importante**
+- **Dove:** §6 "Personaggio stanco".
+- **Problema:**
+  - `PlayerView.update` riporta ogni frame `sy → 1` e `tilt → 0` (righe 128–129): impostare "`sy` di base 0,95 e `tilt` 4°" non ha effetto se non si cambia il **valore di riposo** verso cui tende l'interpolazione. Il "4° in avanti" dipende dalla direzione: con `flipX` il segno va invertito.
+  - "Texture `eyebags` posizionata sugli occhi del frame corrente": la testa si muove con `bob` (−1/0/+1 per frame) e lo sprite scala e ruota; un secondo sprite sovrapposto deve copiare origine, scala, angolo, alpha, flip e `bob`. L'esecutore deve indovinare le coordinate degli occhi per ogni outfit.
+- **Fix proposto:** generare in `TextureFactory` le varianti `player_${outfit}_t1` / `_t2` passando a `makePlayerSheet` un flag `eyebags` (la funzione accetta già `key`), e cambiare `this.key` su `BURNOUT_CHANGED`. Per la postura: `restSy`/`restTilt` usati al posto di 1 e 0 nell'interpolazione, `restTilt = 4 * (flipX ? -1 : 1)` solo a terra e da fermo. Il tremolio va sommato alla posizione dopo l'interpolazione, non dentro.
 
-### 11. Checkpoint verticali: ordine, nomi e regressioni
-- **Gravità:** importante
-- **Dove:** §2 "Respawn", §9 tabella, §10 debug `cp=f2|f3|f4|board`
-- **Problema:** `parseLevel` ordina i checkpoint per **x** e li chiama `cp0..cpN`: in una torre l'ordine è casuale e `?cp=f2` non corrisponde a nessun id. `Checkpoint.activate` accetta qualunque checkpoint non ancora attivo: chi salta il piano 2 con la scorciatoia dei "5 minuti" e poi cade, toccando il checkpoint del piano 2 **sposta il respawn in basso**. La tabella di §9 non mette un checkpoint al piano 1 né al Board, ma §2 parla di "checkpoint del Board".
-- **Fix proposto:** nei livelli verticali ordinare per y decrescente (dal basso) e permettere id espliciti dalla mappa o da `def.checkpointIds`; un checkpoint si attiva solo se è più in alto di quello corrente; completare la tabella di §9 (piano 1 e Board).
+### 12. Sollievo "livello senza morti" quasi sempre annullato dal minimo — **minore**
+- **Dove:** §1, §6 Lessons Learned.
+- **Problema:** chi chiude un livello senza morti è per definizione sotto il minimo del livello dopo (es. 8% → 3% → parte dal 15%): il −5 non si vede mai, e la riga "Burnout: 3% → il Progetto 2 parte dal 15%" può sembrare una punizione. Il "livello senza morti" conta anche dopo un retry (la `run` riparte a 0 morti), quindi premia chi ha appena sforato il budget.
+- **Fix proposto:** applicare il −5 **dopo** `startLevel` del livello successivo (cioè sul valore di partenza), oppure accettare e togliere il −5 dal piano. Nella schermata Lessons Learned mostrare sempre il motivo ("minimo del Progetto 2").
 
-### 12. La delega sceglie il bersaglio solo in orizzontale
-- **Gravità:** importante
-- **Dove:** §4 "delegare un junior"; `core/DelegateTargeting.js`
-- **Problema:** `pickDelegateTarget(playerX, facing, targets, …)` ignora la y: in una torre il bersaglio "più vicino davanti" può essere un ambizioso o una trappola due piani sopra o sotto, nella stessa colonna.
-- **Fix proposto:** aggiungere `playerY` e `rangeRows` (es. ±2 righe) a `pickDelegateTarget`, con test; dire nel piano che il leccapiedi non è delegabile.
+### 13. Narratore `burnoutHigh` mai detto se si entra già sopra l'80% — **minore**
+- **Dove:** §5.
+- **Problema:** "una volta a livello, al passaggio del tier 2": con il trascinamento si entra spesso già a ≥ 80% (vedi tabella), e senza passaggio la riga non scatta proprio quando serve.
+- **Fix proposto:** dirla anche all'inizio del livello se `tier === 2` (dopo `levelStart`, con priorità più bassa), al massimo una volta per livello.
 
-### 13. Corsa di riferimento con input registrati: non verificabile in modo affidabile
-- **Gravità:** importante
-- **Dove:** §2 "Criterio", I5-M7
-- **Problema:** gli smoke test girano in tempo reale e sono già sensibili al carico (DECISIONS 2026-10-31); un replay di input su 150 righe, con fisica a passo variabile, diverge dopo pochi secondi. Il criterio "≥ 3 righe di margine per piano" diventerebbe un test instabile.
-- **Fix proposto:** verifica analitica in Vitest: percorso del validatore (BFS con lunghezza del cammino) × tempi per tipo di salto + attese fisse (lavoratori, layout SteerCo, blocchi) → tempo per piano, confrontato con `EscalationBrain` simulato. Lo smoke test controlla solo che la marea parta, cambi stadio e si fermi. Comunque subordinato a #1.
+### 14. Eventi che mancano o stonano rispetto al tema — **minore** (solo segnalazione)
+- **Dove:** §1.
+- **Problema:** il **KT finto** (1 ora di call inutile, −3 GU) non aumenta il burnout mentre il KT vero lo riduce; il "cliente cambia idea" al traguardo (`clientSwitch`, −5 GU) nemmeno. Lo standup che sfora pesa +1/minuto indipendentemente da come giochi (penalizza solo chi è lento, ed è attivo anche durante la pausa di morte).
+- **Fix proposto:** chiedere all'utente se KT finto e `clientSwitch` devono valere +1; nessuna modifica senza il suo parere (i valori sono decisione dell'utente).
 
-### 14. Camera: il piano non dice come convivere con `updateCamera`
-- **Gravità:** minore
-- **Dove:** §1 "Camera"; `GameScene.updateCamera`, `respawn`
-- **Problema:** `updateCamera` chiama `cam.setFollowOffset(-lookAhead, 0)` a ogni frame: un `followOffset.y = 70` impostato in `create` viene azzerato subito. La deadzone attuale è 60×70 (non 60×40 come implica il "resta"). `respawn` usa `centerOn` senza l'offset (salto di camera al respawn).
-- **Fix proposto:** `updateCamera` usa `this.cameraOffsetY` (0 nei livelli orizzontali, ±70 nei verticali, vedi #9); `respawn` centra tenendo conto dell'offset.
-
-### 15. Troppe meccaniche nuove in un solo livello, e tre di queste sono "un NPC che ti ferma"
-- **Gravità:** importante (design, ritmo)
-- **Dove:** §0, §9
-- **Problema:** il livello 5 introduce: livello verticale + camera, escalation, torcia invertita, lavoratori, ambiziosi, leccapiedi (trampolino **e** complimento), SteerCo, opportunità + porta del Board, porta Recruiter con conferma, finestra + scala antincendio + monete, 4 finali; e in più eredita team, delega, standup e 4 slot di pivot. I livelli 2–4 ne introducevano 2–4 ciascuno. Il piano 2 ha due meccaniche quasi identiche (ambiziosi e collega dei "5 minuti", entrambi "ti fermano per parlarti"), e il complimento del leccapiedi è una terza. Il tutto in un livello che dura, a stima, 90–120 s per chi lo conosce (150 righe a ~80 px/s + attese) più la scala antincendio: è il doppio del livello 1 (45–60 s, DECISIONS), dopo che il playtest #2 ha segnalato "noioso".
-- **Fix proposto:** tagliare almeno due cose. Candidati: il complimento del leccapiedi (resta il trampolino, che è la parte divertente), lo slot `fiveMinutes` nel piano 2 (spostarlo o renderlo solo la porta pivotata), oppure gli ambiziosi (la torcia invertita resta coi lavoratori). Dividere l'iterazione in **5a** (torre, camera, escalation, lavoratori, trampolino, Board + finale Partner, burnout) e **5b** (SteerCo, ambiziosi, Recruiter, campi), con un playtest in mezzo. Torre da 4 piani da 24 righe invece di 5 da 30, se 5a basta.
-
-### 16. Costo in GU di ambiziosi e complimenti non specificato
-- **Gravità:** minore
-- **Dove:** §4, §5, §10
-- **Problema:** DECISIONS dice che micromanager e "5 minuti" costano 0,5 GU; qui si parla solo di "incidenti". L'esecutore deve indovinare. Con il peso dell'incidente inutile (ultimo livello, niente Lessons Learned) l'unico effetto concreto possibile è il GU.
-- **Fix proposto:** scrivere esplicitamente "0 GU" o "0,5 GU" per ciascuno. Se 0, togliere la registrazione come incidente o dire che serve solo per le statistiche.
-
-### 17. Il finale burnout è quasi irraggiungibile
-- **Gravità:** minore
-- **Dove:** §8, §9 (`startGu: 20`)
-- **Problema:** nel livello 5 cadere non uccide, la marea è innocua, e le cose letali sono solo gli slot e le spine: servono 40 morti. Il finale "amaro ma comico" lo vedrà quasi nessuno.
-- **Fix proposto:** se è voluto, scriverlo; altrimenti `startGu` più basso (10–12) o un costo GU per le prese della marea/degli ambiziosi (si lega a #1 e #16).
-
-### 18. Parser e mappa: `G` unico, caratteri nuovi, righe HUD
-- **Gravità:** minore
-- **Dove:** §1, §7, §8; `LevelParser.js`
-- **Problema:** il parser vuole esattamente una `G`: il piano non dice se è il Board (con `Goal`/`trolls`) o se `BoardDoor` la sostituisce. `$` e `€` vanno aggiunti a `KNOWN` (`€` non è ASCII: meglio un carattere ASCII). §1 dice che il parser esclude le righe 0–1, ma quel controllo (`e.y < 2`) sta nel validatore.
-- **Fix proposto:** `G` = Board (porta chiusa via `def.goal.requiresDeals: 3`), Recruiter e uscita dei campi come entità; monete con un carattere ASCII (es. `€` → `b`); correggere §1.
-
-### 19. `longestQuietClimb`: "stessa definizione per righe" non basta
-- **Gravità:** minore
-- **Dove:** §1 "Ritmo"
-- **Problema:** `entityColumns` restituisce solo colonne; per le righe serve una `entityRows` per ogni tipo (vecchi e nuovi), e "gradino" / "burrone" non hanno un equivalente verticale ovvio. Le deviazioni delle opportunità contano come attività anche se fuori dal percorso?
-- **Fix proposto:** definire `entityRows` per tipo e "riga attiva" = riga con un'entità, un pickup, un checkpoint o un cambio di piattaforma raggiungibile dal percorso BFS; tabella nel piano.
-
-### 20. Validatore: costo e "tutte le combinazioni di pivot"
-- **Gravità:** minore
-- **Dove:** §1, §9
-- **Problema:** la BFS prova tutte le righe di destinazione (`y2` da 1 a `height`): su 150 righe × 41 colonne, ripetuta per ogni pivot e per ogni tabella (`normal`, `sycophant`, monete), il test diventa lento. "Tutte le combinazioni di pivot" sono in realtà 5 casi (nessuno + 4 slot: un solo pivot per volta).
-- **Fix proposto:** limitare `y2` a `[y − 6, height)` (oltre non si sale comunque); scrivere "5 casi".
-
-### 21. Rifiniture di testo e coerenza
-- **Gravità:** minore
-- **Dove:** §2, §8
-- **Problema:** "il cliente ha messo in CC il tuo capo": da Partner il "capo" stona; la catena Manager → CEO è del cliente o tua? §8 dice che la leaderboard non si mostra nei campi ma che le partite dei campi entrano in leaderboard: va bene, ma `Leaderboard.record` non ha un campo per l'etichetta del finale. Il finale dei campi è giocabile (outfit `farmer`, uccellini) o una scena fissa? Il debug `ending=` deve entrare in `DEBUG.anyOverride`. Lo `startGu` del livello 5 (20) è più alto dei livelli 2–4 (15) senza motivo scritto.
-- **Fix proposto:** "il cliente ha messo in CC il suo CEO" (la catena è del cliente); aggiungere `ending` a `Leaderboard.record`; decidere scena fissa o giocabile; elencare `ending` tra gli override; motivare lo `startGu`.
+### 15. God mode e debug: coerenti, ma il piano non dice cosa succede ai sollievi — **minore**
+- **Dove:** §4.
+- **Problema:** `die` in god mode esce prima del gancio (bene) e `addBurnout` ignora gli aumenti, ma caffè/KT/livello pulito continuano a ridurre: in god mode il burnout può solo scendere. Accettabile per il debug, va solo scritto. `?ending=burnout` passa da `BootScene` con `levelId: 'level5'`: la riga "Burnout: 100% al Progetto N" va calcolata da `levelId` (già nel payload), non da `session.burnout` (null in quel caso).
+- **Fix proposto:** una riga nel §3 su god mode; nell'`EndingScene` usare `levelId` e il valore 100 fisso.
 
 ---
 
-## 2. Coerenza con `DECISIONS.md` e `PLAN.md`
+## Riassunto
 
-- Coerente: torre verticale ("la scalata è letterale", PLAN.md), niente micromanager dal livello 4, 4 finali nel livello 5, slot pivot che coprono tutte le cause pivotabili possibili del livello 4 (`replyAll`, `fiveMinutes`, `deckCollapse`, `scopeCreep`), meccaniche nuove senza variante pivotata.
-- Divergenze già decise dall'utente (ok): escalation fissa invece che "a GU esaurite o a caso" (e il "a caso" violerebbe comunque "niente casualità"); presa innocua invece di "torni all'inizio del mondo" (ma vedi #1).
-- In conflitto con una decisione registrata: conferma con ↑ (#8).
-
-## 3. Riassunto
-
-Il piano è ricco e il tema regge (la torcia invertita e il finale dei campi con le "ore fatturabili" sono le idee migliori), ma così com'è non si può implementare senza inventare parti essenziali.
-**Bloccanti (3, di cui uno di design):**
-- #1: con presa innocua + guinzaglio l'escalation non ha conseguenze, anzi farsi prendere conviene. Serve una penalità decisa con l'utente (proposta: rallentamento dentro la marea).
-- #2: il trampolino del leccapiedi non funziona con `TeamTrail` (ti sta addosso) e il salto vale ≈ 6–7 tile, non 5,5.
-- #4: SteerCo non è modellato nel validatore, i salti da +3 sono al limite fisico, servono corpi mobili one-way e velocità di scorrimento ragionevoli.
-
-**Importanti:** il trampolino scavalca le sfide obbligatorie (#3); gli ambiziosi non si evitano (#5); i lavoratori si sfruttano saltellando (#6); i complimenti colpiscono le attese obbligatorie (#7); ↑ = salto alla porta del Recruiter (#8); scala antincendio alla cieca e sommersa dalla marea (#9); il segreto dei campi costa una campagna intera per tentativo (#10); checkpoint e delega non sono pensati per la verticale (#11, #12); la corsa di riferimento sarebbe un test instabile (#13); troppe meccaniche in un livello (#15).
-
-Consiglio: risolvere #1 con l'utente, poi dividere l'iterazione in 5a/5b (#15) e applicare i fix con il playbook `plan` prima di qualsiasi milestone.
+1. **Bloccante (design):** con +1% per evento, trascinamento pieno e retry che non torna indietro, il burnout arriva a ~100 eventi totali nella campagna: il giocatore "rage" medio lo vede nei livelli 4–5, chi sfora il budget una o due volte già al livello 3. L'esempio "~40 eventi al livello 5" è fuorviante. Serve una scelta dell'utente (retry = valore d'inizio livello, tetto per livello o trascinamento parziale) e una simulazione nei test.
+2. **Importanti:** KT vero farmabile (−2% a giro, `FakeKT.reset` lo rimette a ogni respawn); manca la guardia `ended` in `addBurnout`/`burnoutOver` (junior `doomed` dopo 450 ms → doppio `fadeTo`); `?burnout=N` riapplicato a ogni `create` (rompe due smoke test di B-M4); junior persi contati due volte per ciclo di morte e in modo incoerente (micromanager e varco non passano da `Team.lose`); barretta HUD attaccata alla barra GU e illeggibile su telefono; personaggio stanco non realizzabile come scritto (l'interpolazione riporta `sy`/`tilt` a 1/0, occhiaie da sovrapporre a mano).
+3. **Minori:** `return` mancante nei ganci micromanager/5 minuti; `burnoutOver` senza evento per nascondere l'HUD e con `failRun` che lo conta come sforamento; `retry` da leggere in `init`; sollievo "livello pulito" annullato dal minimo; `burnoutHigh` mai detto se si entra già all'80%; KT finto e `clientSwitch` non contano; god mode da documentare.
+4. Ganci verificati e corretti nel punto indicato: `GameScene.die` (prima di `spendGu`, dopo `recordDeath`), `Escalation` `catch`, `handleSchedule` `start` con `overrun`, caffè (overlap in `registerColliders`), `completeLevel`; ordine burnout prima del budget giusto. Nuova campagna vs retry del livello 1 risolta correttamente con `retry: true` da `BudgetOverScene`.

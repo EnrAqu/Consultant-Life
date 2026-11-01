@@ -31,7 +31,7 @@ export default class BudgetOverScene extends Phaser.Scene {
       const again = () => {
         if (gone) return;
         gone = true;
-        fadeTo(this, 'GameScene', { levelId, pivotCause });
+        fadeTo(this, 'GameScene', { levelId, pivotCause, retry: true });
       };
       this.input.keyboard.once('keydown-R', again);
       this.input.keyboard.once('keydown-SPACE', again);

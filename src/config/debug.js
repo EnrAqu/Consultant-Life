@@ -30,10 +30,11 @@ export const DEBUG = {
   outfit: q.get('outfit'),
   escalationOff: q.get('escalation') === 'off',
   deals: num('deals'),
-  ending: ['partner'].includes(q.get('ending')) ? q.get('ending') : null,
+  ending: ['partner', 'burnout'].includes(q.get('ending')) ? q.get('ending') : null,
+  burnout: num('burnout') !== null ? Math.min(100, num('burnout')) : null,
 };
 
 // True when any gameplay-changing override is active (such runs stay out of the leaderboard).
 DEBUG.anyOverride = Boolean(
-  DEBUG.level || DEBUG.pivot || DEBUG.standupOff || DEBUG.gu || DEBUG.clock !== null || DEBUG.clockSpeed !== 1 || DEBUG.cp || DEBUG.god || DEBUG.outfit || DEBUG.escalationOff || DEBUG.deals || DEBUG.ending,
+  DEBUG.level || DEBUG.pivot || DEBUG.standupOff || DEBUG.gu || DEBUG.clock !== null || DEBUG.clockSpeed !== 1 || DEBUG.cp || DEBUG.god || DEBUG.outfit || DEBUG.escalationOff || DEBUG.deals || DEBUG.ending || DEBUG.burnout !== null,
 );

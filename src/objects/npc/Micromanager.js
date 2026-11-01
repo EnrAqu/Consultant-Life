@@ -150,7 +150,7 @@ export default class Micromanager {
         player.stopMotion();
         this.say('Fermati un attimo. Spiegami cosa stai facendo.', this.brain.p.explainMs);
         scene.stats.recordIncident('micromanager');
-        if (scene.spendGu(a.cost, 'micromanager')) return;
+        if (scene.addBurnout('micromanager') || scene.spendGu(a.cost, 'micromanager')) return;
         scene.narrate('mmCatch');
         break;
       case 'release':

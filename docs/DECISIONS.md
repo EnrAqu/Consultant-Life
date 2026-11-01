@@ -136,3 +136,10 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 
 ## Versione mobile
 - 2026-11-01 — Controlli su schermo per telefono (`docs/MOBILE.md`): pulsantiera ◀ ▶ in basso a sinistra, SALTA in basso a destra, E e ↺ piccoli sopra; solo su schermi touch (o `?touch=1`); le schermate "premi Spazio" si superano anche con un tocco; avviso "ruota il telefono" in verticale; fullscreen e blocco orizzontale dove il browser lo permette — richiesta utente, scelte di layout proposte e da rivedere dopo il test.
+
+## Burnout
+- 2026-11-01 — Burnout (`docs/BURNOUT.md`): sale di +1% con morte, presa dell'escalation, junior perso, micromanager, "Hai 5 minuti?", standup che sfora; scende con caffè −2%, KT vero −3%, livello senza morti −5%; minimo di partenza 0 / 15 / 30 / 45 / 60% per i livelli 1–5; si vede con una barretta sotto le GU e con il personaggio stanco (occhiaie ≥ 50%, curvo e tremante ≥ 80%) — utente.
+- 2026-11-01 — Il burnout non torna indietro con "Budget sforato" né con la morte; al 100% finale burnout subito (prevale su "Budget sforato"); si azzera solo con una nuova campagna — piano, confermato dalla review.
+- 2026-11-01 — **La morte vale +0,25%** di burnout, gli eventi "sociali" +1% (anche KT finto e cliente che cambia idea): con +1% a morte un giocatore medio entrava nel livello 5 al 94% — utente, dopo la review del piano.
+- 2026-11-01 — Burnout, dalla review: KT vero −3% una volta per livello; junior persi contati al netto (checkpoint e fine livello); −5% del livello pulito applicato sulla partenza del livello dopo; valore nella riga GU (`GU residue · Burnout`) con barretta sotto.
+- 2026-11-01 — Al 100% di burnout **molli tutto e fai il contadino**: è il finale dei "campi" (non più la scala antincendio del livello 5). Il livello extra "Il contadino" (rilassante e ironico: niente trappole né GU, ma il telefono vibra) si progetta dopo; per ora c'è una schermata segnaposto — utente.

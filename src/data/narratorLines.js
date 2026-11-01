@@ -121,4 +121,11 @@ export const NARRATOR_LINES = [
   { id: 'pipeline_full_1', event: 'pipelineFull', text: 'Tre opportunità. Il Board ti aspetta. Anche il cliente, ma questo è un altro discorso.' },
   { id: 'board_closed_1', event: 'boardClosed', text: 'Senza pipeline al Board non si entra. Neanche con la cravatta giusta.' },
   { id: 'board_closed_2', event: 'boardClosed', text: 'Il Board non guarda il lavoro fatto. Guarda quello venduto.' },
+
+  // burnout (docs/BURNOUT.md)
+  { id: 'burnout_high_1', event: 'burnoutHigh', text: 'Ti vedo un po\' stanco. Prenditi un caffè. Dopo la call.' },
+  { id: 'burnout_high_2', event: 'burnoutHigh', text: 'Le occhiaie fanno molto senior. Continua così.' },
+  { id: 'burnout_high_3', event: 'burnoutHigh', text: 'Il wellbeing è una priorità aziendale. C\'è un webinar alle 22.' },
+  { id: 'burnout_over_1', event: 'burnoutOver', priority: 3, text: 'Hai chiesto un periodo di aspettativa. In campagna. Senza Wi-Fi.' },
+  { id: 'burnout_over_2', event: 'burnoutOver', priority: 3, text: 'Ti abbiamo perso. Non il progetto, te.' },
 ];

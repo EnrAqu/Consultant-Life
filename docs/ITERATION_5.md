@@ -245,7 +245,7 @@ Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner
 - **SteerCo**, con le correzioni della review #4: righe a 2 tile, piattaforme one-way, velocità di scorrimento fissa, scatola nera nel validatore.
 - **Ambiziosi**, con la review #5: stato `noticed` di 400 ms, o portata 3.
 - **Porta Recruiter** con conferma su **↓/S** (review #8) → finale società prodotto.
-- **Finestra e scala antincendio** → finale dei campi (pipeline 0/3), con le correzioni della review #9–#10: camera in discesa, marea solo nelle colonne della torre, pianerottoli-checkpoint, archi che attraversano le monete, e "Riprova il Progetto 5" nella scena dei finali.
+- ~~**Finestra e scala antincendio** → finale dei campi (pipeline 0/3)~~ **Superato** (2026-11-01): ai campi si arriva con il burnout al 100% (vedi `DECISIONS.md` e `BURNOUT.md` §5).
 - **Finale burnout**: arriva con la feature burnout (playbook `burnout`).
 
 ## 10. Milestone

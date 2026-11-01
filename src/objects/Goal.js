@@ -64,7 +64,7 @@ export default class Goal {
     scene.player.stopMotion();
     this.bubble.setText('Cliente: "Ci abbiamo ripensato. Lo affidiamo a un altro fornitore."').setVisible(true);
     scene.stats.recordIncident('clientSwitch');
-    if (scene.spendGu(CLIENT_COST, 'clientSwitch')) return;
+    if (scene.addBurnout('clientSwitch') || scene.spendGu(CLIENT_COST, 'clientSwitch')) return;
     scene.narrate('goalTroll');
   }
 
