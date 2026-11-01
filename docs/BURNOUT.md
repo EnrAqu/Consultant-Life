@@ -173,6 +173,6 @@ Criteri: `npm test`, `npm run build`, `npm run smoke` senza errori in console. P
 | 14 | Accolto in parte: KT finto e cliente che cambia idea +1%; lo standup resta com'è |
 
 ## 10. Stato
-- [x] B-M1…B-M4 sviluppati (2026-11-01): 162 test Vitest, `npm run smoke` 88/88 (9 controlli nuovi in `scripts/smoke/smokeBurnout.mjs`).
+- [x] B-M1…B-M4 sviluppati (2026-11-01): 162 test Vitest, `npm run smoke` 89/89 (10 controlli in `scripts/smoke/smokeBurnout.mjs`). Review del codice applicata (`docs/CODE_REVIEW_BURNOUT.md`).
 - Scostamenti: a schermo il valore è arrotondato **per difetto** (99,75% mostra 99%: il 100% compare solo col finale). Il debug `?burnout=N` vale solo al primo livello della pagina; un ricomincio dopo un finale riparte da 0.
-- In attesa: review del codice (contesto separato) e playtest dell'utente.
+- In attesa: playtest dell'utente (taratura).

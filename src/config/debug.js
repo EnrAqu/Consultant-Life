@@ -31,7 +31,8 @@ export const DEBUG = {
   escalationOff: q.get('escalation') === 'off',
   deals: num('deals'),
   ending: ['partner', 'burnout'].includes(q.get('ending')) ? q.get('ending') : null,
-  burnout: num('burnout') !== null ? Math.min(100, num('burnout')) : null,
+  // below 100: a start at 100% could never end (the first gain would change nothing)
+  burnout: num('burnout') !== null ? Math.min(99.75, num('burnout')) : null,
 };
 
 // True when any gameplay-changing override is active (such runs stay out of the leaderboard).

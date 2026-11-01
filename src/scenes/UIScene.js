@@ -183,10 +183,12 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onBurnout({ value, delta }) {
+    // flash only when the number on screen changes (a death is a quarter of a point)
+    const shownChanged = Math.floor(value) !== Math.floor(this.burnout);
     this.burnout = value;
     this.burnoutBar.width = 2 * value;
     this.burnoutBar.fillColor = value >= 80 ? 0xef4444 : value >= 50 ? 0xf97316 : 0xfacc15;
-    if (delta !== 0) {
+    if (delta !== 0 && shownChanged) {
       this.burnoutFlashLeft = 400;
       this.burnoutFlashColor = delta > 0 ? '#fb923c' : '#86efac';
     }

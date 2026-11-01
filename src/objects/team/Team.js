@@ -60,12 +60,17 @@ export default class Team {
 
   // checkpoint reached: this is the team you get back after a death
   snapshot() {
-    this.savedCount = this.count;
+    this.savedCount = this.aliveCount;
+  }
+
+  // following you or still running to a delegated trap: not lost (yet)
+  get aliveCount() {
+    return this.members.filter((m) => m.state === 'follow' || m.state === 'going').length;
   }
 
   // juniors lost since the last checkpoint (or the level start): what the burnout charges for
   netLoss() {
-    return Math.max(0, this.savedCount - this.count);
+    return Math.max(0, this.savedCount - this.aliveCount);
   }
 
   restore() {

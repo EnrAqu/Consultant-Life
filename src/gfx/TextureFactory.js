@@ -169,8 +169,9 @@ function drawPerson(p, o, pose) {
   p.fill(0x111827).circle(18, 8 + b, 0.9).circle(21, 8 + b, 0.9);
   // burnout (docs/BURNOUT.md §6): eye bags at 50%, darker and with heavy eyelids at 80%
   if (o.eyebags) {
-    p.fill(0x6b21a8, o.eyebags === 2 ? 0.75 : 0.45).round(16.9, 9.3 + b, 2.4, 1.1, 0.5).round(19.9, 9.3 + b, 2.4, 1.1, 0.5);
-    if (o.eyebags === 2) p.fill(o.skin).rect(16.9, 6.6 + b, 2.4, 1.1).rect(19.9, 6.6 + b, 2.4, 1.1);
+    // the right eye sits near the edge of the face: its bag and eyelid are narrower
+    p.fill(0x6b21a8, o.eyebags === 2 ? 0.75 : 0.45).round(16.9, 9.3 + b, 2.4, 1.1, 0.5).round(19.9, 9.3 + b, 1.7, 1.1, 0.5);
+    if (o.eyebags === 2) p.fill(o.skin).rect(16.9, 6.6 + b, 2.4, 1.1).rect(19.9, 6.6 + b, 1.8, 1.1);
   }
   if (o.sunglasses) p.fill(0x111827).round(16, 6.5 + b, 7, 2.5, 1);
   if (o.strawHat) p.fill(0xfacc15).round(7, 2 + b, 18, 2, 1).round(11, -2 + b, 10, 5, 2);

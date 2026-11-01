@@ -115,6 +115,21 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.close();
 }
 
+// crossing 80%: the warning line is not covered by the death line (review #1); tier 2 HUD at 960×540
+{
+  const page = await open('?debug=1&standup=off&burnout=79.75');
+  await page.setViewport({ width: 960, height: 540 });
+  await die(page);
+  await sleep(2200);
+  const line = await page.evaluate(() => { const ui = globalThis.__game.scene.getScene('UIScene'); return ui.narrText.visible ? ui.narrText.text : ''; });
+  const s = await state(page);
+  check('crossing 80% the narrator warns you, after the death line', s.tier === 2 && /stanco|occhiaie|wellbeing/.test(line), { line, ...s });
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').addBurnout('micromanager'));
+  await sleep(100);
+  await page.screenshot({ path: OUT + 'burnout-tier2-960.png' });
+  await page.close();
+}
+
 await browser.close();
 console.log(results.join('\n'));
 console.log('\nERRORS:\n' + (errors.length ? errors.join('\n') : 'none'));

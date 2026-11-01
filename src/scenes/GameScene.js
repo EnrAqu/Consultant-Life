@@ -131,7 +131,7 @@ export default class GameScene extends Phaser.Scene {
     this.narrate(this.pivotCause ? 'levelStartPivot' : 'levelStart', { pivotLabel: CAUSES[this.pivotCause]?.label });
     this.playerView.setTier(this.burnout.tier);
     // entering a level already cooked: say it once, after the level's opening line
-    if (this.burnout.tier === 2) this.time.delayedCall(3500, () => !this.ended && this.sayBurnoutHigh());
+    if (this.burnout.tier === 2) this.time.delayedCall(2000, () => !this.ended && this.sayBurnoutHigh());
   }
 
   // ---------- building ----------
@@ -334,10 +334,11 @@ export default class GameScene extends Phaser.Scene {
     this.playerView.setTier(this.burnout.tier);
   }
 
+  // after the line of the event that caused it (which would cover it straight away), once per level
   sayBurnoutHigh() {
     if (this.burnoutHighSaid) return;
     this.burnoutHighSaid = true;
-    this.narrate('burnoutHigh');
+    this.time.delayedCall(1500, () => !this.ended && this.narrate('burnoutHigh'));
   }
 
   // juniors lost since the last checkpoint (or the level start); the ones a respawn gives back never count
