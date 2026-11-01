@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT } from '../config/constants.js';
+import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
 import { LEVELS, nextLevel, LEVEL_ORDER } from '../levels/index.js';
 import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
@@ -67,11 +67,15 @@ export default class GameScene extends Phaser.Scene {
     const cam = this.cameras.main;
     cam.setZoom(WORLD_ZOOM);
     cam.setBounds(0, 0, this.worldW, this.worldH);
-    cam.startFollow(this.player, false, 0.12, 0.12);
-    cam.setDeadzone(120, 80);
+    cam.startFollow(this.player, false, CAMERA_LERP, CAMERA_LERP);
+    cam.setDeadzone(60, 70);
+    this.lookAhead = 0;
     fadeIn(this);
     this.lastDelta = 16;
-    const syncView = () => this.playerView.update(this.lastDelta, this.pauseReasons.size > 0);
+    const syncView = () => {
+      this.playerView.update(this.lastDelta, this.pauseReasons.size > 0);
+      this.updateCamera(this.lastDelta);
+    };
     this.events.on('postupdate', syncView);
     this.events.once('shutdown', () => this.events.off('postupdate', syncView));
 
@@ -213,6 +217,18 @@ export default class GameScene extends Phaser.Scene {
         });
       }
     }
+  }
+
+  // Phaser's follow lerp is per frame: at 30 fps the camera would trail twice as far behind.
+  // Scale it by the frame time, and lead the view a little in the running direction.
+  updateCamera(dt) {
+    const cam = this.cameras.main;
+    const k = 1 - Math.pow(1 - CAMERA_LERP, dt / (1000 / 60));
+    cam.setLerp(k, k);
+    const vx = this.player.body.velocity.x;
+    const target = Math.abs(vx) > 40 ? Math.sign(vx) * CAMERA_LOOK_AHEAD : this.lookAhead;
+    this.lookAhead += (target - this.lookAhead) * Math.min(1, dt / 400);
+    cam.setFollowOffset(-this.lookAhead, 0);
   }
 
   // ---------- state helpers ----------

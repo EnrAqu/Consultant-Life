@@ -114,3 +114,5 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-10-31 — Gli smoke test nel browser aspettano in tempo reale: vanno eseguiti a macchina scarica (sotto carico Phaser rallenta il gioco invece di saltare frame e i controlli a tempo falliscono).
 - 2026-10-31 — Tempo di gioco reale: `fps.smoothStep: false` (Phaser limitava ogni frame a 16,7 ms quando la finestra non ha il focus o nei primi 120 frame → a 30 fps il gioco andava a metà velocità). GameScene limita già un singolo frame a 50 ms.
 - 2026-11-01 — Bonus AI: le piattaforme vere richiedono salti da 5 (più difficili del percorso normale): è voluto, l'AI è una scommessa, non una scorciatoia sicura (review 4 #16).
+- 2026-11-01 — Camera: lerp indipendente dal frame rate (il lerp di Phaser è per frame: a 30 fps la camera restava il doppio indietro e tutto sembrava lento), lerp 0,18, deadzone 60×70, "look-ahead" di 70 px nella direzione di corsa — utente: "ho ancora la sensazione sia lento".
+- 2026-11-01 — Smoke test: tutti e 61 i controlli verdi (`npm run smoke`); l'ultimo fallimento era una gara nel test (deck fatto scattare prima che il frame gestisse il tasto E), non un bug.

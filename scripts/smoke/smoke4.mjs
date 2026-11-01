@@ -109,13 +109,18 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
     const deck = g.traps.find((t) => t.def.id === 'slotC');
     g.npcs.find((n) => n.def.id === 'mmB').brain.occupy(20000); // keep the deck the only target in range
     g.player.body.reset(90 * 32 + 16, 15 * 32 - 16);
+    g.player.setFlipX(false); // facing the deck
     return { before: team.count, deckState: deck.state };
   });
-  await sleep(300);
+  // let the team catch up after the teleport (the trail still points at the start of the level)
+  await sleep(1500);
   await page.keyboard.press('KeyE');
+  // the junior is on the way (E is handled on the next frame); now the deck fires before they arrive
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').team.members.some((m) => m.state === 'going'), { timeout: 2000 }).catch(() => {});
   await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((t) => t.def.id === 'slotC').onTrigger());
   await sleep(2500);
   const after = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.count);
+  r.states = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.members.map((m) => `${m.state}@${Math.floor(m.sprite.x / 32)}${m.target ? '->' + m.target.kind : ''}`));
   check('a junior sent to a trap that already fired comes back to the team', after === r.before, { ...r, after });
   await page.close();
 }

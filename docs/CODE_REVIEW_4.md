@@ -132,4 +132,4 @@
 - ✅ #9–#11: arrivista 2 più lento (215 px/s, parte quando fai scattare la valanga), −2 GU una sola volta per livello; arrivista 1 parte dietro di te e del team; niente "leapfrog" a mezz'aria.
 - ✅ #12–#15: `floorAt` ignora le sporgenze sopra la testa; lo stagista non sovrascrive lo snapshot e avvisa se non ci sono GU; nuova campagna = team nuovo.
 - ✅ #16: HUD "[E] delega ◀" quando c'è un bersaglio; la scia si ferma quando sei bloccato; `goalRight` non viene sovrascritta; fumetto del collega con timeout.
-- ✏️ #17: test aggiunti (delega, pattuglia, varchi). **Aperto:** lo smoke "un junior mandato a una trappola già scattata torna nel team" fallisce ancora (team 2 → 1): da indagare.
+- ✅ #17: test aggiunti (delega, pattuglia, varchi, ritorno del junior). Il fallimento residuo era una gara nel test stesso; ora 61/61 smoke verdi.

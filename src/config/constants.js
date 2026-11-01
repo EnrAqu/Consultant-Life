@@ -11,6 +11,10 @@ export const CANVAS_WIDTH = GAME_WIDTH * RENDER_SCALE;
 export const CANVAS_HEIGHT = GAME_HEIGHT * RENDER_SCALE;
 export const PHYSICS_FPS = 120;
 export const FADE_MS = 180;
+// Camera follow: fraction of the distance covered per 60 Hz frame (made frame-rate independent in GameScene),
+// and how far ahead (world px) it looks in the running direction.
+export const CAMERA_LERP = 0.18;
+export const CAMERA_LOOK_AHEAD = 70;
 export const UI_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 export const TILE = 32;
 export const LEVEL_ROWS = 17;
