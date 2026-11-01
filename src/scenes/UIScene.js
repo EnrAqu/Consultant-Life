@@ -4,6 +4,7 @@ import { formatGu } from '../core/format.js';
 import { bus, EV, listen } from '../events/EventBus.js';
 import { stats, session } from '../state.js';
 import { setupScreenCamera } from './sceneUtils.js';
+import { touch } from '../input/TouchControls.js';
 
 const NARR_Y = 96;
 const KT_LINES = [
@@ -72,7 +73,7 @@ export default class UIScene extends Phaser.Scene {
     this.title = this.add.container(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60).setVisible(false);
     this.title.add([
       text(this, 0, 0, 'CONSULTANT LIFE', { fontSize: '56px', fontStyle: 'bold', color: '#fbbf24' }).setOrigin(0.5),
-      text(this, 0, 50, '← → / A D muoviti   Spazio salta   R ricomincia', { fontSize: '16px' }).setOrigin(0.5),
+      text(this, 0, 50, touch.enabled ? '◀ ▶ muoviti   SALTA salta   ↺ ricomincia' : '← → / A D muoviti   Spazio salta   R ricomincia', { fontSize: '16px' }).setOrigin(0.5),
       text(this, 0, 78, 'Un rage game sulla consulenza. Il cliente ha sempre ragione.', { fontSize: '14px', color: '#9ca3af' }).setOrigin(0.5),
     ]);
 

@@ -133,3 +133,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-11-01 — Livello 5 implementato: torre 32×100, solai one-way, 3 lavoratori (5 + 1 + 3 tavole), 2 tappetini del leccapiedi, 3 opportunità, checkpoint `cp0…cp3` dal basso (piano 1, 2, 3, Board), 4 slot pivotabili. Classifica finale ridotta ai primi 2 per progetto (5 progetti devono stare nella schermata).
 - 2026-11-01 — Review del codice 5A (`docs/CODE_REVIEW_5.md`): vano scale nei solai per tornare a prendere un'opportunità saltata; marea con guinzaglio 10 righe e velocità **42 / 48 / 54 / 62** px/s (margine ≥ 1,5 righe per chi sale a buon ritmo); rimbalzo del leccapiedi controllato tra i frame; delega filtrata per altezza solo nelle torri.
 - 2026-11-01 — La riga HUD dell'escalation sta in basso al centro (la marea arriva dal basso), non sotto l'orologio.
+
+## Versione mobile
+- 2026-11-01 — Controlli su schermo per telefono (`docs/MOBILE.md`): pulsantiera ◀ ▶ in basso a sinistra, SALTA in basso a destra, E e ↺ piccoli sopra; solo su schermi touch (o `?touch=1`); le schermate "premi Spazio" si superano anche con un tocco; avviso "ruota il telefono" in verticale; fullscreen e blocco orizzontale dove il browser lo permette — richiesta utente, scelte di layout proposte e da rivedere dopo il test.

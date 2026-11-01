@@ -4,6 +4,7 @@ import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { formatDuration, formatGu } from '../core/format.js';
 import { stats, leaderboard, session } from '../state.js';
 import { LEVEL_ORDER, projectNumber } from '../levels/index.js';
+import { pressLabel } from '../input/TouchControls.js';
 
 const style = (size, color = '#e5e7eb', align = 'center') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, align, resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
 
@@ -13,7 +14,7 @@ const ENDINGS = {
     title: 'Benvenuto nella partnership.',
     color: '#fbbf24',
     after: 'Il cliente vuole rifare tutto da capo.',
-    restart: 'Premi Spazio per ricominciare dal Progetto 1 (vestito da Partner)',
+    restart: 'per ricominciare dal Progetto 1 (vestito da Partner)',
     outfit: 'partner',
   },
 };
@@ -60,12 +61,17 @@ export default class EndingScene extends Phaser.Scene {
 
     const prompt = this.add.text(cx, GAME_HEIGHT - 50, '', style(18, '#fbbf24')).setOrigin(0.5);
     this.time.delayedCall(2000, () => {
-      prompt.setText(e.restart);
-      this.input.keyboard.once('keydown-SPACE', () => {
+      prompt.setText(`${pressLabel()} ${e.restart}`);
+      let gone = false;
+      const restart = () => {
+        if (gone) return;
+        gone = true;
         // the new campaign is played in the clothes of the ending (until the page is reloaded)
         session.outfitOverride = e.outfit;
         fadeTo(this, 'GameScene', { levelId: LEVEL_ORDER[0], pivotCause: null });
-      });
+      };
+      this.input.keyboard.once('keydown-SPACE', restart);
+      this.input.once('pointerdown', restart);
     });
   }
 }

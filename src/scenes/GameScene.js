@@ -23,6 +23,7 @@ import Escalation from '../objects/Escalation.js';
 import Sycophant from '../objects/npc/Sycophant.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
 import { NPC_CLASSES } from '../objects/npc/index.js';
+import { touch } from '../input/TouchControls.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -114,7 +115,13 @@ export default class GameScene extends Phaser.Scene {
     this.lastNarration = null;
 
 
-    listen(this, { [EV.UI_READY]: () => this.emitSnapshot() });
+    listen(this, {
+      [EV.UI_READY]: () => this.emitSnapshot(),
+      [EV.TEAM_CHANGED]: ({ canDelegate }) => touch.setDelegateReady(canDelegate),
+    });
+    // on-screen controls only while playing (not on the Lessons Learned or ending screens)
+    touch.setVisible(true);
+    this.events.once('shutdown', () => touch.setVisible(false));
     this.emitSnapshot();
     this.narrate(this.pivotCause ? 'levelStartPivot' : 'levelStart', { pivotLabel: CAUSES[this.pivotCause]?.label });
   }
@@ -343,14 +350,16 @@ export default class GameScene extends Phaser.Scene {
   readInput() {
     const k = this.keys;
     const JD = Phaser.Input.Keyboard.JustDown;
-    const jumpPressed = JD(k.SPACE) || JD(k.UP) || JD(k.W) || JD(k.Z);
+    const t = touch.state;
+    // keyboard and on-screen controls together (docs/MOBILE.md); a JustDown must be read every frame, hence `|` not `||`
+    const jumpPressed = JD(k.SPACE) | JD(k.UP) | JD(k.W) | JD(k.Z) | touch.take('jump');
     return {
-      left: k.LEFT.isDown || k.A.isDown,
-      right: k.RIGHT.isDown || k.D.isDown,
-      jumpPressed,
-      jumpHeld: k.SPACE.isDown || k.UP.isDown || k.W.isDown || k.Z.isDown,
-      restart: JD(k.R),
-      delegate: this.delegateQueued,
+      left: k.LEFT.isDown || k.A.isDown || t.left,
+      right: k.RIGHT.isDown || k.D.isDown || t.right,
+      jumpPressed: Boolean(jumpPressed),
+      jumpHeld: k.SPACE.isDown || k.UP.isDown || k.W.isDown || k.Z.isDown || t.jumpHeld,
+      restart: Boolean(JD(k.R) | touch.take('restart')),
+      delegate: this.delegateQueued || touch.take('delegate'),
     };
   }
 

@@ -115,6 +115,38 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.close();
 }
 
+// on-screen controls (docs/MOBILE.md), forced with ?touch=1
+{
+  const page = await open('?debug=1&standup=off&touch=1');
+  const shown = await page.evaluate(() => document.querySelector('#touch')?.classList.contains('on'));
+  check('touch controls are shown while playing', shown === true, shown);
+  const press = (sel, type, side = 0.75) => page.evaluate(([sel, type, side]) => {
+    const el = document.querySelector(sel);
+    const r = el.getBoundingClientRect();
+    el.dispatchEvent(new PointerEvent(type, { pointerId: 7, bubbles: true, clientX: r.left + r.width * side, clientY: r.top + r.height / 2 }));
+  }, [sel, type, side]);
+  const x0 = (await state(page)).tile[0];
+  await press('#touch .pad', 'pointerdown'); await sleep(500); await press('#touch .pad', 'pointerup');
+  const x1 = (await state(page)).tile[0];
+  check('▶ on the pad runs right', x1 > x0, { x0, x1 });
+  const y0 = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').player.y);
+  await press('#touch .jump', 'pointerdown'); await sleep(250);
+  const y1 = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').player.y);
+  await press('#touch .jump', 'pointerup');
+  check('SALTA jumps', y1 < y0 - 40, { y0, y1 });
+  await page.screenshot({ path: OUT + 'touch-controls.png' });
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(g.goal.x - 40, g.goal.floorY - 20); });
+  await press('#touch .pad', 'pointerdown'); await sleep(400); await press('#touch .pad', 'pointerup');
+  await page.waitForFunction(() => globalThis.__game.scene.isActive('LessonsLearnedScene'), { timeout: 5000 }).catch(() => {});
+  const hidden = await page.evaluate(() => !document.querySelector('#touch').classList.contains('on'));
+  check('the controls hide on the Lessons Learned slide', hidden, hidden);
+  await sleep(1300);
+  await page.mouse.click(960, 540); await sleep(1000);
+  const s = await state(page);
+  check('a tap on the slide goes on to level 2', s.level === 'level2', s);
+  await page.close();
+}
+
 await browser.close();
 console.log(results.join('\n'));
 console.log('\nERRORS:\n' + (errors.length ? errors.join('\n') : 'none'));

@@ -3,6 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/con
 import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatDuration } from '../core/format.js';
+import { pressLabel } from '../input/TouchControls.js';
 
 const style = (size, color = '#fecaca') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, align: 'center', resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
 
@@ -25,10 +26,16 @@ export default class BudgetOverScene extends Phaser.Scene {
     const prompt = this.add.text(cx, GAME_HEIGHT - 120, '', style(20, '#ffffff')).setOrigin(0.5);
 
     this.time.delayedCall(1000, () => {
-      prompt.setText('Premi R o Spazio per riaprire il progetto (nuova SOW)');
-      const again = () => fadeTo(this, 'GameScene', { levelId, pivotCause });
+      prompt.setText(`${pressLabel('Premi R o Spazio')} per riaprire il progetto (nuova SOW)`);
+      let gone = false;
+      const again = () => {
+        if (gone) return;
+        gone = true;
+        fadeTo(this, 'GameScene', { levelId, pivotCause });
+      };
       this.input.keyboard.once('keydown-R', again);
       this.input.keyboard.once('keydown-SPACE', again);
+      this.input.once('pointerdown', again);
     });
   }
 }

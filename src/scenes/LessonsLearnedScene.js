@@ -4,6 +4,7 @@ import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
 import { CAUSES } from '../data/causes.js';
 import { formatGu, formatDuration } from '../core/format.js';
 import { projectNumber } from '../levels/index.js';
+import { pressLabel } from '../input/TouchControls.js';
 
 const style = (size, color = '#111827') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION, wordWrap: { width: 780 } });
 
@@ -48,7 +49,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     const prompt = this.add.text(GAME_WIDTH - 60, GAME_HEIGHT - 74, '', style(16, '#1d4ed8')).setOrigin(1, 0);
 
     this.time.delayedCall(1000, () => {
-      prompt.setText(`Premi Spazio per passare al Progetto ${projectNumber(next)}`);
+      prompt.setText(`${pressLabel()} per passare al Progetto ${projectNumber(next)}`);
       let gone = false;
       const go = () => {
         if (gone) return;
@@ -57,6 +58,7 @@ export default class LessonsLearnedScene extends Phaser.Scene {
       };
       this.input.keyboard.once('keydown-SPACE', go);
       this.input.keyboard.once('keydown-ENTER', go);
+      this.input.once('pointerdown', go);
     });
   }
 }
