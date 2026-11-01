@@ -21,6 +21,8 @@ export const EV = {
   FIRST_MOVE: 'first-move',
   DEBUG: 'debug',
   TEAM_CHANGED: 'team-changed',
+  ESCALATION: 'escalation',
+  DEALS_CHANGED: 'deals-changed',
 };
 
 // Subscribe for the lifetime of a scene: listeners are removed on shutdown.

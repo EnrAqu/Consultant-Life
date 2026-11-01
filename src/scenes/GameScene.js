@@ -18,6 +18,7 @@ import Pickup from '../objects/Pickup.js';
 import Checkpoint from '../objects/Checkpoint.js';
 import Goal from '../objects/Goal.js';
 import Team from '../objects/team/Team.js';
+import Escalation from '../objects/Escalation.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
 import { NPC_CLASSES } from '../objects/npc/index.js';
 
@@ -66,6 +67,7 @@ export default class GameScene extends Phaser.Scene {
     this.team = def.team ? new Team(this, this.teamAtStart) : null;
     this.buildNpcs(def, level);
     this.registerColliders();
+    this.escalation = def.escalation && !DEBUG.escalationOff ? new Escalation(this, def.escalation) : null;
 
     const cam = this.cameras.main;
     cam.setZoom(WORLD_ZOOM);
@@ -247,6 +249,18 @@ export default class GameScene extends Phaser.Scene {
     bus.emit(EV.GU_CHANGED, { gu: this.budget.gu, max: this.budget.max, delta: 0, reason: 'snapshot' });
     bus.emit(EV.CLOCK_TICK, { label: this.schedule.clockLabel, warning: this.schedule.isWarning });
     if (this.lastNarration) bus.emit(EV.NARRATE, this.lastNarration);
+    if (this.escalation) {
+      this.escalation.lastHud = null;
+      this.escalation.emitHud();
+    }
+  }
+
+  floatText(str, x, y, color = '#f87171') {
+    const fx = this.add
+      .text(x, y, str, { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color, resolution: TEXT_RESOLUTION * 2 })
+      .setOrigin(0.5)
+      .setDepth(DEPTH.fx);
+    this.time.delayedCall(700, () => fx.destroy());
   }
 
   narrate(event, ctx = {}) {
@@ -336,6 +350,7 @@ export default class GameScene extends Phaser.Scene {
     for (const trap of this.traps) trap.update(dt);
     for (const npc of this.npcs) npc.update(dt);
     this.goal.update(dt);
+    this.escalation?.update(dt);
     this.team?.update(dt, input.delegate);
     for (const p of this.pickups) p.update(dt);
 
@@ -394,13 +409,10 @@ export default class GameScene extends Phaser.Scene {
     for (const trap of this.traps) trap.cancelCall();
     for (const npc of this.npcs) npc.cancelCall();
     this.goal.cancelCall();
+    this.escalation?.cancelCall();
     this.playerView.onDeath();
     this.cameras.main.shake(120, 0.006);
-    const fx = this.add
-      .text(player.x, player.y - 24, `-${formatGu(BUDGET.deathCost)} GU`, { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#f87171', resolution: TEXT_RESOLUTION * 2 })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.fx);
-    this.time.delayedCall(700, () => fx.destroy());
+    this.floatText(`-${formatGu(BUDGET.deathCost)} GU`, player.x, player.y - 24);
     this.addPause('death');
 
     const r = this.stats.recordDeath({ cause, x: player.x, y: Math.min(player.y, this.worldH) });
@@ -416,6 +428,7 @@ export default class GameScene extends Phaser.Scene {
     for (const npc of this.npcs) npc.reset();
     this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
     this.playerView.onRespawn();
+    this.escalation?.onRespawn();
     this.team?.restore();
     for (const o of [...this.traps, ...this.npcs]) o.delegateReserved = false;
     this.cameras.main.centerOn(this.player.x + this.lookAhead, this.player.y - this.lookY);
@@ -431,6 +444,7 @@ export default class GameScene extends Phaser.Scene {
     for (const trap of this.traps) trap.cancelCall();
     for (const npc of this.npcs) npc.cancelCall();
     this.goal.cancelCall();
+    this.escalation?.cancelCall();
   }
 
   budgetOver() {

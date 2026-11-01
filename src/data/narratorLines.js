@@ -102,4 +102,16 @@ export const NARRATOR_LINES = [
   { id: 'ai_draft_1', event: 'aiDraft', text: "L'AI ti ha fatto una draft in tre secondi. Ricontrollala in tre ore." },
   { id: 'ai_fake_1', event: 'aiFake', text: 'Quella piattaforma era un\'allucinazione. Molto convincente, però.' },
   { id: 'start_level4_1', event: 'levelStart', when: { levelId: 'level4' }, text: 'Senior Manager! Ora il cliente ti chiama per nome. Purtroppo.' },
+
+  // level 5 (ITERATION_5): the tower
+  { id: 'esc_start_1', event: 'escalationStart', text: 'Escalation. Niente panico: sali. Il panico è fatturabile solo ai piani alti.' },
+  { id: 'esc_start_2', event: 'escalationStart', text: 'Il cliente ha scritto al tuo capo. Tu sei il capo. Sali lo stesso.' },
+  { id: 'esc_stage_1', event: 'escalationStage', text: 'Si è aggiunto il {chainLabel}. Il thread ha già 48 risposte.' },
+  { id: 'esc_stage_2', event: 'escalationStage', text: 'Ora c\'è in CC anche il {chainLabel}. Qualcuno ha detto "giusto per visibilità".' },
+  { id: 'esc_catch_1', event: 'escalationCatch', text: 'Call col cliente: spiegare tutto quello che è successo. Tre giornate, a voler essere ottimisti.' },
+  { id: 'esc_catch_2', event: 'escalationCatch', text: 'Hai spiegato tutto. Il cliente ha chiesto di rispiegarlo con meno parole e più slide.' },
+  { id: 'esc_catch_3', event: 'escalationCatch', text: '"Facciamo un punto?" Tre giornate di punto.' },
+  { id: 'esc_stop_1', event: 'escalationStop', text: 'Il CEO del cliente è in ferie. Goditi questi cinque minuti di pace.' },
+  { id: 'worker_1', event: 'workerWatched', text: 'Se li guardi lavorare, smettono per farti vedere che lavorano. Girati.' },
+  { id: 'worker_2', event: 'workerWatched', text: 'Un buon Partner delega. E poi guarda da un\'altra parte.' },
 ];

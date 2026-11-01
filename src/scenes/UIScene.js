@@ -45,8 +45,11 @@ export default class UIScene extends Phaser.Scene {
     // level name
     this.levelText = text(this, 16, 54, '', { fontSize: '14px', color: '#9ca3af' });
     this.teamText = text(this, 16, 74, '', { fontSize: '14px', color: '#fde68a' });
+    this.dealsText = text(this, 16, 94, '', { fontSize: '14px', color: '#fbbf24' });
+    // level 5: the escalation tide comes from below, so its line sits at the bottom
+    this.escalationText = text(this, GAME_WIDTH / 2, GAME_HEIGHT - 34, '', { fontSize: '16px', fontStyle: 'bold', color: '#fca5a5', backgroundColor: '#111827', padding: { x: 8, y: 3 } }).setOrigin(0.5, 0).setVisible(false);
 
-    this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText]);
+    this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText, this.dealsText, this.escalationText]);
     this.debugText = text(this, 16, GAME_HEIGHT - 44, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
 
     // warning border, standup overlay, KT overlay, title
@@ -110,6 +113,11 @@ export default class UIScene extends Phaser.Scene {
       [EV.FIRST_MOVE]: () => this.hideTitle(),
       [EV.DEBUG]: (s) => this.debugText.setText(s),
       [EV.TEAM_CHANGED]: ({ count, canDelegate }) => this.showTeam(count, canDelegate),
+      [EV.ESCALATION]: ({ text: str, danger }) => {
+        this.escalationText.setText(str).setVisible(str !== '');
+        this.escalationDanger = danger;
+      },
+      [EV.DEALS_CHANGED]: ({ count, required }) => this.dealsText.setText(required ? `Pipeline: ${count}/${required}` : ''),
     });
     bus.emit(EV.UI_READY);
   }
@@ -131,6 +139,8 @@ export default class UIScene extends Phaser.Scene {
     this.kt.setVisible(false);
     this.levelText.setText(e.career ? `${e.career} — ${e.name}` : e.name ?? '');
     this.showTeam(e.team);
+    this.dealsText.setText('');
+    this.escalationText.setVisible(false);
     this.refreshDeaths(stats.getRun().deaths);
     if (e.levelId === 'level1' && !session.titleShown) {
       session.titleShown = true;
@@ -204,6 +214,10 @@ export default class UIScene extends Phaser.Scene {
       const on = Math.floor(this.blink / 250) % 2 === 0;
       this.clockText.setColor(on ? '#f97316' : '#e5e7eb');
       this.border.setVisible(on);
+    }
+    if (this.escalationText.visible) {
+      const on = !this.escalationDanger || Math.floor(this.blink / 200) % 2 === 0;
+      this.escalationText.setColor(on ? '#fca5a5' : '#ffffff');
     }
     if (this.standupLeft > 0) {
       this.standupLeft -= delta;
