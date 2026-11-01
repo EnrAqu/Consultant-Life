@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
 import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
-import { CAUSES } from '../data/causes.js';
+import { causeLabel } from '../data/causes.js';
+import { LEVELS } from '../levels/index.js';
 import { formatDuration } from '../core/format.js';
 import { pressLabel } from '../input/TouchControls.js';
 
@@ -21,7 +22,7 @@ export default class BudgetOverScene extends Phaser.Scene {
     this.add.text(cx, 200, 'Il progetto ha superato le Giornate Uomo previste.\nEscalation in arrivo (prossimamente).', style(18)).setOrigin(0.5);
     const top = Object.entries(runStats.deathsByCause).sort((a, b) => b[1] - a[1])[0];
     this.add
-      .text(cx, 290, `Morti: ${runStats.deaths}   Tempo: ${formatDuration(runStats.timeMs)}   Causa principale: ${top ? CAUSES[top[0]].label : '-'}`, style(16))
+      .text(cx, 290, `Morti: ${runStats.deaths}   Tempo: ${formatDuration(runStats.timeMs)}   Causa principale: ${top ? causeLabel(top[0], LEVELS[levelId]?.skin) : '-'}`, style(16))
       .setOrigin(0.5);
     const prompt = this.add.text(cx, GAME_HEIGHT - 120, '', style(20, '#ffffff')).setOrigin(0.5);
 

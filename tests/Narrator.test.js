@@ -26,6 +26,16 @@ describe('Narrator', () => {
     }
   });
 
+  it('spot and milestone lines also beat a level flavour line (cause + levelId)', () => {
+    const withLevel = [...lines, { id: 'l1', event: 'death', when: { cause: 'spike', levelId: 'level1' }, text: 'junior' }];
+    for (let i = 0; i < 10; i++) {
+      const n = new Narrator(withLevel, Math.random);
+      expect(n.pick('death', { cause: 'spike', levelId: 'level1' }).id).toBe('l1');
+      expect(n.pick('death', { cause: 'spike', levelId: 'level1', spotCount: 3 }).id).toBe('spot');
+      expect(n.pick('death', { cause: 'spike', levelId: 'level1', spotCount: 3, runDeaths: 5 }).id).toBe('ms5');
+    }
+  });
+
   it('avoids repeating recent lines when possible', () => {
     const n = new Narrator(lines, () => 0);
     const a = n.pick('death', {}).id;

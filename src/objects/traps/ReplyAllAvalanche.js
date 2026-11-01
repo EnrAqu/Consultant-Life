@@ -1,6 +1,6 @@
 import BaseTrap from './BaseTrap.js';
 import { TILE, DEPTH, TEXT_RESOLUTION, TEXTURE_SCALE, UI_FONT } from '../../config/constants.js';
-import { EMAIL_KEYS } from '../../gfx/TextureFactory.js';
+import { EMAIL_KEYS, TICKET_KEYS } from '../../gfx/TextureFactory.js';
 
 const BASE = 1 / TEXTURE_SCALE;
 const DEBRIS_MS = 600;
@@ -20,10 +20,13 @@ export default class ReplyAllAvalanche extends BaseTrap {
     this.spawnY = this.floorY - p.spawnHeight * TILE;
     this.fallMs = (p.spawnHeight / p.fallSpeed) * 1000;
     this.solidLanding = this.pivoted || p.landing === 'solid';
+    // junior skin (level 1): AMS tickets instead of emails
+    const junior = scene.def?.skin === 'junior';
+    const cardKeys = junior ? TICKET_KEYS : EMAIL_KEYS;
 
     const badgeX = (this.tx + p.triggerDx) * TILE + 16;
     const badgeY = (p.restRow - 4) * TILE;
-    this.badge = scene.add.image(badgeX, badgeY, 'inboxBadge').setScale(BASE).setDepth(DEPTH.traps);
+    this.badge = scene.add.image(badgeX, badgeY, junior ? 'ticketBadge' : 'inboxBadge').setScale(BASE).setDepth(DEPTH.traps);
     this.badgeText = scene.add
       .text(badgeX + 12, badgeY - 7, '0', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '10px', color: '#ffffff', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5)
@@ -44,7 +47,7 @@ export default class ReplyAllAvalanche extends BaseTrap {
       const stackIndex = heights[dx] ?? 0;
       heights[dx] = stackIndex + 1;
       const x = (this.tx + dx) * TILE + 16;
-      const email = this.objectGroup.create(x, this.spawnY, this.pivoted ? 'emailGreen' : EMAIL_KEYS[i % EMAIL_KEYS.length]);
+      const email = this.objectGroup.create(x, this.spawnY, this.pivoted ? 'emailGreen' : cardKeys[i % cardKeys.length]);
       email.setOrigin(0.5, 1).setScale(BASE).setDepth(DEPTH.traps);
       email.setData({ state: 'idle', lethal: !this.pivoted, targetBottom: this.floorY - (this.solidLanding ? stackIndex * 16 : 0) });
       const shadow = scene.add.image(x, this.floorY - 2, 'emailShadow').setScale(BASE).setDepth(DEPTH.objects).setVisible(false);

@@ -22,13 +22,34 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | File | `src/levels/level1.js` (195 colonne, orizzontale) |
 | Carriera / GU / burnout min | junior · 20 GU · 0% |
 | Nato da | `IMPLEMENTATION_PLAN.md` §6.4 · `ITERATION_2.md` §6 (ponte di email) · `ITERATION_4.md` §1 (ritmo) |
-| Trappole | replyAll ×3 (una è il ponte `ra2`), scopeCreep ×3, deckCollapse, fakeKT. Non ha slot: è il primo livello |
+| Tema | **progetto da junior** (`skin: 'junior'`): le email sono ticket AMS, i CR sono fix sul codice di Marco (che non c'è più), il deck è la `Documentazione_v12_DEF.docx`. Etichette e lezioni in `src/data/causes.js` (`causeLabel`/`causeLesson`), frasi `junior_*` del narratore |
+| Trappole | replyAll ×5 (ra1, ra1b, il ponte `ra2`, ra3, ra4), scopeCreep ×3, deckCollapse ×2 (dk1, dk2), fakeKT. Non ha slot: è il primo livello |
 | Checkpoint | cp0 (col 95) |
-| Test | `tests/LevelParser.test.js`: completabile, e completabile **solo** grazie al ponte di email |
-| Smoke | `smoke.mjs` (default senza `?level`), `smokeBurnout.mjs` |
+| Test | `tests/LevelParser.test.js`: completabile, e completabile **solo** grazie al ponte di email; `tests/causes.test.js`: testi della skin |
+| Smoke | `smoke.mjs` (default senza `?level`; sezione 1c: tradimenti e combo), `smokeBurnout.mjs` |
 | Prova | `?debug=1` |
 
-**Registro:** —
+**Registro:**
+- **2026-11-02 — Più difficile e complesso, da junior** (utente: "combo di trappole" + "trappole che tradiscono", stessa lunghezza, 20 GU; "da junior che cosa hai? Documentazione, AMS di codici di altri").
+  Stesse 4 cause, quindi la catena dei pivot verso il livello 2 non cambia (ci si aspetta più morti da ticket, quindi la lezione "replyAll" sarà più frequente). Le colonne invariate (spawn, primo burrone, spine, corridoio 42–51, KT, checkpoint, ponte, CR sinistro) tengono validi gli smoke esistenti.
+  - **Seconda coda di ticket (`ra1b`, colonne 52–54):** chi ha aspettato la prima valanga riparte di corsa e viene preso all'uscita dalla seconda. Indizio: il secondo contatore, visibile da lontano. Chi si ferma sul suo innesco (col 50) non viene colpito.
+  - **Cartelli che mentono:**
+    - "Tranquillo, il codice di Marco regge. — il tuo senior" sopra il gradino del fix #47: invita a fermarsi, e fermarsi lo fa scattare;
+    - "KT di onboarding: obbligatorio! — HR" accanto al KT rosso.
+  - **Ultimo giro di ticket (`ra3`, colonne 156–160):** spostato da col 184 a prima del salto di 4. Le email inseguono chi corre (intervallo 120 ms ≈ velocità massima).
+  - **Fix sotto la tempesta (`ra4` sul gradino 173–178):** 12 ticket letali da circa 0,5 s a 1,7 s dopo l'innesco (col 169). Sul gradino non puoi fermarti, perché il fix ti spinge nel burrone 179–181, e non puoi entrarci subito: aspetti, poi lo attraversi senza fermarti.
+  - **La documentazione prima della consegna (`dk2`, colonne 184–189):** chi arriva di corsa al traguardo viene schiacciato. Chi aspetta trova una pila di 2 righe su cui salire per arrivare a col 191.
+
+    ```
+    prima (145–194)                                      dopo
+    14 ##...o..................####.....R......G...       ##...o.....R................####.....D......G...
+       (ra3 a 184, nessuna email sul gradino)           (ra3 a 156, ra4 sul gradino 173–178, dk2 a 184)
+    ```
+  Verifica: 166 test Vitest, build, `npm run smoke` 97/97. La sezione 1c di `smoke.mjs` (7 controlli) verifica che chi corre muoia e chi aspetta passi, compresa la catena reale "tempesta → fix → salto → fermarsi prima della documentazione". Screenshot di ticket, fix e pila di documentazione.
+  Review (`docs/CODE_REVIEW_LEVEL1.md`, 11 punti, nessuno bloccante):
+  - accolti: `ra1b` più fitto (12 ticket ogni 70 ms), perché chi saltava sul gradino passava per pochi pixel; controlli smoke (a) ed (e) rifatti, perché passavano per il motivo sbagliato; pesi del narratore (`minSpot` 3, `runDeathsExact` 4), perché le frasi "muori sempre qui" non perdano contro quelle da junior, con un test; cartelli spostati (KT sopra la scrivania, senior sopra l'etichetta del fix);
+  - per l'utente: niente secondo checkpoint (decisione registrata), nonostante 8 trappole letali dopo cp0;
+  - lasciati: margini stretti dei tempi, numero "#47" ripetuto, etichetta della causa nel contesto del narratore non usata.
 
 ## Livello 2 — "La rivincita"
 | | |

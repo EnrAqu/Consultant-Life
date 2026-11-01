@@ -1,4 +1,5 @@
-const WEIGHTS = { runDeathsExact: 3, minSpot: 2 };
+// above cause + levelId (2): "you keep dying here" and the milestone lines must win over a level's flavour lines
+const WEIGHTS = { runDeathsExact: 4, minSpot: 3 };
 const HISTORY_SIZE = 6;
 
 const MATCHERS = {

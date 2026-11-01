@@ -13,6 +13,9 @@ export default class ScopeCreepPlatform extends BaseTrap {
     const p = this.p;
     const scene = this.scene;
     this.dir = p.direction === 'left' ? -1 : 1;
+    // junior skin (level 1): a fix on someone else's code, not a client CR
+    const junior = scene.def?.skin === 'junior';
+    const blockKey = junior ? 'codeBlock' : 'scopeBlock';
     this.row = this.ty + (p.dy ?? 0);
     this.rootCol = this.tx;
     this.y = this.row * TILE;
@@ -31,13 +34,13 @@ export default class ScopeCreepPlatform extends BaseTrap {
 
     if (!this.pivoted) {
       scene.add
-        .text(this.rootCol * TILE + 16, this.y - 14, 'CR #47', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#facc15', resolution: TEXT_RESOLUTION * 2 })
+        .text(this.rootCol * TILE + 16, this.y - 14, junior ? 'Fix #47 (codice di Marco)' : 'CR #47', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#facc15', resolution: TEXT_RESOLUTION * 2 })
         .setOrigin(0.5)
         .setDepth(DEPTH.traps);
     }
 
-    this.trail = this.addPlatform(this.rootCol, this.row, 1, 1, 'scopeBlock');
-    this.head = scene.physics.add.image(0, 0, 'scopeBlock').setOrigin(0, 0).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.traps);
+    this.trail = this.addPlatform(this.rootCol, this.row, 1, 1, blockKey);
+    this.head = scene.physics.add.image(0, 0, blockKey).setOrigin(0, 0).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.traps);
     this.head.body.setAllowGravity(false);
     this.head.body.setImmovable(true);
     this.solids.push(this.head);

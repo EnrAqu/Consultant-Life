@@ -176,6 +176,98 @@ function check(name, ok, info) {
   await page.close();
 }
 
+// 1c. level 1 betrayals and combos (docs/LEVELS.md, level 1 log): runners die, whoever waits gets through
+{
+  const fresh = () => open('?debug=1&standup=off');
+  const cause = (s, c) => s.byCause[c] ?? 0;
+  const run = async (page, from, ms) => {
+    await teleport(page, from, 14);
+    await sleep(150);
+    await hold(page, 'ArrowRight', ms);
+    await sleep(300);
+    return state(page);
+  };
+
+  // run right and jump when the player reaches `jumpCol` (a real runner jumps onto the next step)
+  const runJump = async (page, from, jumpCol, ms, row = 14) => {
+    await teleport(page, from, row);
+    await sleep(150);
+    await page.keyboard.down('ArrowRight');
+    await page.waitForFunction((c) => globalThis.__game.scene.getScene('GameScene').player.x >= c * 32, { timeout: 3000 }, jumpCol).catch(() => {});
+    await hold(page, 'Space', 250);
+    await sleep(ms);
+    await page.keyboard.up('ArrowRight');
+    await sleep(300);
+    return state(page);
+  };
+
+  let page = await fresh();
+  const a = await runJump(page, 46, 53.3, 600);
+  check('L1: running out of the first corridor and jumping onto the step, the second inbox (ra1b) gets you', cause(a, 'replyAll') >= 1, a);
+  await page.close();
+
+  page = await fresh();
+  await teleport(page, 50, 14);
+  await sleep(1300);
+  const b = await state(page);
+  check('L1: stopping on the second inbox trigger, its emails miss you', b.deaths === 0, b);
+  await page.screenshot({ path: OUT + 'shot-l1-inbox2.png' });
+  await page.close();
+
+  page = await fresh();
+  const c = await run(page, 147, 1700);
+  check('L1: running at the last gap, the "last round of comments" (ra3) gets you', cause(c, 'replyAll') >= 1, c);
+  await page.close();
+
+  page = await fresh();
+  await teleport(page, 169, 14);
+  await sleep(100);
+  await teleport(page, 177, 12);
+  await sleep(1200);
+  const d = await state(page);
+  check('L1: on the CR step right after the trigger, the email storm (ra4) gets you', cause(d, 'replyAll') >= 1, d);
+  await page.close();
+
+  page = await fresh();
+  await teleport(page, 169, 14);
+  await sleep(2300);
+  await page.screenshot({ path: OUT + 'shot-l1-storm.png' });
+  // the real chain: onto the step, across the fix without stopping, short hop over the pit, stop before the deck
+  await teleport(page, 171, 14);
+  await sleep(150);
+  await page.keyboard.down('ArrowRight');
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').player.x >= 172.2 * 32, { timeout: 3000 }).catch(() => {});
+  await hold(page, 'Space', 250);
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').player.x >= 177.9 * 32, { timeout: 3000 }).catch(() => {});
+  await hold(page, 'Space', 200);
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').player.x >= 182.2 * 32, { timeout: 3000 }).catch(() => {});
+  await page.keyboard.up('ArrowRight');
+  await sleep(600);
+  const e = await state(page);
+  check('L1: after waiting out the storm you cross the fix step and land before the documentation', e.deaths === 0 && e.tile[0] >= 182 && e.tile[0] <= 183, e);
+  await page.close();
+
+  page = await fresh();
+  const f = await run(page, 182, 1300);
+  check('L1: running at the goal, the final deck (dk2) crushes you', cause(f, 'deckCollapse') >= 1, f);
+  await page.close();
+
+  page = await fresh();
+  await teleport(page, 184, 14);
+  await hold(page, 'ArrowLeft', 250);
+  await sleep(1800);
+  await page.screenshot({ path: OUT + 'shot-l1-deck-pile.png' });
+  await page.keyboard.down('ArrowRight');
+  await sleep(80);
+  await hold(page, 'Space', 300);
+  await sleep(1300);
+  await page.keyboard.up('ArrowRight');
+  await sleep(1300);
+  const g = await state(page);
+  check('L1: after the deck falls, you climb its pile and reach the goal', g.deaths === 0 && g.active.includes('LessonsLearnedScene'), g);
+  await page.close();
+}
+
 // 1b. outfits preview
 for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farmer']) {
   const page = await open(`?debug=1&standup=off&outfit=${outfit}`);

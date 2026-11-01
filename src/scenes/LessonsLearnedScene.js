@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
 import { setupScreenCamera, fadeIn, fadeTo } from './sceneUtils.js';
-import { CAUSES } from '../data/causes.js';
+import { causeLabel, causeLesson } from '../data/causes.js';
 import { formatGu, formatDuration } from '../core/format.js';
-import { projectNumber, LEVEL_ORDER } from '../levels/index.js';
+import { LEVELS, projectNumber, LEVEL_ORDER } from '../levels/index.js';
 import { nextStart } from '../core/Burnout.js';
 import { BURNOUT } from '../config/constants.js';
 import { pressLabel } from '../input/TouchControls.js';
@@ -24,17 +24,17 @@ export default class LessonsLearnedScene extends Phaser.Scene {
     this.add.rectangle(40, 30, GAME_WIDTH - 80, 64, 0x1d4ed8).setOrigin(0, 0);
     this.add.text(x, 46, `Lessons Learned — Progetto ${projectNumber(levelId)}`, style(30, '#ffffff'));
 
-    const cause = CAUSES[dominant.cause];
+    const skin = LEVELS[levelId]?.skin ?? null;
     const bullets = [];
     if (dominant.isDefault) {
       bullets.push('Nessun incidente rilevante. Sospetto. Abbiamo comunque preparato una lesson learned.');
     } else {
-      bullets.push(`Causa principale: ${cause.label} (${dominant.incidents} incidenti, ${formatGu(dominant.guLost)} GU bruciate)`);
+      bullets.push(`Causa principale: ${causeLabel(dominant.cause, skin)} (${dominant.incidents} incidenti, ${formatGu(dominant.guLost)} GU bruciate)`);
     }
     if (dominant.realCause) {
-      bullets.push(`Causa reale: ${CAUSES[dominant.realCause].label} (non pivotabile. Il cliente ha scelto un'altra lesson.)`);
+      bullets.push(`Causa reale: ${causeLabel(dominant.realCause, skin)} (non pivotabile. Il cliente ha scelto un'altra lesson.)`);
     }
-    bullets.push(`Azione correttiva: ${cause.lesson}`);
+    bullets.push(`Azione correttiva: ${causeLesson(dominant.cause, skin)}`);
     bullets.push(`Morti totali nel progetto: ${run.deaths} — Tempo: ${formatDuration(run.timeMs)} — GU residue: ${formatGu(gu)} / ${guMax}`);
     if (team) bullets.push(`Team arrivato alla consegna: ${team.count}/${team.size}${team.count < team.size ? ' (gli altri sono stati "valorizzati" altrove)' : ''}`);
     // where the next project starts, and why (docs/BURNOUT.md §6)

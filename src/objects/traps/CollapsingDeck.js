@@ -10,7 +10,8 @@ export default class CollapsingDeck extends BaseTrap {
   build() {
     const p = this.p;
     const scene = this.scene;
-    const key = this.pivoted ? 'slideGreen' : 'slide';
+    const junior = scene.def?.skin === 'junior';
+    const key = this.pivoted ? 'slideGreen' : junior ? 'docPage' : 'slide';
     this.stackBottom = (p.stackRow + 1) * TILE;
 
     // Slides that fall first sit on top of their pile.
@@ -32,7 +33,7 @@ export default class CollapsingDeck extends BaseTrap {
     scene.add.rectangle(minX - 4, this.stackBottom, maxX - minX + 8, 4, 0x6b7280).setOrigin(0, 0).setDepth(DEPTH.traps - 1);
     const topY = Math.min(...this.slides.map((s) => s.getData('home'))) - 50;
     scene.add
-      .text((minX + maxX) / 2, topY, this.pivoted ? 'deck_FINAL_v8_APPROVATO.pptx' : 'deck_FINAL_v7_DEF_ok.pptx', {
+      .text((minX + maxX) / 2, topY, this.pivoted ? 'deck_FINAL_v8_APPROVATO.pptx' : junior ? 'Documentazione_v12_DEF.docx' : 'deck_FINAL_v7_DEF_ok.pptx', {
         fontFamily: UI_FONT,
         fontSize: '12px',
         color: this.pivoted ? '#22c55e' : '#e5e7eb',

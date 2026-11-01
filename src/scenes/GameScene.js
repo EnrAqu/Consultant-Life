@@ -8,7 +8,7 @@ import Budget from '../core/Budget.js';
 import Burnout from '../core/Burnout.js';
 import StandupSchedule from '../core/StandupSchedule.js';
 import { formatGu } from '../core/format.js';
-import { CAUSES } from '../data/causes.js';
+import { CAUSES, causeLabel } from '../data/causes.js';
 import { bus, EV, listen } from '../events/EventBus.js';
 import { stats, narrator, leaderboard, session } from '../state.js';
 import Player from '../objects/Player.js';
@@ -560,7 +560,7 @@ export default class GameScene extends Phaser.Scene {
     // the burnout comes first: if it ends the campaign, it wins over the budget
     if (this.addBurnout('death')) return;
     this.floatText(`-${formatGu(BUDGET.deathCost)} GU`, player.x, player.y - 24);
-    this.narrate('death', { cause, causeLabel: CAUSES[cause]?.label, spotCount: r.spotCount, causeDeaths: r.causeDeaths, runDeaths: r.deathsThisRun, totalDeaths: r.totalDeaths });
+    this.narrate('death', { cause, causeLabel: causeLabel(cause, this.def.skin), spotCount: r.spotCount, causeDeaths: r.causeDeaths, runDeaths: r.deathsThisRun, totalDeaths: r.totalDeaths });
     if (this.spendGu(BUDGET.deathCost, cause)) return;
     this.time.delayedCall(DEATH_FREEZE_MS, () => this.respawn());
   }

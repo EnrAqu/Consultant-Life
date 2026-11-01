@@ -205,6 +205,16 @@ const EMAIL_VARIANTS = [
 ];
 export const EMAIL_KEYS = EMAIL_VARIANTS.map((v) => v.key);
 
+// Junior skin (level 1): the same falling cards are AMS tickets on other people's code.
+const TICKET_VARIANTS = [
+  { key: 'ticket_0', bar: COLORS.red, title: 'P1 BLOCCANTE', color: '#ffffff' },
+  { key: 'ticket_1', bar: 0x475569, title: 'INC-4711 [AMS]', color: '#ffffff' },
+  { key: 'ticket_2', bar: 0x7c3aed, title: 'Riaperto (x3)', color: '#ffffff' },
+  { key: 'ticket_3', bar: COLORS.orange, title: 'Non va niente', color: '#ffffff' },
+  { key: 'ticket_4', bar: 0xcbd5e1, title: 'Prima andava', color: '#334155' },
+];
+export const TICKET_KEYS = TICKET_VARIANTS.map((v) => v.key);
+
 function ktCoin(p, base, rim) {
   p.fill(base).circle(14, 14, 13);
   p.line(2, rim).strokeCircle(14, 14, 12);
@@ -293,6 +303,9 @@ export function generateAll(scene) {
   for (const v of EMAIL_VARIANTS) {
     makeWithText(scene, v.key, EMAIL_W, 25, (p) => emailCard(p, v.bar), [{ text: v.title, size: 6, color: v.color, x: 3, y: 0.8 }]);
   }
+  for (const v of TICKET_VARIANTS) {
+    makeWithText(scene, v.key, EMAIL_W, 25, (p) => emailCard(p, v.bar), [{ text: v.title, size: 6, color: v.color, x: 3, y: 0.8 }]);
+  }
   make(scene, 'emailGreen', 32, 16, (p) => {
     p.fill(0xffffff).round(0, 0, 32, 16, 2);
     p.line(1.5, COLORS.green).strokeRound(0.75, 0.75, 30.5, 14.5, 2);
@@ -312,6 +325,31 @@ export function generateAll(scene) {
     [],
   );
 
+  makeWithText(
+    scene,
+    'ticketBadge',
+    40,
+    32,
+    (p) => {
+      p.fill(0xffffff).round(0, 8, 34, 22, 3);
+      p.fill(0x475569).round(0, 8, 34, 7, 3).rect(0, 12, 34, 3);
+      p.fill(0xcbd5e1).rect(4, 19, 22, 2).rect(4, 24, 16, 2);
+      p.fill(COLORS.red).circle(32, 9, 8);
+    },
+    [],
+  );
+
+  // junior skin: the CR is a fix on legacy code (dark editor block with code lines)
+  make(scene, 'codeBlock', 32, 32, (p) => {
+    p.fill(0x0f172a).rect(0, 0, 32, 32);
+    p.fill(0x1e293b).rect(0, 0, 32, 29);
+    p.fill(0x38bdf8).rect(4, 6, 10, 2);
+    p.fill(0xf472b6).rect(16, 6, 10, 2);
+    p.fill(0xa3e635).rect(8, 12, 16, 2);
+    p.fill(0xfacc15).rect(8, 18, 12, 2);
+    p.fill(0x94a3b8).rect(4, 24, 18, 2);
+  });
+
   make(scene, 'scopeBlock', 32, 32, (p) => {
     p.fill(0xeab308).rect(0, 0, 32, 32);
     p.fill(COLORS.postit).rect(0, 0, 32, 29);
@@ -329,6 +367,14 @@ export function generateAll(scene) {
   };
   make(scene, 'slide', 66, 38, (p) => slide(p, COLORS.slideBar));
   make(scene, 'slideGreen', 66, 38, (p) => slide(p, COLORS.green));
+  // junior skin: the deck is a pile of documentation (a .docx page: title bar, dense text lines)
+  make(scene, 'docPage', 66, 38, (p) => {
+    p.fill(0x000000, 0.2).rect(2, 2, 64, 36);
+    p.fill(0xffffff).rect(0, 0, 64, 36);
+    p.fill(0x2563eb).rect(0, 0, 64, 8);
+    p.fill(0xcbd5e1);
+    for (let i = 0; i < 6; i++) p.rect(6, 12 + i * 4, i % 3 === 2 ? 34 : 52, 2);
+  });
 
   make(scene, 'kt', 28, 28, (p) => {
     ktCoin(p, 0xdc2626, 0x7f1d1d);

@@ -40,5 +40,18 @@ export const CAUSES = {
 
 export const DEFAULT_PIVOT_CAUSE = 'replyAll';
 
+// Level skins (docs/LEVELS.md): the same cause, told the way that career lives it. Level 1 is a junior's project:
+// AMS tickets, fixes on someone else's code, documentation. The lesson bridges to the next (consultant) project.
+const SKIN_TEXT = {
+  junior: {
+    replyAll: { label: 'i ticket AMS in coda', lesson: 'Da consulente i ticket diventano email: e le email cadenti diventano piattaforme su cui salire.' },
+    scopeCreep: { label: 'i fix sul codice di altri', lesson: 'Da consulente i fix diventano change request: ora allungano i ponti sopra i burroni.' },
+    deckCollapse: { label: 'la Documentazione_v12_DEF.docx', lesson: 'Da consulente la documentazione diventa un deck: le slide che crollano ora fanno da ponte.' },
+  },
+};
+
+export const causeLabel = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.label ?? CAUSES[cause]?.label;
+export const causeLesson = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.lesson ?? CAUSES[cause]?.lesson;
+
 // Lessons Learned weight of non-death incidents (a death always weighs 1).
 export const INCIDENT_WEIGHT = { death: 1, fakeKT: 2, micromanager: 1, fiveMinutes: 1 };
