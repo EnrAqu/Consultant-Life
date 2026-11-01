@@ -19,4 +19,10 @@ describe('GoalBrain', () => {
     expect(g.touch(110, 100)).toBe('winRight');
     expect(g.trolled).toBe(false);
   });
+
+  it('the Board door stays shut until the pipeline is full', () => {
+    const b = new GoalBrain({ requiresDeals: 3 });
+    expect(b.touch(100, 200, 2)).toBe('locked');
+    expect(b.touch(100, 200, 3)).toBe('win');
+  });
 });

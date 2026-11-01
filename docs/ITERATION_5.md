@@ -285,4 +285,4 @@ Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner
 ## 12. Stato
 
 - [x] Piano 5A (2026-11-01), review applicata.
-- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [ ] I5-M4 · [ ] I5-M5 · [ ] I5-M6 · [ ] I5-M7
+- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [x] I5-M4 · [ ] I5-M5 · [ ] I5-M6 · [ ] I5-M7

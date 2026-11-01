@@ -15,6 +15,7 @@ import PlayerView from '../objects/PlayerView.js';
 import { OUTFITS } from '../data/outfits.js';
 import { fadeIn, fadeTo } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
+import Deal from '../objects/Deal.js';
 import Checkpoint from '../objects/Checkpoint.js';
 import Goal from '../objects/Goal.js';
 import Team from '../objects/team/Team.js';
@@ -58,7 +59,8 @@ export default class GameScene extends Phaser.Scene {
       this.spawnPoint = cp.spawn;
     }
     this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
-    this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : def.career ?? 'junior';
+    // the Partner ending dresses the next campaign as a Partner (until the page is reloaded)
+    this.outfit = OUTFITS[DEBUG.outfit] ? DEBUG.outfit : OUTFITS[session.outfitOverride] ? session.outfitOverride : def.career ?? 'junior';
     this.playerView = new PlayerView(this, this.player, this.outfit);
     this.levelTiles = level.tiles;
     // a new campaign starts with a fresh team
@@ -166,6 +168,9 @@ export default class GameScene extends Phaser.Scene {
         .setDepth(DEPTH.objects);
     }
     this.pickups = level.pickups.map((p) => new Pickup(this, p.x, p.y));
+    this.deals = level.deals.map((d) => new Deal(this, d.x, d.y));
+    this.dealsRequired = this.def.goal?.requiresDeals ?? 0;
+    this.dealCount = Math.min(this.dealsRequired, DEBUG.deals ?? 0);
     this.checkpoints = level.checkpoints.map((c) => new Checkpoint(this, c));
     this.goal = new Goal(this, level.goal.x, level.goal.y, this.def.goal);
     for (const e of level.entities.filter((en) => en.type === 'sign')) {
@@ -207,6 +212,16 @@ export default class GameScene extends Phaser.Scene {
         this.stats.recordPickup('coffee');
         this.gainGu(BUDGET.coffeeBonus, 'coffee');
         bus.emit(EV.TOAST, { text: `Caffè: +${formatGu(BUDGET.coffeeBonus)} GU`, durationMs: 1200 });
+      });
+    }
+    for (const d of this.deals) {
+      this.physics.add.overlap(player, d.sprite, () => {
+        if (!d.collect()) return;
+        this.dealCount += 1;
+        this.stats.recordPickup('deal');
+        bus.emit(EV.TOAST, { text: `Opportunità chiusa! Pipeline ${this.dealCount}/${this.dealsRequired}`, durationMs: 1800, color: '#fbbf24' });
+        bus.emit(EV.DEALS_CHANGED, { count: this.dealCount, required: this.dealsRequired });
+        this.narrate(this.dealCount >= this.dealsRequired ? 'pipelineFull' : 'deal');
       });
     }
     for (const c of this.checkpoints) {
@@ -259,6 +274,7 @@ export default class GameScene extends Phaser.Scene {
     bus.emit(EV.GU_CHANGED, { gu: this.budget.gu, max: this.budget.max, delta: 0, reason: 'snapshot' });
     bus.emit(EV.CLOCK_TICK, { label: this.schedule.clockLabel, warning: this.schedule.isWarning });
     if (this.lastNarration) bus.emit(EV.NARRATE, this.lastNarration);
+    if (this.dealsRequired) bus.emit(EV.DEALS_CHANGED, { count: this.dealCount, required: this.dealsRequired });
     if (this.escalation) {
       this.escalation.lastHud = null;
       this.escalation.emitHud();
@@ -364,6 +380,7 @@ export default class GameScene extends Phaser.Scene {
     this.sycophant?.update(dt);
     this.team?.update(dt, input.delegate);
     for (const p of this.pickups) p.update(dt);
+    for (const d of this.deals) d.update(dt);
 
     if (this.player.y > this.worldH + 64) this.die('pit');
 
@@ -483,7 +500,7 @@ export default class GameScene extends Phaser.Scene {
     const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
-      fadeTo(this, next ? 'LessonsLearnedScene' : 'MvpEndScene', payload);
+      fadeTo(this, next ? 'LessonsLearnedScene' : 'EndingScene', { ending: 'partner', ...payload });
     });
   }
 }

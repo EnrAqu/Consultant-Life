@@ -15,4 +15,5 @@ export const stats = new StatsTracker(storage);
 export const narrator = new Narrator(NARRATOR_LINES);
 export const leaderboard = new Leaderboard(storage);
 // team: juniors carried over between levels (ITERATION_4 §4.1); null until the first team level
-export const session = { titleShown: false, team: null };
+// outfitOverride: set by the Partner ending, the next campaign is played dressed as a Partner
+export const session = { titleShown: false, team: null, outfitOverride: null };

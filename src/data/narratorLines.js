@@ -116,4 +116,9 @@ export const NARRATOR_LINES = [
   { id: 'worker_2', event: 'workerWatched', text: 'Un buon Partner delega. E poi guarda da un\'altra parte.' },
   { id: 'syc_bow_1', event: 'sycophantBow', text: 'Il tuo ex rivale si è inchinato. Saltagli addosso: è quello che vuole.' },
   { id: 'syc_bow_2', event: 'sycophantBow', text: 'Un collaboratore che si piega a tutto. Usalo, fa carriera anche lui.' },
+  { id: 'deal_1', event: 'deal', text: 'Un\'opportunità! Ora devi solo venderla, consegnarla e farla pagare.' },
+  { id: 'deal_2', event: 'deal', text: 'Pipeline in crescita. Il delivery lo scopre dopo.' },
+  { id: 'pipeline_full_1', event: 'pipelineFull', text: 'Tre opportunità. Il Board ti aspetta. Anche il cliente, ma questo è un altro discorso.' },
+  { id: 'board_closed_1', event: 'boardClosed', text: 'Senza pipeline al Board non si entra. Neanche con la cravatta giusta.' },
+  { id: 'board_closed_2', event: 'boardClosed', text: 'Il Board non guarda il lavoro fatto. Guarda quello venduto.' },
 ];

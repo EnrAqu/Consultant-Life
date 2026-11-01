@@ -16,10 +16,10 @@ export default class Goal {
     this.floorY = (ty + 1) * TILE;
     this.x = tx * TILE + 16;
     this.targetX = (tx + this.brain.carryCols) * TILE + 16;
-    const key = this.brain.trolls ? 'goalTroll' : 'goal';
+    const key = this.brain.requiresDeals ? 'boardDoor' : this.brain.trolls ? 'goalTroll' : 'goal';
     this.sprite = scene.physics.add.staticImage(this.x, this.floorY - 32, key).setScale(BASE).setDepth(DEPTH.objects).refreshBody();
     this.label = scene.add
-      .text(this.x, this.floorY - 80, 'Consegna al cliente', { fontFamily: UI_FONT, fontSize: '12px', color: '#e5e7eb', resolution: TEXT_RESOLUTION * 2 })
+      .text(this.x, this.floorY - 80, params.label ?? 'Consegna al cliente', { fontFamily: UI_FONT, fontSize: '12px', color: '#e5e7eb', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5)
       .setDepth(DEPTH.objects);
     if (this.brain.trolls) {
@@ -38,12 +38,22 @@ export default class Goal {
     );
     this.state = 'idle';
     this.timer = 0;
+    // "locked" message once per approach: it re-arms when you step away from the door
+    this.lockedArmed = true;
   }
 
   onTouch() {
     if (this.state !== 'idle') return;
     const scene = this.scene;
-    const result = this.brain.touch(scene.player.body.center.x, this.x);
+    const result = this.brain.touch(scene.player.body.center.x, this.x, scene.dealCount ?? 0);
+    if (result === 'locked') {
+      if (!this.lockedArmed) return;
+      this.lockedArmed = false;
+      const n = scene.dealCount ?? 0;
+      this.bubble.setText(`Il Board vuole vedere la pipeline. ${n}/${this.brain.requiresDeals} non è una pipeline, è un auspicio.`).setVisible(true);
+      scene.narrate('boardClosed');
+      return;
+    }
     if (result !== 'troll') {
       scene.completeLevel(result === 'winRight' ? 'goalRight' : 'levelComplete');
       return;
@@ -60,6 +70,10 @@ export default class Goal {
 
   // Runs in GameScene.update (frozen during standup/death like everything else).
   update(dt) {
+    if (!this.lockedArmed && Math.abs(this.scene.player.body.center.x - this.x) > 3 * TILE) {
+      this.lockedArmed = true;
+      this.bubble.setVisible(false);
+    }
     if (this.state === 'idle') return;
     const scene = this.scene;
     this.timer += dt;

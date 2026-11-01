@@ -6,7 +6,7 @@ import GameScene from './scenes/GameScene.js';
 import UIScene from './scenes/UIScene.js';
 import LessonsLearnedScene from './scenes/LessonsLearnedScene.js';
 import BudgetOverScene from './scenes/BudgetOverScene.js';
-import MvpEndScene from './scenes/MvpEndScene.js';
+import EndingScene from './scenes/EndingScene.js';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -22,7 +22,7 @@ const game = new Phaser.Game({
   // 30 fps browser into slow motion. GameScene already clamps a single frame to 50 ms (tab switches).
   fps: { target: 60, smoothStep: false },
   physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, fps: PHYSICS_FPS, debug: DEBUG.debug } },
-  scene: [BootScene, GameScene, UIScene, LessonsLearnedScene, BudgetOverScene, MvpEndScene],
+  scene: [BootScene, GameScene, UIScene, LessonsLearnedScene, BudgetOverScene, EndingScene],
 });
 
 // Exposed only in debug mode, for automated smoke tests.
