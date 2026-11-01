@@ -114,4 +114,6 @@ export const NARRATOR_LINES = [
   { id: 'esc_stop_1', event: 'escalationStop', text: 'Il CEO del cliente è in ferie. Goditi questi cinque minuti di pace.' },
   { id: 'worker_1', event: 'workerWatched', text: 'Se li guardi lavorare, smettono per farti vedere che lavorano. Girati.' },
   { id: 'worker_2', event: 'workerWatched', text: 'Un buon Partner delega. E poi guarda da un\'altra parte.' },
+  { id: 'syc_bow_1', event: 'sycophantBow', text: 'Il tuo ex rivale si è inchinato. Saltagli addosso: è quello che vuole.' },
+  { id: 'syc_bow_2', event: 'sycophantBow', text: 'Un collaboratore che si piega a tutto. Usalo, fa carriera anche lui.' },
 ];

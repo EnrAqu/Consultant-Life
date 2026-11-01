@@ -216,6 +216,7 @@ export function generateAll(scene) {
   // NPCs reuse the character drawing: the micromanager (manager + mug) and the "5 minutes" colleague
   makePlayerSheet(scene, 'micromanager', { ...OUTFITS.manager, hair: 0x6b7280, mug: true }, 'npc_micromanager');
   makePlayerSheet(scene, 'rival', { ...OUTFITS.manager, top: 0x7c3aed, topDark: 0x5b21b6, shirtV: 0xffffff, tie: 0xfacc15, hair: 0x111827 }, 'npc_rival');
+  makePlayerSheet(scene, 'sycophant', { ...OUTFITS.manager, top: 0x7c3aed, topDark: 0x5b21b6, shirtV: 0xffffff, tie: 0xfacc15, hair: 0x111827, pocketSquare: true }, 'npc_sycophant');
   makePlayerSheet(scene, 'colleague', { ...OUTFITS.consultant, top: 0xfde68a, topDark: 0xfcd34d, mug: true }, 'npc_colleague');
 
   make(scene, 'plant', 24, 48, (p) => {

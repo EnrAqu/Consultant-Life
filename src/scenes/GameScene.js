@@ -19,6 +19,7 @@ import Checkpoint from '../objects/Checkpoint.js';
 import Goal from '../objects/Goal.js';
 import Team from '../objects/team/Team.js';
 import Escalation from '../objects/Escalation.js';
+import Sycophant from '../objects/npc/Sycophant.js';
 import { TRAP_CLASSES } from '../objects/traps/index.js';
 import { NPC_CLASSES } from '../objects/npc/index.js';
 
@@ -68,6 +69,7 @@ export default class GameScene extends Phaser.Scene {
     this.buildNpcs(def, level);
     this.registerColliders();
     this.escalation = def.escalation && !DEBUG.escalationOff ? new Escalation(this, def.escalation) : null;
+    this.sycophant = def.sycophant ? new Sycophant(this, level.mats) : null;
 
     const cam = this.cameras.main;
     cam.setZoom(WORLD_ZOOM);
@@ -154,6 +156,14 @@ export default class GameScene extends Phaser.Scene {
     // plants: hiding spots from the micromanager, drawn in front of the player
     for (const pl of level.plants) {
       this.add.image(pl.x * TILE + 16, (pl.y + 1) * TILE, 'plant').setOrigin(0.5, 1).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.player + 1);
+    }
+    // bow mats: where the sycophant bows and becomes a trampoline (ITERATION_5 §4)
+    for (const m of level.mats) {
+      this.add.image(m.x * TILE + 16, (m.y + 1) * TILE, 'mat').setOrigin(0.5, 1).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.objects);
+      this.add
+        .text(m.x * TILE + 16, (m.y + 1) * TILE + 4, 'Prego, Partner', { fontFamily: UI_FONT, fontSize: '7px', color: '#fde68a', resolution: TEXT_RESOLUTION * 2 })
+        .setOrigin(0.5, 0)
+        .setDepth(DEPTH.objects);
     }
     this.pickups = level.pickups.map((p) => new Pickup(this, p.x, p.y));
     this.checkpoints = level.checkpoints.map((c) => new Checkpoint(this, c));
@@ -351,6 +361,7 @@ export default class GameScene extends Phaser.Scene {
     for (const npc of this.npcs) npc.update(dt);
     this.goal.update(dt);
     this.escalation?.update(dt);
+    this.sycophant?.update(dt);
     this.team?.update(dt, input.delegate);
     for (const p of this.pickups) p.update(dt);
 
@@ -429,6 +440,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
     this.playerView.onRespawn();
     this.escalation?.onRespawn();
+    this.sycophant?.onRespawn();
     this.team?.restore();
     for (const o of [...this.traps, ...this.npcs]) o.delegateReserved = false;
     this.cameras.main.centerOn(this.player.x + this.lookAhead, this.player.y - this.lookY);
