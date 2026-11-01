@@ -78,11 +78,12 @@ export default {
   map: g.toMap(),
   entities: [
     { id: 'sign1', type: 'sign', x: 5, y: 96, text: "Partner: finalmente puoi chiedere tu \"hai 5 minuti?\"" },
-    { id: 'sign2', type: 'sign', x: 15, y: 13, text: 'Board dei Partner — solo con la pipeline piena' },
+    { id: 'sign2', type: 'sign', x: 6, y: 13, text: 'Board dei Partner — solo con la pipeline piena' },
     { id: 'sign3', type: 'sign', x: 8, y: 92, text: 'Il Board riceve solo con 3 opportunità in pipeline' },
-    { id: 'stairs1', type: 'sign', x: 3, y: 61, text: '↓ Scale' },
-    { id: 'stairs2', type: 'sign', x: 26, y: 37, text: 'Scale ↓' },
-    { id: 'stairs3', type: 'sign', x: 26, y: 13, text: 'Scale ↓' },
+    // stairwells: the gap at the end of the slab (walk off the edge); `stairs` marks the edge and the gap
+    { id: 'stairs1', type: 'sign', x: 5, y: 61, text: '← Scale (cadi giù)', stairs: { edgeCol: 3, gapCol: 1.5 } },
+    { id: 'stairs2', type: 'sign', x: 23, y: 37, text: 'Scale (cadi giù) →', stairs: { edgeCol: 28, gapCol: 29.5 } },
+    { id: 'stairs3', type: 'sign', x: 23, y: 13, text: 'Scale (cadi giù) →', stairs: { edgeCol: 28, gapCol: 29.5 } },
     // floor 1
     {
       id: 'worker1', type: 'worker', x: 14, y: 85,

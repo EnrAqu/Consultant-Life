@@ -2,7 +2,15 @@ import { TILE, DEPTH, TEXTURE_SCALE, TEXT_RESOLUTION, UI_FONT } from '../../conf
 import FiveMinutesBrain, { tilesBetween } from '../../core/FiveMinutesBrain.js';
 
 const BASE = 1 / TEXTURE_SCALE;
-const HOOK_LINES = ['Hai 5 minuti? È una cosa veloce.', 'Volevo solo un parere su un Excel.', 'Anzi, condivido lo schermo.'];
+// The opening line changes at every catch, in a fixed order (no randomness): mostly "Hai 5 minuti?", now and then
+// another way of asking the same thing. Then the follow-ups, one per second.
+const OPENERS = [
+  'Hai 5 minuti? È una cosa veloce.',
+  'Tu sai fare questa cosa?',
+  'Hai 5 minuti? Giuro che sono 5.',
+  "Qui c'è bisogno del tuo aiuto.",
+];
+const HOOK_LINES = ['Volevo solo un parere su un Excel.', 'Anzi, condivido lo schermo.'];
 
 // View + side effects of the "Hai 5 minuti?" colleague; decisions live in FiveMinutesBrain (pure, tested).
 // Normal: he steps out of his door as you pass; touching him hooks you for 3 s. Jump over him or wait.
@@ -89,7 +97,8 @@ export default class FiveMinutesDoor {
     }
     if (this.brain.state === 'hooked') {
       this.hookedMs += dt;
-      this.say(HOOK_LINES[Math.floor(this.hookedMs / 1000) % HOOK_LINES.length]);
+      const lines = [this.opener, ...HOOK_LINES];
+      this.say(lines[Math.floor(this.hookedMs / 1000) % lines.length]);
     }
   }
 
@@ -109,6 +118,9 @@ export default class FiveMinutesDoor {
         player.lockInput('five', true);
         player.stopMotion();
         this.hookedMs = 0;
+        // kept across respawns: every catch in the level gets the next opener
+        this.hookCount = (this.hookCount ?? 0) + 1;
+        this.opener = OPENERS[(this.hookCount - 1) % OPENERS.length];
         scene.stats.recordIncident('fiveMinutes');
         if (scene.addBurnout('fiveMinutes') || scene.spendGu(a.cost, 'fiveMinutes')) return;
         scene.narrate('fiveHook');

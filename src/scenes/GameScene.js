@@ -194,7 +194,23 @@ export default class GameScene extends Phaser.Scene {
         .setOrigin(0, 1)
         .setDepth(DEPTH.objects);
       t.setY((e.y + 1) * TILE - 40);
+      if (e.stairs) this.markStairwell(e.stairs, e.y + 1);
     }
+  }
+
+  // Level 5 stairwells: hazard stripes on the last slab tile and a bobbing arrow over the gap.
+  markStairwell({ edgeCol, gapCol }, slabRow) {
+    const stripes = this.add.graphics().setDepth(DEPTH.objects);
+    const x0 = edgeCol * TILE;
+    const y0 = slabRow * TILE;
+    for (let i = 0; i < 4; i++) {
+      stripes.fillStyle(i % 2 === 0 ? 0xfacc15 : 0x111827, 1).fillRect(x0 + i * 8, y0, 8, 6);
+    }
+    const arrow = this.add
+      .text(gapCol * TILE + 16, y0 - 22, '↓', { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '22px', color: '#facc15', resolution: TEXT_RESOLUTION * 2 })
+      .setOrigin(0.5)
+      .setDepth(DEPTH.objects);
+    this.tweens.add({ targets: arrow, y: y0 - 12, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
   buildNpcs(def, level) {

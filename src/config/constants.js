@@ -54,10 +54,10 @@ export const BUDGET = {
 };
 
 // Burnout (docs/BURNOUT.md): what the job costs *you*, in %. Max and character tiers live in core/Burnout.js.
-// "Non è morire che ti brucia, è come lavori": a death is a quarter, the social events a full point.
+// "Non è morire che ti brucia, è come lavori": a death is 1%, the social events 3% (user, after the first tuning).
 export const BURNOUT = {
   levelMin: [0, 15, 30, 45, 60],
-  gain: { death: 0.25, escalation: 1, teamLoss: 1, micromanager: 1, fiveMinutes: 1, standupOverrun: 1, fakeKT: 1, clientSwitch: 1 },
+  gain: { death: 1, escalation: 3, teamLoss: 3, micromanager: 3, fiveMinutes: 3, standupOverrun: 3, fakeKT: 3, clientSwitch: 3 },
   relief: { coffee: 2, realKT: 3, cleanLevel: 5 },
 };
 

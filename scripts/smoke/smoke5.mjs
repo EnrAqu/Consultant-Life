@@ -88,6 +88,17 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.close();
 }
 
+// the stairwell: walking off the end of the Board slab drops you to floor 3 (the marked gap)
+{
+  const page = await open('?debug=1&standup=off&level=level5&cp=cp3');
+  await teleport(page, 25, 13); await sleep(1200);
+  await page.screenshot({ path: OUT + 'i5-stairs.png' });
+  await hold(page, 'ArrowRight', 700);
+  const s = await waitFor(page, (st) => st.tile[1] >= 32, 3000);
+  check('walking right past "Scale →" you drop to floor 3', s.tile[1] === 32 && s.tile[0] >= 26, s);
+  await page.close();
+}
+
 // deals, the Board door and the Partner ending
 {
   const page = await open('?debug=1&standup=off&level=level5&cp=cp3');

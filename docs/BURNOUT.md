@@ -9,7 +9,7 @@ Feature a parte (playbook `.claude/skills/burnout/`). Design rivisto con l'utent
 
 | Regola | Valore |
 |---|---|
-| Sale con | **morte +0,25%** (anche ↺ ricomincia). **+1%**: presa dell'escalation, junior perso (netto, vedi §4), micromanager che ti becca, "Hai 5 minuti?" che ti ferma, standup che sfora, KT finto, cliente che cambia idea al traguardo. *"Non è morire che ti brucia, è come lavori"* |
+| Sale con | **morte +1%** (anche ↺ ricomincia). **+3%**: presa dell'escalation, junior perso (netto, vedi §4), micromanager che ti becca, "Hai 5 minuti?" che ti ferma, standup che sfora, KT finto, cliente che cambia idea al traguardo. *"Non è morire che ti brucia, è come lavori"* |
 | Scende con | caffè −2% (non torna al respawn), KT vero −3% (**una volta per livello**), livello finito senza morti −5% (applicato **sul valore di partenza** del livello dopo, quindi anche sotto il minimo) |
 | Tra un livello e l'altro | non si azzera: si trascina |
 | Minimo di partenza | livelli 1–5: **0 / 15 / 30 / 45 / 60%**. Si parte da `max(trascinato, minimo)` |
@@ -20,16 +20,16 @@ Feature a parte (playbook `.claude/skills/burnout/`). Design rivisto con l'utent
 | Persistenza | `session.burnout`: vive quanto la pagina, niente `localStorage` |
 | Costi in GU | invariati: il burnout si **aggiunge**, non sostituisce |
 
-Conti (review #1): con la morte a +1% un giocatore medio (~20 morti a livello) entrava nel livello 5 al 94% e un "Budget sforato" valeva +30%. Con la morte a **+0,25%** (decisione utente) lo stesso giocatore aggiunge ~5% di morti a livello più gli eventi sociali: i minimi tornano a contare e uno sforamento vale ~+7,5%. Il burnout lo fanno salire soprattutto gli eventi "sociali". Taratura fine: dopo il playtest, dall'utente.
+Conti (review #1): con la morte a +1% un giocatore medio (~20 morti a livello) entrava nel livello 5 al 94% e un "Budget sforato" valeva +30%. Prima taratura: morte +0,25%, eventi sociali +1%. **Dopo, l'utente ha scelto +1% / +3%** ("più attivo"): il burnout arriva prima e il gioco verrà complicato di conseguenza.
 
-Il valore è decimale (passi da 0,25); a schermo si mostra arrotondato all'intero.
+Il valore può essere decimale (la logica lo supporta); a schermo si mostra arrotondato per difetto.
 
 ## 2. Logica pura — `src/core/Burnout.js` (test Vitest)
 
 ```js
 export default class Burnout {
   constructor(value = 0)            // clamp 0..100
-  get value()                        // 0..100, multipli di 0,25 (arrotondato a 2 decimali)
+  get value()                        // 0..100 (arrotondato a 2 decimali)
   get isOver()                       // value >= 100
   get tier()                         // 0 (<50), 1 (>=50), 2 (>=80) — per il personaggio stanco
   add(cause, amount)                 // → { delta, value, over }; ignora amount <= 0; clamp a 100
@@ -43,7 +43,7 @@ export default class Burnout {
 ```js
 export const BURNOUT = {
   levelMin: [0, 15, 30, 45, 60],
-  gain: { death: 0.25, escalation: 1, teamLoss: 1, micromanager: 1, fiveMinutes: 1, standupOverrun: 1, fakeKT: 1, clientSwitch: 1 },
+  gain: { death: 1, escalation: 3, teamLoss: 3, micromanager: 3, fiveMinutes: 3, standupOverrun: 3, fakeKT: 3, clientSwitch: 3 },
   relief: { coffee: 2, realKT: 3, cleanLevel: 5 },
 };
 // max (100) e soglie del personaggio (50, 80) stanno in core/Burnout.js: BURNOUT_MAX, BURNOUT_TIERS
@@ -153,11 +153,13 @@ Criteri: `npm test`, `npm run build`, `npm run smoke` senza errori in console. P
 - Il livello extra "Il contadino" (i campi): brainstorming a parte.
 - Burnout nelle statistiche persistenti o in classifica.
 
+> **Aggiornamento 2026-11-01 (utente):** "vorrei il burnout più attivo": morte **+1%**, eventi sociali **+3%**. Il burnout arriva prima (vedi i conti della review #1) e va bene così: il gioco verrà complicato di conseguenza.
+
 ## 9. Esito della review (`docs/PLAN_REVIEW.md`)
 
 | # | Esito |
 |---|---|
-| 1 | **Accolto, scelta dell'utente:** la morte vale +0,25%, gli eventi sociali +1% |
+| 1 | **Accolto, scelta dell'utente:** la morte vale +0,25%, gli eventi sociali +1% (poi portati a +1% / +3%, vedi DECISIONS) |
 | 2 | Accolto: KT vero una volta per livello (il +1 GU farmabile resta, fuori scope) |
 | 3 | Accolto: guardie `this.ended`, −5% registrato prima di `endLevel` |
 | 4 | Accolto: `?burnout` solo al primo `create`; `ending=burnout` ammesso |
