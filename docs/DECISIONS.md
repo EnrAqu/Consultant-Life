@@ -116,3 +116,15 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-11-01 — Bonus AI: le piattaforme vere richiedono salti da 5 (più difficili del percorso normale): è voluto, l'AI è una scommessa, non una scorciatoia sicura (review 4 #16).
 - 2026-11-01 — Camera: lerp indipendente dal frame rate (il lerp di Phaser è per frame: a 30 fps la camera restava il doppio indietro e tutto sembrava lento), lerp 0,18, deadzone 60×70, "look-ahead" di 70 px nella direzione di corsa — utente: "ho ancora la sensazione sia lento".
 - 2026-11-01 — Smoke test: tutti e 61 i controlli verdi (`npm run smoke`); l'ultimo fallimento era una gara nel test (deck fatto scattare prima che il frame gestisse il tasto E), non un bug.
+
+## Iterazione 5 (pianificata, non sviluppata)
+- 2026-11-01 — Velocità di gioco: va bene così dopo la correzione della camera — utente.
+- 2026-11-01 — Livello 5 "Partner" **verticale** (torre), con l'escalation come sfida principale — utente.
+- 2026-11-01 — **Tutti e 4 i finali nel livello 5** (Partner troll, società prodotto, burnout, campi), per ora: probabilmente cambierà — utente.
+- 2026-11-01 — Torcia invertita (la torcia ce l'hai tu: i lavoratori si fermano se li guardi), SteerCo, Business Development (3 opportunità per il Board), arrivista diventato leccapiedi, NPC "ambiziosi" che ti fermano per far colpo — utente. Dettagli proposti in `docs/ITERATION_5.md`.
+- 2026-11-01 — Le meccaniche nuove del livello 5 non hanno variante pivotata (è l'ultimo livello); il livello 5 contiene gli slot delle trappole pivotabili dal livello 4.
+- 2026-11-01 — Risposte all'iterazione 5: campi solo con pipeline 0/3; dopo il finale Partner si ricomincia vestiti da Partner; la presa dell'escalation **per ora è innocua** (nessuna morte né GU: la marea si riabbassa); la porta del Recruiter chiede conferma — utente.
+- 2026-11-01 — Escalation: la presa costa **3 GU** ("spiegare al cliente cosa è successo") + 1,2 s di call, non è una morte — utente (sostituisce la presa innocua).
+- 2026-11-01 — Si sviluppa solo la **5A** (torre, escalation, lavoratori, leccapiedi, opportunità, Board, finale Partner); SteerCo, ambiziosi, Recruiter e campi nella 5B — utente, su proposta della review.
+- 2026-11-01 — Il leccapiedi non blocca mai il player (adula soltanto) e fa da trampolino solo sui tappetini `b` — review #2/#3/#7.
+- 2026-11-01 — **Burnout** = feature a parte con un suo playbook (`.claude/skills/burnout/`): barra che sale con morti, prese dell'escalation, junior persi (per ora tutto +1%), non si azzera tra i livelli e ogni livello parte da un minimo più alto (0, 15, …); il finale burnout si lega alla barra — utente.

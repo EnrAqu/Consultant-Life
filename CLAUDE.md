@@ -13,6 +13,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/ITERATION_2.md` | Piano dell'iterazione 2 (dal playtest #1): prevale su `IMPLEMENTATION_PLAN.md` dove lo modifica | Playbook `plan` |
 | `docs/ITERATION_3.md` | Piano dell'iterazione 3 (micromanager, "Hai 5 minuti?", livello 3): in sviluppo | Playbook `plan` |
 | `docs/ITERATION_4.md` | Piano dell'iterazione 4 (ritmo, traguardo che tradisce, team & delega, livello 4): in sviluppo | Playbook `plan` |
+| `docs/ITERATION_5.md` | Piano dell'iterazione 5 (5A: livello 5 "Partner" verticale, escalation, lavoratori, leccapiedi, Board): in sviluppo | Playbook `plan` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |
@@ -27,6 +28,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `/plan` | Nuova feature o correzione del piano | Aggiorna `IMPLEMENTATION_PLAN.md` + `DECISIONS.md` |
 | `/review` | Dopo ogni modifica sostanziale al piano o al codice. **Gira in un contesto separato** per restare critico | Scrive `PLAN_REVIEW.md` o una code review |
 | `/implement` | Realizzare una milestone del piano | Codice + test, milestone spuntata |
+| `/burnout` | Quando si costruisce o si modifica la barra burnout (feature a parte) | Piano `docs/BURNOUT.md`, poi codice con lo stesso flusso |
 
 Flusso tipico: `plan` → `review` → `plan` (applica i fix) → `implement` (una milestone alla volta) → `review` sul codice.
 
