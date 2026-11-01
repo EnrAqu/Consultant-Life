@@ -11,7 +11,10 @@ Se questo playbook non gira già in un contesto separato, avvia un sotto-agente 
 
 ## Input
 - `CLAUDE.md`, `docs/DECISIONS.md` (le decisioni registrate non sono in discussione, ma puoi segnalarne i rischi).
-- Oggetto della review: `docs/IMPLEMENTATION_PLAN.md` oppure il codice in `src/` (indicato nella richiesta).
+- Oggetto della review, indicato nella richiesta:
+  - un piano (`docs/ITERATION_N.md`, `docs/BURNOUT.md`…);
+  - il codice in `src/` (di solito il diff dall'ultimo commit pubblicato);
+  - **un livello**: la scheda in `docs/LEVELS.md`, `src/levels/levelN.js` e il diff.
 
 ## Cosa controllare
 1. **Correttezza tecnica**: API di Phaser 3 / Vite usate in modo corretto; cose che non funzionerebbero come descritto.
@@ -20,10 +23,16 @@ Se questo playbook non gira già in un contesto separato, avvia un sotto-agente 
 4. **Ambiguità**: punti dove un esecutore dovrebbe indovinare.
 5. **Scope**: cose fuori dall'MVP deciso.
 6. **Verificabilità**: ogni criterio di accettazione è controllabile senza giocare a mano?
-7. Per il codice: bug, test mancanti, divergenze dal piano, `npm test` e `npm run build` eseguiti davvero.
+7. Per il codice: bug, test mancanti, divergenze dal piano, `npm test`, `npm run build` e `npm run smoke` eseguiti davvero.
+8. Per un livello:
+   - completabile con **ogni** pivot in entrata;
+   - catena dei pivot verso il livello dopo (`docs/LEVELS.md`);
+   - ritmo, senza tratti morti;
+   - indizi leggibili alla risoluzione reale;
+   - coordinate di test e smoke ancora sensate.
 
 ## Output
-Scrivi `docs/PLAN_REVIEW.md` (o `docs/CODE_REVIEW.md` per il codice), in italiano: lista numerata con **gravità** (bloccante / importante / minore), **dove**, **problema**, **fix proposto**. Chiudi con un riassunto di massimo 15 righe.
+Scrivi `docs/PLAN_REVIEW.md` per un piano, `docs/CODE_REVIEW_<oggetto>.md` per il codice (es. `CODE_REVIEW_LEVEL3.md`). In italiano: lista numerata con **gravità** (bloccante / importante / minore), **dove**, **problema**, **fix proposto**. Chiudi con un riassunto di massimo 15 righe.
 
 ## Non fare
 - Non modificare il piano né il codice.

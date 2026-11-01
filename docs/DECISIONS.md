@@ -146,3 +146,6 @@ Formato: `data — decisione — motivo`. Le decisioni più recenti prevalgono s
 - 2026-11-01 — Burnout più attivo: **morte +1%, eventi sociali +3%** (sostituisce +0,25% / +1%). Il burnout arriva prima, consapevolmente: il gioco verrà complicato — utente.
 - 2026-11-01 — Vani scale del livello 5: cartello "Scale (cadi giù) →" con la freccia verso il buco, strisce gialle/nere sull'ultima piastrella e freccia ↓ animata sul vano — utente (punto 1; scendere con ↓/S scartato).
 - 2026-11-01 — "Hai 5 minuti?": la frase d'aggancio cambia a ogni presa, in ordine fisso ("Hai 5 minuti?", "Tu sai fare questa cosa?", "Hai 5 minuti? Giuro che sono 5.", "Qui c'è bisogno del tuo aiuto.") — utente.
+
+## Lavoro per livelli
+- 2026-11-01 — Da ora il gioco si modifica **un livello alla volta**: nuovo playbook `level`, e `docs/LEVELS.md` come stato attuale di ogni livello (prevale sui documenti d'iterazione da cui il livello è nato) con un registro delle modifiche per livello. Playbook `plan`/`implement`/`review`/`burnout` allineati (piani per feature, smoke nella verifica, burnout già costruito) — utente.

@@ -11,9 +11,10 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/DECISIONS.md` | Registro delle decisioni prese, con data e motivo. **Fonte di verità** in caso di conflitto | Ogni volta che si decide qualcosa |
 | `docs/IMPLEMENTATION_PLAN.md` | Piano tecnico dell'MVP: struttura, interfacce, formati dati, milestone M0–M13 con criteri di accettazione | Playbook `plan` |
 | `docs/ITERATION_2.md` | Piano dell'iterazione 2 (dal playtest #1): prevale su `IMPLEMENTATION_PLAN.md` dove lo modifica | Playbook `plan` |
-| `docs/ITERATION_3.md` | Piano dell'iterazione 3 (micromanager, "Hai 5 minuti?", livello 3): in sviluppo | Playbook `plan` |
-| `docs/ITERATION_4.md` | Piano dell'iterazione 4 (ritmo, traguardo che tradisce, team & delega, livello 4): in sviluppo | Playbook `plan` |
-| `docs/ITERATION_5.md` | Piano dell'iterazione 5 (5A: livello 5 "Partner" verticale, escalation, lavoratori, leccapiedi, Board): in sviluppo | Playbook `plan` |
+| `docs/ITERATION_3.md` | Piano dell'iterazione 3 (micromanager, "Hai 5 minuti?", livello 3): sviluppata | Storia |
+| `docs/ITERATION_4.md` | Piano dell'iterazione 4 (ritmo, traguardo che tradisce, team & delega, livello 4): sviluppata | Storia |
+| `docs/ITERATION_5.md` | Piano dell'iterazione 5 (5A: livello 5 "Partner" verticale, escalation, lavoratori, leccapiedi, Board): 5A sviluppata, 5B da pianificare | Playbook `plan` |
+| `docs/LEVELS.md` | **Stato attuale di ogni livello** (scheda: file, slot, checkpoint, test, smoke, URL di debug) e registro delle modifiche per livello | Playbook `level` |
 | `docs/MOBILE.md` | Versione mobile: controlli su schermo (`src/input/TouchControls.js`) | Playbook `plan` / `implement` |
 | `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
@@ -21,18 +22,20 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |
 | `.claude/skills/*` | I playbook operativi (vedi sotto) | Quando un errore ricorrente va trasformato in regola |
 
-**Precedenza in caso di conflitto:** `DECISIONS.md` > `ITERATION_2.md` > `IMPLEMENTATION_PLAN.md` > `PLAN.md`.
+**Precedenza in caso di conflitto:** `DECISIONS.md` > `LEVELS.md` (per i livelli) e i documenti di feature (`BURNOUT.md`, `MOBILE.md`) > `ITERATION_N.md` (il più recente vince) > `IMPLEMENTATION_PLAN.md` > `PLAN.md`.
 
 ## Playbook (un solo agente, più playbook)
 
 | Playbook | Quando | Output |
 |---|---|---|
-| `/plan` | Nuova feature o correzione del piano | Aggiorna `IMPLEMENTATION_PLAN.md` + `DECISIONS.md` |
-| `/review` | Dopo ogni modifica sostanziale al piano o al codice. **Gira in un contesto separato** per restare critico | Scrive `PLAN_REVIEW.md` o una code review |
+| `/level` | **Cambiare un livello** (il lavoro di adesso: un livello alla volta) | Scheda in `LEVELS.md` + codice, test, smoke + `DECISIONS.md` |
+| `/plan` | Meccanica o feature nuova, o correzione di un piano | Documento della feature / `ITERATION_N.md` + `DECISIONS.md` |
+| `/review` | Dopo ogni modifica sostanziale a un piano, al codice o a un livello. **Gira in un contesto separato** per restare critico | Scrive `PLAN_REVIEW.md` o `CODE_REVIEW_<oggetto>.md` |
 | `/implement` | Realizzare una milestone del piano | Codice + test, milestone spuntata |
-| `/burnout` | Quando si costruisce o si modifica la barra burnout (feature a parte) | Piano `docs/BURNOUT.md`, poi codice con lo stesso flusso |
+| `/burnout` | Ritarare o modificare la barra burnout (già costruita) | `BURNOUT` in constants, `docs/BURNOUT.md`, test e smoke |
 
-Flusso tipico: `plan` → `review` → `plan` (applica i fix) → `implement` (una milestone alla volta) → `review` sul codice.
+Flusso per un livello: `level` (proposta nella scheda → codice → verifica) → `review` sul livello se non è banale → commit locale.
+Flusso per una feature: `plan` → `review` → `plan` (applica i fix) → `implement` (una milestone alla volta) → `review` sul codice.
 
 ## Regole sempre valide
 
@@ -51,5 +54,6 @@ Flusso tipico: `plan` → `review` → `plan` (applica i fix) → `implement` (u
 npm install        # dipendenze
 npm run dev        # server locale (Vite)
 npm run build      # build di produzione in dist/
-npm test           # test Vitest della logica in src/core/
+npm test           # test Vitest della logica in src/core/ (incluso il validatore dei livelli)
+npm run smoke      # build + smoke nel browser (Chrome locale): a macchina scarica
 ```
