@@ -44,21 +44,41 @@ export function trapSurfaces(entity) {
   return cells;
 }
 
+// One-way platforms a worker builds (ITERATION_5 §3), all of them.
+export function workerSurfaces(entity) {
+  if (entity.type !== 'worker') return [];
+  const cells = [];
+  for (const c of entity.params.cells) for (let i = 0; i < (c.w ?? 2); i++) cells.push({ x: entity.x + c.dx + i, y: entity.y + c.dy });
+  return cells;
+}
+
+// Sycophant bounce from a mat (ITERATION_5 §4): up to 5 rows, gap up to 2.
+export const BOUNCE = { maxRise: 5, maxGap: 2 };
+
 // gatesClosed: treat 'Approvazione richiesta' barriers as walls (nobody delegated to their plate).
-export function validateLevel(parsed, { table = 'hard', gatesClosed = false } = {}) {
+// workers: count the platforms workers build; bounces: allow the sycophant's bounce from the mats.
+export function validateLevel(parsed, { table = 'hard', gatesClosed = false, workers = true, bounces = true } = {}) {
   const errors = [];
   const { width, height } = parsed;
   const solid = parsed.tiles.map((row) => row.map((t) => t === TILE_SOLID));
   const oneway = parsed.tiles.map((row) => row.map((t) => t === TILE_ONEWAY));
   const spike = parsed.tiles.map((row) => row.map(() => false));
   for (const s of parsed.spikes) spike[s.y][s.x] = true;
+  // rows 0–1 sit under the HUD in a horizontal level; a vertical level scrolls under it
+  const minRow = parsed.vertical ? 0 : 2;
 
   for (const e of parsed.entities) {
-    if (e.x < 0 || e.x >= width || e.y < 2 || e.y >= height) errors.push(`entity ${e.id} out of bounds or in HUD rows`);
+    if (e.x < 0 || e.x >= width || e.y < minRow || e.y >= height) errors.push(`entity ${e.id} out of bounds or in HUD rows`);
+    if (workers) {
+      for (const c of workerSurfaces(e)) {
+        if (c.x < 0 || c.x >= width || c.y < minRow || c.y >= height) errors.push(`entity ${e.id} surface out of bounds`);
+        else oneway[c.y][c.x] = true;
+      }
+    }
     const cells = trapSurfaces(e);
     if (gatesClosed && e.type === 'approvalGate' && e.mode !== 'pivoted') for (let r = 0; r < 4; r++) cells.push({ x: e.x, y: e.y - r });
     for (const c of cells) {
-      if (c.x < 0 || c.x >= width || c.y < 2 || c.y >= height) errors.push(`entity ${e.id} surface out of bounds`);
+      if (c.x < 0 || c.x >= width || c.y < minRow || c.y >= height) errors.push(`entity ${e.id} surface out of bounds`);
       else solid[c.y][c.x] = true;
     }
   }
@@ -86,20 +106,28 @@ export function validateLevel(parsed, { table = 'hard', gatesClosed = false } = 
   if (!standable(start.x, start.y)) errors.push(`spawn ${key(start.x, start.y)} is not standable`);
   if (!standable(goal.x, goal.y)) errors.push(`goal ${key(goal.x, goal.y)} is not standable`);
 
+  const mats = new Set(bounces ? (parsed.mats ?? []).map((m) => key(m.x, m.y)) : []);
   const seen = new Set([key(start.x, start.y)]);
+  // minimum number of jumps to reach each cell (breadth-first order)
+  const dist = new Map([[key(start.x, start.y), 0]]);
   const queue = [start];
   while (queue.length) {
     const { x, y } = queue.shift();
+    const onMat = mats.has(key(x, y));
+    const d = dist.get(key(x, y));
     for (let dx = -7; dx <= 7; dx++) {
       const x2 = x + dx;
       if (x2 < 0 || x2 >= width) continue;
-      for (let y2 = 1; y2 < height - 1; y2++) {
+      // nothing higher than 6 rows is reachable; longer falls pass through intermediate cells
+      for (let y2 = Math.max(1, y - 6); y2 < Math.min(height - 1, y + 9); y2++) {
         if (seen.has(key(x2, y2)) || !standable(x2, y2)) continue;
         const rise = y - y2;
         const gap = Math.max(0, Math.abs(dx) - 1);
-        if (gap > maxGap(rise, table)) continue;
+        const bounce = onMat && rise <= BOUNCE.maxRise && gap <= BOUNCE.maxGap;
+        if (gap > maxGap(rise, table) && !bounce) continue;
         if (!clearArc(x, y, x2, y2)) continue;
         seen.add(key(x2, y2));
+        dist.set(key(x2, y2), d + 1);
         queue.push({ x: x2, y: y2 });
       }
     }
@@ -108,7 +136,10 @@ export function validateLevel(parsed, { table = 'hard', gatesClosed = false } = 
   for (const cp of parsed.checkpoints) {
     if (!seen.has(key(cp.x, cp.y))) errors.push(`checkpoint ${cp.id} not reachable`);
   }
-  return { ok: errors.length === 0, errors, reachable: seen };
+  for (const dl of parsed.deals ?? []) {
+    if (!seen.has(key(dl.x, dl.y))) errors.push(`deal ${key(dl.x, dl.y)} not reachable`);
+  }
+  return { ok: errors.length === 0, errors, reachable: seen, dist };
 }
 
 // Columns an entity makes "active" (something to do or to watch out for).
@@ -166,6 +197,36 @@ export function longestQuietStretch(parsed) {
   let run = 0;
   for (let x = parsed.spawn.x + 4; x < parsed.goal.x - 2; x++) {
     run = active[x] ? 0 : run + 1;
+    longest = Math.max(longest, run);
+  }
+  return longest;
+}
+
+// Rows an entity makes "active" in a vertical level.
+function entityRows(e) {
+  const rows = [e.y - 2, e.y + 2];
+  for (const c of workerSurfaces(e)) rows.push(c.y - 1);
+  return [Math.min(...rows), Math.max(...rows)];
+}
+
+// Vertical pacing rule (ITERATION_5 §1): longest run of consecutive rows between spawn and goal with
+// nothing on them — no entity, deal, checkpoint, spike, mat, nor a reachable landing spot. At most 6.
+export function longestQuietClimb(parsed, reachable) {
+  const { height } = parsed;
+  const active = new Array(height).fill(false);
+  const mark = (a, b) => {
+    for (let y = Math.max(0, a); y <= Math.min(height - 1, b); y++) active[y] = true;
+  };
+  for (const e of parsed.entities) {
+    const [a, b] = entityRows(e);
+    mark(a, b);
+  }
+  for (const o of [...parsed.spikes, ...(parsed.deals ?? []), ...parsed.checkpoints, ...(parsed.mats ?? [])]) mark(o.y - 1, o.y + 1);
+  for (const k of reachable) mark(Number(k.split(':')[1]), Number(k.split(':')[1]));
+  let longest = 0;
+  let run = 0;
+  for (let y = parsed.spawn.y; y > parsed.goal.y; y--) {
+    run = active[y] ? 0 : run + 1;
     longest = Math.max(longest, run);
   }
   return longest;

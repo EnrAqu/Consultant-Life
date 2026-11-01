@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD } from '../config/constants.js';
+import { TILE, DEPTH, BUDGET, STANDUP, DEATH_FREEZE_MS, LEVEL_COMPLETE_DELAY_MS, IDLE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD, CAMERA_LOOK_UP, CAMERA_LOOK_DOWN } from '../config/constants.js';
 import { DEBUG } from '../config/debug.js';
 import { LEVELS, nextLevel, LEVEL_ORDER } from '../levels/index.js';
 import { parseLevel, TILE_ONEWAY, TILE_SOLID } from '../core/LevelParser.js';
@@ -47,9 +47,12 @@ export default class GameScene extends Phaser.Scene {
     this.buildTraps(def);
 
     this.spawnPoint = { x: level.spawn.x * TILE + 16, y: (level.spawn.y + 1) * TILE - 16 };
+    // index of the active checkpoint: only a later one (further right, or higher up) can replace it
+    this.cpIndex = -1;
     const cp = this.checkpoints.find((c) => c.id === DEBUG.cp);
     if (cp) {
       cp.activate();
+      this.cpIndex = this.checkpoints.indexOf(cp);
       this.spawnPoint = cp.spawn;
     }
     this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
@@ -68,8 +71,9 @@ export default class GameScene extends Phaser.Scene {
     cam.setZoom(WORLD_ZOOM);
     cam.setBounds(0, 0, this.worldW, this.worldH);
     cam.startFollow(this.player, false, CAMERA_LERP, CAMERA_LERP);
-    cam.setDeadzone(60, 70);
+    cam.setDeadzone(60, def.vertical ? 40 : 70);
     this.lookAhead = 0;
+    this.lookY = 0;
     fadeIn(this);
     this.lastDelta = 16;
     const syncView = () => {
@@ -195,7 +199,9 @@ export default class GameScene extends Phaser.Scene {
     }
     for (const c of this.checkpoints) {
       this.physics.add.overlap(player, c.sprite, () => {
-        if (!c.activate()) return;
+        const index = this.checkpoints.indexOf(c);
+        if (index <= this.cpIndex || !c.activate()) return;
+        this.cpIndex = index;
         this.spawnPoint = c.spawn;
         this.team?.snapshot();
         bus.emit(EV.TOAST, { text: 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
@@ -221,6 +227,7 @@ export default class GameScene extends Phaser.Scene {
 
   // Phaser's follow lerp is per frame: at 30 fps the camera would trail twice as far behind.
   // Scale it by the frame time, and lead the view a little in the running direction.
+  // In a tower it also looks up (where you are going), or down while you fall.
   updateCamera(dt) {
     const cam = this.cameras.main;
     const k = 1 - Math.pow(1 - CAMERA_LERP, dt / (1000 / 60));
@@ -228,7 +235,9 @@ export default class GameScene extends Phaser.Scene {
     const vx = this.player.body.velocity.x;
     const target = Math.abs(vx) > 40 ? Math.sign(vx) * CAMERA_LOOK_AHEAD : this.lookAhead;
     this.lookAhead += (target - this.lookAhead) * Math.min(1, dt / 400);
-    cam.setFollowOffset(-this.lookAhead, 0);
+    const targetY = !this.def.vertical ? 0 : this.player.body.velocity.y > 350 ? CAMERA_LOOK_DOWN : CAMERA_LOOK_UP;
+    this.lookY += (targetY - this.lookY) * Math.min(1, dt / 400);
+    cam.setFollowOffset(-this.lookAhead, this.lookY);
   }
 
   // ---------- state helpers ----------
@@ -409,7 +418,7 @@ export default class GameScene extends Phaser.Scene {
     this.playerView.onRespawn();
     this.team?.restore();
     for (const o of [...this.traps, ...this.npcs]) o.delegateReserved = false;
-    this.cameras.main.centerOn(this.player.x, this.player.y);
+    this.cameras.main.centerOn(this.player.x + this.lookAhead, this.player.y - this.lookY);
     this.input.keyboard.resetKeys();
     this.idleMs = 0;
     this.idleSaid = false;

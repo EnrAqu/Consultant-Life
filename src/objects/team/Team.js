@@ -128,11 +128,13 @@ export default class Team {
     const owners = [...scene.traps, ...scene.npcs].filter((o) => !o.delegateReserved);
     const targets = owners.map((o) => {
       const t = o.delegateTarget?.();
-      return t && { ...t, owner: o };
+      // feet height of the thing to face (its row's floor), so a target two floors up is out of reach
+      const row = o.ty ?? o.def?.y;
+      return t && { y: row !== undefined ? (row + 1) * TILE : undefined, ...t, owner: o };
     });
     // a closed "Approvazione richiesta" gate is a wall for juniors too
     const blockers = scene.traps.filter((tr) => tr.type === 'approvalGate' && !tr.open).map((tr) => tr.tx * TILE + 16);
-    return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers });
+    return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers, playerY: player.body.bottom });
   }
 
   // Juniors replaying your path get hit by the falling emails/slides you only just escaped.

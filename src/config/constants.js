@@ -15,6 +15,9 @@ export const FADE_MS = 180;
 // and how far ahead (world px) it looks in the running direction.
 export const CAMERA_LERP = 0.18;
 export const CAMERA_LOOK_AHEAD = 70;
+// Vertical levels: look up while climbing, down while falling fast (world px; + = up).
+export const CAMERA_LOOK_UP = 60;
+export const CAMERA_LOOK_DOWN = -50;
 export const UI_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 export const TILE = 32;
 export const LEVEL_ROWS = 17;
