@@ -5,6 +5,8 @@ import { inTorch } from '../../core/torch.js';
 const BASE = 1 / TEXTURE_SCALE;
 // The Partner's gaze (ITERATION_5 §3): 10 tiles ahead, 3 rows up or down, also in the air.
 export const GAZE = { reach: 10 * TILE, above: 3 * TILE, below: 3 * TILE };
+// He starts working when the Partner arrives on his floor.
+const WAKE = { cols: 14, rows: 4 };
 const PLANK_H = 10;
 const LINES = ['Volevi un aggiornamento?', 'Sto finendo, giuro.', 'Mi guardi mentre lavoro? Ok.'];
 
@@ -78,7 +80,10 @@ export default class Worker {
     const scene = this.scene;
     this.t += dt;
     const watched = !this.brain.done && this.watched;
-    for (const a of this.brain.update(dt, { watched, blocked: this.nextBlocked() })) {
+    const b = scene.player.body;
+    const near = Math.abs(b.center.x - this.x) <= WAKE.cols * TILE && Math.abs(b.bottom - this.floorY) <= WAKE.rows * TILE;
+    for (const a of this.brain.update(dt, { watched, blocked: this.nextBlocked(), near })) {
+      if (a.type === 'wake') this.say('Il Partner! Tutti al lavoro!', 1200);
       if (a.type === 'noticed') {
         this.say(LINES[this.lineIndex % LINES.length], 1500);
         this.lineIndex += 1;
@@ -99,7 +104,7 @@ export default class Worker {
 
     const sp = scene.player.body.center.x;
     this.npc.setFlipX(watched ? sp < this.x : this.t % 1600 < 800);
-    this.npc.setFrame(this.brain.done ? 'idle0' : watched ? 'freeze' : `run${Math.floor(this.t / 120) % 4}`);
+    this.npc.setFrame(this.brain.done || this.brain.state === 'idle' ? 'idle0' : watched ? 'freeze' : `run${Math.floor(this.t / 120) % 4}`);
     this.eye.setVisible(watched);
     if (!this.brain.done) this.drawBar(watched);
 

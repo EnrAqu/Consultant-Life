@@ -18,14 +18,16 @@ describe('outfits', () => {
     expect(LEVELS.level2.career).toBe('consultant');
     expect(LEVELS.level3.career).toBe('manager');
     expect(LEVELS.level4.career).toBe('seniorManager');
+    expect(LEVELS.level5.career).toBe('partner');
   });
 
-  it('campaign order: level1 → level2 → level3 → end', () => {
-    expect(LEVEL_ORDER).toEqual(['level1', 'level2', 'level3', 'level4']);
+  it('campaign order: level1 → … → level5 → end', () => {
+    expect(LEVEL_ORDER).toEqual(['level1', 'level2', 'level3', 'level4', 'level5']);
     expect(nextLevel('level1')).toBe('level2');
     expect(nextLevel('level2')).toBe('level3');
     expect(nextLevel('level3')).toBe('level4');
-    expect(nextLevel('level4')).toBe(null);
+    expect(nextLevel('level4')).toBe('level5');
+    expect(nextLevel('level5')).toBe(null);
     expect(projectNumber('level3')).toBe(3);
   });
 });

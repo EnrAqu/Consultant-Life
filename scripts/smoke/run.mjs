@@ -12,7 +12,7 @@ const server = spawn('npx', ['vite', 'preview', '--port', '4173', '--strictPort'
 await new Promise((r) => setTimeout(r, 2500));
 let failed = false;
 try {
-  for (const script of ['smoke.mjs', 'smoke3.mjs', 'smoke4.mjs']) {
+  for (const script of ['smoke.mjs', 'smoke3.mjs', 'smoke4.mjs', 'smoke5.mjs']) {
     let out;
     try {
       out = execFileSync(process.execPath, [join(here, script)], { encoding: 'utf8' });

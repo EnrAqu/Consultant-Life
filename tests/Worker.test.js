@@ -14,6 +14,7 @@ describe('WorkerBrain', () => {
   it('builds one platform every 450 ms while nobody looks', () => {
     const b = new WorkerBrain({ cells });
     const a = run(b, 3 * WORKER_DEFAULTS.buildMs + 20, { watched: false });
+    expect(a[0].type).toBe('wake');
     expect(a.filter((x) => x.type === 'build').map((x) => x.index)).toEqual([0, 1, 2]);
     expect(a.some((x) => x.type === 'done')).toBe(true);
     expect(b.done).toBe(true);
@@ -30,6 +31,12 @@ describe('WorkerBrain', () => {
     expect(later.map((x) => x.type)).toEqual(['resume', 'build']);
   });
 
+  it('does nothing until the Partner shows up on his floor', () => {
+    const b = new WorkerBrain({ cells });
+    expect(run(b, 5000, { watched: false, near: false })).toEqual([]);
+    expect(b.built).toBe(0);
+  });
+
   it('hopping in front of him does not help: a glance resets the wait', () => {
     const b = new WorkerBrain({ cells });
     // watched 200 ms out of every 700 (a jump-and-land rhythm)
@@ -43,6 +50,7 @@ describe('WorkerBrain', () => {
     expect(b.built).toBe(0);
     const a = run(b, 20, { watched: false, blocked: false });
     expect(a.map((x) => x.type)).toEqual(['build']);
+    expect(b.built).toBe(1);
   });
 });
 

@@ -9,11 +9,12 @@ export const ESCALATION_DEFAULTS = {
   catchLockMs: 1200,
   pauseMs: 1500,
   // stages from the bottom up: active once the surface is at or above fromRow
+  // speeds checked against the shortest climb of level 5 (tests/Level5.test.js): 50 / 60 / 62 / 72 px/s
   stages: [
     { fromRow: Infinity, speed: 50, label: 'Manager' },
     { fromRow: 62, speed: 60, label: 'Director' },
-    { fromRow: 38, speed: 70, label: 'VP' },
-    { fromRow: 26, speed: 80, label: 'CEO' },
+    { fromRow: 38, speed: 62, label: 'VP' },
+    { fromRow: 26, speed: 72, label: 'CEO' },
   ],
 };
 

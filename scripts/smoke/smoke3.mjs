@@ -113,10 +113,12 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   const s4 = await state(page);
   check('Lessons Learned 3 leads to level 4 (Senior Manager)', s4.level === 'level4' && s4.outfit === 'seniorManager', s4);
   await teleport(page, 178, 14); await hold(page, 'ArrowLeft', 250); await sleep(1500);
-  const end = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
-  check('level 4 (from the client side) opens the end screen', end.includes('MvpEndScene'), end);
-  await sleep(500);
-  await page.screenshot({ path: OUT + 'i4-end.png' });
+  const ll4 = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
+  check('level 4 (from the client side) opens Lessons Learned 4', ll4.includes('LessonsLearnedScene'), ll4);
+  await sleep(800);
+  await page.keyboard.press('Space'); await sleep(900);
+  const s5 = await state(page);
+  check('Lessons Learned 4 leads to level 5 (Partner)', s5.level === 'level5' && s5.outfit === 'partner', s5);
   await page.close();
 }
 

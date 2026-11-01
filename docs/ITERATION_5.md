@@ -285,4 +285,6 @@ Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner
 ## 12. Stato
 
 - [x] Piano 5A (2026-11-01), review applicata.
-- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [x] I5-M4 · [ ] I5-M5 · [ ] I5-M6 · [ ] I5-M7
+- Scostamenti in sviluppo (registrati in DECISIONS): velocità della marea **50 / 60 / 62 / 72** px/s (non 70/80 ai piani alti: la verifica analitica dava prese anche a un player rapido); i lavoratori iniziano a costruire **quando arrivi sul loro piano** (altrimenti finirebbero prima che tu arrivi).
+- Verifica: 148 test Vitest (livello 5 valido nei 5 casi di pivot, lavoratori e tappetini obbligatori, verifica analitica della marea), build, `npm run smoke` 74/74 (nuova suite `smoke5.mjs`).
+- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [x] I5-M4 · [x] I5-M5 · [x] I5-M6 · [ ] I5-M7

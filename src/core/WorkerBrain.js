@@ -1,6 +1,7 @@
 // Pure logic of a junior building part of the path (ITERATION_5 §3): one platform every buildMs,
 // only while the Partner is NOT looking at him. Watched: he stops ("Volevi un aggiornamento?") and
-// resumes resumeMs after you look away. Work done stays done (no reset on death). Times in ms; no Phaser.
+// resumes resumeMs after you look away. He gets to work only once the Partner shows up on his floor (near),
+// otherwise he would be done long before you arrive. Work done stays done (no reset on death). Times in ms; no Phaser.
 export const WORKER_DEFAULTS = { buildMs: 450, resumeMs: 800 };
 
 export default class WorkerBrain {
@@ -9,7 +10,7 @@ export default class WorkerBrain {
     this.total = this.p.cells.length;
     this.built = 0;
     this.timer = 0;
-    this.state = 'working';
+    this.state = 'idle';
     this.quietMs = 0;
   }
 
@@ -24,9 +25,14 @@ export default class WorkerBrain {
   }
 
   // watched: he is in the Partner's torch; blocked: the next platform's cell is occupied (wait, never trap anyone)
-  update(dt, { watched, blocked = false }) {
+  update(dt, { watched, blocked = false, near = true }) {
     const actions = [];
     if (this.done) return actions;
+    if (this.state === 'idle') {
+      if (!near) return actions;
+      this.state = 'working';
+      actions.push({ type: 'wake' });
+    }
     if (watched) {
       if (this.state !== 'watched') actions.push({ type: 'noticed' });
       this.state = 'watched';
