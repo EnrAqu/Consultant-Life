@@ -57,6 +57,7 @@ export default class Escalation {
       if (a.type === 'released') {
         player.lockInput('escalation', false);
         scene.input.keyboard.resetKeys();
+        scene.sycophant?.placeNearPlayer();
       }
       if (a.type === 'stop') {
         bus.emit(EV.TOAST, { text: 'Il CEO del cliente è in ferie fino a lunedì.', durationMs: 2600, color: '#86efac' });

@@ -5,6 +5,7 @@ import { resolveLevel } from '../src/core/pivot.js';
 import { validateLevel, longestQuietClimb } from '../src/core/LevelValidator.js';
 import EscalationBrain from '../src/core/EscalationBrain.js';
 import { WORKER_DEFAULTS } from '../src/core/WorkerBrain.js';
+import { FIVE_DEFAULTS } from '../src/core/FiveMinutesBrain.js';
 
 const T = 32;
 const def = LEVELS.level5;
@@ -36,6 +37,15 @@ describe('level 5 "La Partnership"', () => {
     expect(validateLevel(parse(noMat3), { table: 'normal' }).ok).toBe(false);
   });
 
+  it('a skipped deal can always be fetched again: from every checkpoint every deal is reachable', () => {
+    const p = parse(def);
+    for (const cp of p.checkpoints) {
+      const r = validateLevel(p, { table: 'normal', from: cp });
+      for (const d of p.deals) expect(r.reachable.has(`${d.x}:${d.y}`), `${cp.id} → deal ${d.x}:${d.y}`).toBe(true);
+      expect(r.reachable.has(`${p.goal.x}:${p.goal.y}`)).toBe(true);
+    }
+  });
+
   it('has three deals and a checkpoint on every floor', () => {
     const p = parse(def);
     expect(p.deals).toHaveLength(3);
@@ -54,8 +64,11 @@ describe('level 5 "La Partnership"', () => {
     const { dist } = validateLevel(p, { table: 'normal' });
     const minDist = (row) => Math.min(...[...dist].filter(([k]) => Number(k.split(':')[1]) === row).map(([, d]) => d));
     const workers = def.entities.filter((e) => e.type === 'worker');
+    // the mandatory waits of floor 2 (review 5 #2): the "5 minuti" colleague standing in the corridor, the deck collapsing
+    const deck = def.entities.find((e) => e.id === 'slotC').params.normal;
+    const floor2Ms = FIVE_DEFAULTS.standMs + deck.wobbleMs + deck.slideCount * deck.dropIntervalMs;
     // waypoints: each floor slab, plus each worker's row (you wait for him there); waits: the worker's build time
-    const waypoints = [...FLOORS.map((row) => ({ row, waitMs: 0 })), ...workers.map((w) => ({ row: w.y, waitMs: w.params.cells.length * WORKER_DEFAULTS.buildMs + WORKER_DEFAULTS.resumeMs }))]
+    const waypoints = [...FLOORS.map((row) => ({ row, waitMs: row === 61 ? floor2Ms : 0 })), ...workers.map((w) => ({ row: w.y, waitMs: w.params.cells.length * WORKER_DEFAULTS.buildMs + WORKER_DEFAULTS.resumeMs }))]
       .sort((a, b) => b.row - a.row)
       .reduce((list, wp) => {
         const same = list.find((x) => x.row === wp.row);
@@ -69,27 +82,34 @@ describe('level 5 "La Partnership"', () => {
         const to = waypoints[i + 1].row;
         return { from: wp.row, to, waitMs: wp.waitMs + (FLOORS.includes(wp.row) ? toleranceMs : 0), climbMs: (minDist(to) - minDist(wp.row)) * jumpMs };
       });
+    // returns the number of catches and the closest the tide got to your feet (rows)
     const simulate = (legs) => {
       const brain = new EscalationBrain(def.escalation);
       let catches = 0;
+      let margin = Infinity;
       for (const leg of legs) {
         const steps = [
           [leg.waitMs, () => (leg.from + 1) * T],
           [leg.climbMs, (t) => (leg.from + 1) * T - ((leg.from - leg.to) * T * t) / leg.climbMs],
         ];
         for (const [ms, feet] of steps) {
-          for (let t = 0; t < ms; t += 10) catches += brain.update(10, { feetY: feet(t) }).filter((a) => a.type === 'catch').length;
+          for (let t = 0; t < ms; t += 10) {
+            catches += brain.update(10, { feetY: feet(t) }).filter((a) => a.type === 'catch').length;
+            if (brain.active) margin = Math.min(margin, brain.distanceRows(feet(t)));
+          }
         }
       }
-      return catches;
+      return { catches, margin };
     };
 
-    it('a player climbing at a good pace is never caught', () => {
-      expect(simulate(climb(750, 2000))).toBe(0);
+    it('a player climbing at a good pace is never caught, with at least 1.5 rows to spare', () => {
+      const r = simulate(climb(800, 2000));
+      expect(r.catches).toBe(0);
+      expect(r.margin).toBeGreaterThanOrEqual(1.5);
     });
 
     it('a slow player gets caught at least once', () => {
-      expect(simulate(climb(1100, 3000))).toBeGreaterThan(0);
+      expect(simulate(climb(1100, 3000)).catches).toBeGreaterThan(0);
     });
   });
 });

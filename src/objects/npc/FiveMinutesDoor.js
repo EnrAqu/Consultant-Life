@@ -75,7 +75,10 @@ export default class FiveMinutesDoor {
   update(dt) {
     const player = this.scene.player;
     this.t += dt;
-    const actions = this.brain.update(dt, { distTiles: tilesBetween(player.body.center.x, this.x), touching: this.touching(), locked: player.inputLocked });
+    // only the floor he is on counts (a tower has floors right above and below him)
+    const sameFloor = Math.abs(player.body.bottom - this.floorY) <= 3 * TILE;
+    const distTiles = sameFloor ? tilesBetween(player.body.center.x, this.x) : Infinity;
+    const actions = this.brain.update(dt, { distTiles, touching: this.touching(), locked: player.inputLocked });
     for (const a of actions) this.handle(a);
 
     this.npc.setAlpha(this.brain.outAmount);

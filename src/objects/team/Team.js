@@ -134,7 +134,8 @@ export default class Team {
     });
     // a closed "Approvazione richiesta" gate is a wall for juniors too
     const blockers = scene.traps.filter((tr) => tr.type === 'approvalGate' && !tr.open).map((tr) => tr.tx * TILE + 16);
-    return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers, playerY: player.body.bottom });
+    // in a tower, only targets on your floor (review 5 #5: horizontal levels keep delegating from a raised platform)
+    return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers, playerY: scene.def.vertical ? player.body.bottom : null });
   }
 
   // Juniors replaying your path get hit by the falling emails/slides you only just escaped.
@@ -186,11 +187,13 @@ export default class Team {
     const k = m.duration > 0 ? Math.min(1, m.t / m.duration) : 1;
     const x = m.fromX + (m.target.x - m.fromX) * k;
     // a hop every tile or so: they get there whatever the floor looks like
-    const floorY = this.floorAt(x, m.fromY) ?? m.fromY;
+    // the target's floor (it may be up to 3 rows above in a tower), else the junior's own
+    const refY = m.target.y ?? m.fromY;
+    const floorY = this.floorAt(x, refY) ?? m.fromY;
     m.sprite.setPosition(x, floorY - Math.abs(Math.sin(k * Math.PI * Math.max(1, m.duration / 300))) * 18);
     m.sprite.setFlipX(m.target.x < m.fromX).setFrame(`run${Math.floor(m.t / 80) % 4}`);
     if (k < 1) return;
-    m.sprite.setPosition(m.target.x, this.floorAt(m.target.x, m.fromY) ?? m.fromY).setFrame('freeze');
+    m.sprite.setPosition(m.target.x, this.floorAt(m.target.x, refY) ?? m.fromY).setFrame('freeze');
     const owner = m.target.owner;
     owner.delegateReserved = false;
     // things may have changed while the junior was running (it already fired, it caught you…): re-check

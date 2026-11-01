@@ -51,12 +51,12 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.screenshot({ path: OUT + 'i5-lobby.png' });
   await teleport(page, 25, 85); await sleep(300);
   const s1 = await state(page);
-  check('reaching floor 1 starts the escalation, 8 rows below you', s1.esc.state === 'rising' && s1.esc.rows <= 8, s1);
-  const s2 = await waitFor(page, (s) => (s.incidents.escalation ?? 0) > 0, 9000);
+  check('reaching floor 1 starts the escalation, 10 rows below you', s1.esc.state === 'rising' && s1.esc.rows <= 10, s1);
+  const s2 = await waitFor(page, (s) => (s.incidents.escalation ?? 0) > 0, 12000);
   await page.screenshot({ path: OUT + 'i5-escalation.png' });
   check('standing still, the tide catches you: a call with the client (-3 GU, frozen)', s2.gu === 12 && s2.locks.includes('escalation'), s2);
   const s3 = await waitFor(page, (s) => !s.locks.includes('escalation'), 3000);
-  check('after the call the tide drops back below you', s3.esc.rows >= 7 && s3.gu === 12, s3);
+  check('after the call the tide drops back below you', s3.esc.rows >= 9 && s3.gu === 12, s3);
   await page.close();
 }
 

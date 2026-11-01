@@ -33,8 +33,9 @@ export default class BaseTrap {
   }
 
   // Zone in tile units relative to the entity: columns [dx, dx + w), rows [rowTop, rowBottom].
-  // Default rows: from 12 above the entity to 2 below (2–16 for the usual y = 14; stays on its floor in a tower).
-  addTrigger(dx, w, rowTop = this.ty - 12, rowBottom = this.ty + 2) {
+  // Default rows: from 12 above the entity to 2 below (2–16 for the usual y = 14); in a tower only its own floor
+  // (5 above, 1 below), so it never reaches the floor above (review 5 #7).
+  addTrigger(dx, w, rowTop = this.ty - (this.scene.def?.vertical ? 5 : 12), rowBottom = this.ty + (this.scene.def?.vertical ? 1 : 2)) {
     const x = (this.tx + dx) * TILE;
     const y = rowTop * TILE;
     const zone = this.scene.add.zone(x + (w * TILE) / 2, y + ((rowBottom - rowTop + 1) * TILE) / 2, w * TILE, (rowBottom - rowTop + 1) * TILE);

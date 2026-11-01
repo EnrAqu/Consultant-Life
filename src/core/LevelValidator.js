@@ -56,8 +56,9 @@ export function workerSurfaces(entity) {
 export const BOUNCE = { maxRise: 5, maxGap: 2 };
 
 // gatesClosed: treat 'Approvazione richiesta' barriers as walls (nobody delegated to their plate).
-// workers: count the platforms workers build; bounces: allow the sycophant's bounce from the mats.
-export function validateLevel(parsed, { table = 'hard', gatesClosed = false, workers = true, bounces = true } = {}) {
+// workers: count the platforms workers build; bounces: allow the sycophant's bounce from the mats;
+// from: start cell (default: the spawn), e.g. a checkpoint.
+export function validateLevel(parsed, { table = 'hard', gatesClosed = false, workers = true, bounces = true, from = null } = {}) {
   const errors = [];
   const { width, height } = parsed;
   const solid = parsed.tiles.map((row) => row.map((t) => t === TILE_SOLID));
@@ -101,7 +102,7 @@ export function validateLevel(parsed, { table = 'hard', gatesClosed = false, wor
   };
 
   const key = (x, y) => `${x}:${y}`;
-  const start = parsed.spawn;
+  const start = from ?? parsed.spawn;
   const goal = parsed.goal;
   if (!standable(start.x, start.y)) errors.push(`spawn ${key(start.x, start.y)} is not standable`);
   if (!standable(goal.x, goal.y)) errors.push(`goal ${key(goal.x, goal.y)} is not standable`);
@@ -118,8 +119,8 @@ export function validateLevel(parsed, { table = 'hard', gatesClosed = false, wor
     for (let dx = -7; dx <= 7; dx++) {
       const x2 = x + dx;
       if (x2 < 0 || x2 >= width) continue;
-      // nothing higher than 6 rows is reachable; longer falls pass through intermediate cells
-      for (let y2 = Math.max(1, y - 6); y2 < Math.min(height - 1, y + 9); y2++) {
+      // nothing higher than 6 rows is reachable (rises are limited); falls of any length are allowed
+      for (let y2 = Math.max(1, y - 6); y2 < height - 1; y2++) {
         if (seen.has(key(x2, y2)) || !standable(x2, y2)) continue;
         const rise = y - y2;
         const gap = Math.max(0, Math.abs(dx) - 1);

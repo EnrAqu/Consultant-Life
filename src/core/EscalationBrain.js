@@ -5,16 +5,17 @@
 const T = 32;
 
 export const ESCALATION_DEFAULTS = {
-  leashRows: 8,
+  leashRows: 10,
   catchLockMs: 1200,
   pauseMs: 1500,
   // stages from the bottom up: active once the surface is at or above fromRow
-  // speeds checked against the shortest climb of level 5 (tests/Level5.test.js): 50 / 60 / 62 / 72 px/s
+  // speeds checked against the shortest climb of level 5 (tests/Level5.test.js): a player at a good pace keeps
+  // 2.7 rows of margin, a slow one gets caught (review 5 #2)
   stages: [
-    { fromRow: Infinity, speed: 50, label: 'Manager' },
-    { fromRow: 62, speed: 60, label: 'Director' },
-    { fromRow: 38, speed: 62, label: 'VP' },
-    { fromRow: 26, speed: 72, label: 'CEO' },
+    { fromRow: Infinity, speed: 42, label: 'Manager' },
+    { fromRow: 62, speed: 48, label: 'Director' },
+    { fromRow: 38, speed: 54, label: 'VP' },
+    { fromRow: 26, speed: 62, label: 'CEO' },
   ],
 };
 
@@ -71,6 +72,11 @@ export default class EscalationBrain {
     if (this.state === 'stopped') return actions;
     if (this.state === 'waiting') {
       if (feetY > (this.p.startRow + 1) * T) return actions;
+      // already at the Board (debug checkpoint): it never starts
+      if (feetY <= (this.p.stopRow + 1) * T) {
+        this.state = 'stopped';
+        return actions;
+      }
       this.state = 'rising';
       actions.push({ type: 'start' });
     }
@@ -112,6 +118,8 @@ export default class EscalationBrain {
   resetBelow(feetY) {
     if (!this.active) return;
     this.surfaceY = Math.max(this.surfaceY, feetY + this.p.leashRows * T);
+    // back to the stage of where the tide now is (a floor replayed at its own speed), without a banner
+    this.stageIndex = this.stageFor(this.surfaceY);
     this.state = 'paused';
     this.timer = this.p.pauseMs;
   }

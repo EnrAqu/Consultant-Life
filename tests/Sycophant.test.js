@@ -43,9 +43,10 @@ describe('SycophantBrain', () => {
     const mats = [{ x: 340, feetY: FLOOR }];
     run(b, 500, { player: player(), mats });
     const falling = player({ x: 342, feetY: FLOOR - 20, vy: 200, grounded: false });
+    // going up past him: nothing
+    expect(b.update(10, { player: { ...falling, feetY: FLOOR - 10, vy: -300 }, mats })).toEqual([]);
+    expect(b.update(10, { player: { ...falling, feetY: FLOOR - 40, vy: -100 }, mats })).toEqual([]);
     expect(b.update(10, { player: falling, mats }).map((x) => x.type)).toEqual(['bounce']);
-    // going up through him: nothing
-    expect(b.update(10, { player: { ...falling, vy: -300 }, mats })).toEqual([]);
   });
 
   it('far from mats he is no trampoline', () => {
@@ -63,5 +64,19 @@ describe('SycophantBrain', () => {
     const a = run(b, 1500, { player: player({ x: 360, feetY: FLOOR - 160 }), mats });
     expect(a.map((x) => x.type)).toContain('stand');
     expect(b.feetY).toBe(FLOOR - 160);
+  });
+
+  it('a fast fall at 30 fps still bounces (the back is checked between frames)', () => {
+    const b = new SycophantBrain();
+    b.placeAt(340, FLOOR);
+    const mats = [{ x: 340, feetY: FLOOR }];
+    run(b, 500, { player: player(), mats });
+    // 900 px/s, 33 ms frames: 30 px per frame, larger than the back's window
+    // the last frame has already landed you on the floor
+    const frames = [{ feetY: FLOOR - 60, vy: 900, grounded: false }, { feetY: FLOOR - 31, vy: 900, grounded: false }, { feetY: FLOOR, vy: 0, grounded: true }];
+    const actions = frames.flatMap((f) => b.update(33, { player: player({ x: 340, ...f }), mats }));
+    const bounce = actions.find((a) => a.type === 'bounce');
+    expect(bounce).toBeDefined();
+    expect(bounce.feetY).toBe(FLOOR - SYCOPHANT_DEFAULTS.backHeight);
   });
 });

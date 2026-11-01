@@ -50,7 +50,8 @@ export default class UIScene extends Phaser.Scene {
     this.escalationText = text(this, GAME_WIDTH / 2, GAME_HEIGHT - 34, '', { fontSize: '16px', fontStyle: 'bold', color: '#fca5a5', backgroundColor: '#111827', padding: { x: 8, y: 3 } }).setOrigin(0.5, 0).setVisible(false);
 
     this.hud.add([this.guBarBg, this.guBar, this.guText, this.clockText, this.deathsText, this.narrBox, this.narrText, this.toastText, this.levelText, this.teamText, this.dealsText, this.escalationText]);
-    this.debugText = text(this, 16, GAME_HEIGHT - 44, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
+    // above the escalation line (bottom centre)
+    this.debugText = text(this, 16, GAME_HEIGHT - 84, '', { fontFamily: 'monospace', fontSize: '12px', color: '#a3e635' });
 
     // warning border, standup overlay, KT overlay, title
     this.border = this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0, 0).setStrokeStyle(8, 0xf97316).setVisible(false);

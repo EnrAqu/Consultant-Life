@@ -3,6 +3,8 @@ import { createGrid } from './builder.js';
 // Level 5 "La Partnership" (ITERATION_5 §7): a tower. You climb from the lobby to the Board while the
 // escalation rises from below. Floors are one-way slabs (land on them, jump through them from below).
 // Rows: standing row = the row above a platform. Lobby 87–96, floor 1 62–85, floor 2 38–61, floor 3 14–37, Board 1–13.
+// Every slab above floor 1 has a stairwell (2 empty columns) right above the floor's deal: a deal you skipped can
+// always be fetched by dropping back down (review 5 #1).
 const W = 32;
 const H = 100;
 const g = createGrid(W, H);
@@ -22,12 +24,12 @@ shelf(24, 26, 89);
 shelf(1, W - 2, 86);
 shelf(1, 2, 71);
 g.put(1, 70, '$');
-shelf(1, 24, 68);
+shelf(3, 24, 68);
 g.put(3, 67, 'C');
 
 // Floor 2 (slab B, standing 61) — "5 minuti" door; two steps up to shelf T (standing 52) with the deck corridor;
 // deal on a ledge at the end of T; four steps up to floor 3.
-shelf(1, W - 2, 62);
+shelf(3, W - 2, 62);
 shelf(9, 11, 59);
 shelf(5, 7, 56);
 shelf(2, 28, 53);
@@ -41,7 +43,7 @@ shelf(18, 20, 41);
 
 // Floor 3 (slab C, standing 37) — mat to bounce onto shelf U (standing 32); deal ledge on the left;
 // scope creep slot at the end of U over a pit with a pillar; worker 3 on U2, then three steps to the Board.
-shelf(1, W - 2, 38);
+shelf(1, W - 4, 38);
 g.put(14, 37, 'C').put(8, 37, 'b');
 shelf(6, 15, 33);
 shelf(3, 4, 30);
@@ -53,7 +55,7 @@ shelf(25, 27, 19);
 shelf(21, 23, 16);
 
 // Board (slab D, standing 13) — the escalation stops here; the Board door wants the full pipeline
-shelf(1, W - 2, 14);
+shelf(1, W - 4, 14);
 g.put(22, 13, 'C').put(12, 13, 'o').put(4, 13, 'G');
 
 const replyAllNormal = { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 67 };
@@ -77,6 +79,10 @@ export default {
   entities: [
     { id: 'sign1', type: 'sign', x: 5, y: 96, text: "Partner: finalmente puoi chiedere tu \"hai 5 minuti?\"" },
     { id: 'sign2', type: 'sign', x: 15, y: 13, text: 'Board dei Partner — solo con la pipeline piena' },
+    { id: 'sign3', type: 'sign', x: 8, y: 92, text: 'Il Board riceve solo con 3 opportunità in pipeline' },
+    { id: 'stairs1', type: 'sign', x: 3, y: 61, text: '↓ Scale' },
+    { id: 'stairs2', type: 'sign', x: 26, y: 37, text: 'Scale ↓' },
+    { id: 'stairs3', type: 'sign', x: 26, y: 13, text: 'Scale ↓' },
     // floor 1
     {
       id: 'worker1', type: 'worker', x: 14, y: 85,

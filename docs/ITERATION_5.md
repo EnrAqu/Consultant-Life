@@ -125,7 +125,7 @@ Test Vitest, senza smoke a tempo:
 
 *"Io lo sapevo fare meglio" ora lo dici tu.* Davanti al Partner c'è una "torcia": un alone tenue di **10 tile** nella direzione in cui guarda, su **±3 righe**. Vale **anche in aria**, così non si imbroglia saltellando (review #6).
 
-- `core/torch.js`, puro: `inTorch(viewer, target, { range, rowsUp, rowsDown, requireGround })`.
+- `core/torch.js`, puro: `inTorch(viewer, target, { reach, above, below, requireGround, behind })` (pixel).
   - `viewer = { x, feetY, facing, grounded }`, `target = { x, feetY }`.
   - `MicromanagerBrain` la riusa per la sua torcia (range 5, 2 righe, `requireGround: true`): stesso comportamento, verificato dai test esistenti.
   - Piante e burroni restano nel brain del micromanager.
@@ -210,10 +210,10 @@ Altri dettagli:
 | Zona | Righe | Stadio marea | Contenuto |
 |---|---|---|---|
 | Lobby | 86–99 | — | spawn; cartello *"Partner: finalmente puoi chiedere tu 'hai 5 minuti?'"*; il leccapiedi si presenta; **tappetino** obbligatorio (rise 5) per uscire dalla lobby |
-| Piano 1 Delivery | 62–85 | 1 | 2 **lavoratori** (impalcature obbligatorie); slot `replyAll` (pivot: le email fanno da gradini); opportunità 1 su una deviazione; checkpoint `cp1` |
-| Piano 2 | 38–61 | 2 | slot `fiveMinutes` (pivot: scorciatoia di mezzo piano); slot `deckCollapse` (pivot: ponte); opportunità 2; checkpoint `cp2` |
-| Piano 3 | 14–37 | 3 → 4 | **tappetino** + 1 lavoratore; slot `scopeCreep` (pivot: ponte); opportunità 3; checkpoint `cp3`. Il CEO entra in CC a metà piano |
-| Board | 2–13 | ferma | checkpoint `cp4`, porta del Board (3/3) |
+| Piano 1 Delivery | 62–85 | 1 | 2 **lavoratori** (impalcature obbligatorie); slot `replyAll` (pivot: le email fanno da gradini); opportunità 1 su una deviazione; checkpoint `cp0` |
+| Piano 2 | 38–61 | 2 | slot `fiveMinutes` (pivot: scorciatoia di mezzo piano); slot `deckCollapse` (pivot: ponte); opportunità 2; checkpoint `cp1` |
+| Piano 3 | 14–37 | 3 → 4 | **tappetino** + 1 lavoratore; slot `scopeCreep` (pivot: ponte); opportunità 3; checkpoint `cp2`. Il CEO entra in CC a metà piano |
+| Board | 2–13 | ferma | checkpoint `cp3`, porta del Board (3/3) |
 
 Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner).
 
@@ -236,7 +236,7 @@ Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner
   - finale.
 - **HUD:** riga dell'escalation (§2), `Pipeline n/3` sotto il team.
 - **Debug:**
-  - `level=level5`, `cp=cp1…cp4`, `escalation=off`, `deals=3`, `ending=partner`;
+  - `level=level5`, `cp=cp0…cp3`, `escalation=off`, `deals=3`, `ending=partner`;
   - `pivot` già esistente;
   - tutti questi parametri entrano in `DEBUG.anyOverride`.
 
@@ -286,5 +286,6 @@ Flusso: livello 4 → Lessons Learned 4 → livello 5 → `EndingScene` (Partner
 
 - [x] Piano 5A (2026-11-01), review applicata.
 - Scostamenti in sviluppo (registrati in DECISIONS): velocità della marea **50 / 60 / 62 / 72** px/s (non 70/80 ai piani alti: la verifica analitica dava prese anche a un player rapido); i lavoratori iniziano a costruire **quando arrivi sul loro piano** (altrimenti finirebbero prima che tu arrivi).
-- Verifica: 148 test Vitest (livello 5 valido nei 5 casi di pivot, lavoratori e tappetini obbligatori, verifica analitica della marea), build, `npm run smoke` 74/74 (nuova suite `smoke5.mjs`).
-- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [x] I5-M4 · [x] I5-M5 · [x] I5-M6 · [ ] I5-M7
+- Dopo la review del codice: guinzaglio 10 righe e marea 42/48/54/62 px/s, vani scale nei solai (vedi CODE_REVIEW_5).
+- Verifica: 153 test Vitest (livello 5 valido nei 5 casi di pivot, lavoratori e tappetini obbligatori, verifica analitica della marea), build, `npm run smoke` 74/74 (nuova suite `smoke5.mjs`).
+- [x] I5-M1 · [x] I5-M2 · [x] I5-M3 · [x] I5-M4 · [x] I5-M5 · [x] I5-M6 · [x] I5-M7 (review: `docs/CODE_REVIEW_5.md`, tutto corretto; manca il playtest utente)

@@ -217,7 +217,8 @@ export default class GameScene extends Phaser.Scene {
     for (const d of this.deals) {
       this.physics.add.overlap(player, d.sprite, () => {
         if (!d.collect()) return;
-        this.dealCount += 1;
+        // (debug deals=3 already fills the pipeline)
+        this.dealCount = Math.min(this.dealsRequired, this.dealCount + 1);
         this.stats.recordPickup('deal');
         bus.emit(EV.TOAST, { text: `Opportunità chiusa! Pipeline ${this.dealCount}/${this.dealsRequired}`, durationMs: 1800, color: '#fbbf24' });
         bus.emit(EV.DEALS_CHANGED, { count: this.dealCount, required: this.dealsRequired });
@@ -229,6 +230,7 @@ export default class GameScene extends Phaser.Scene {
         const index = this.checkpoints.indexOf(c);
         if (index <= this.cpIndex || !c.activate()) return;
         this.cpIndex = index;
+        this.sycophant?.placeNearPlayer();
         this.spawnPoint = c.spawn;
         this.team?.snapshot();
         bus.emit(EV.TOAST, { text: 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
@@ -429,7 +431,11 @@ export default class GameScene extends Phaser.Scene {
   die(cause) {
     if (this.player.isDead || this.ended) return;
     if (DEBUG.god) {
-      if (cause === 'pit' || cause === 'selfRestart') this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
+      if (cause === 'pit' || cause === 'selfRestart') {
+        this.player.respawnAt(this.spawnPoint.x, this.spawnPoint.y);
+        this.escalation?.onRespawn();
+        this.sycophant?.onRespawn();
+      }
       return;
     }
     const player = this.player;

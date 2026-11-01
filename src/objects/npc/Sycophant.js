@@ -50,8 +50,10 @@ export default class Sycophant {
         this.bows += 1;
       }
       if (a.type === 'bounce' && !player.inputLocked) {
+        // fixed height: feet snapped to his back, no fall gravity, and releasing the jump key does not cut it short
+        b.y = a.feetY - b.height;
         b.setVelocityY(a.vy);
-        // fixed height: releasing the jump key does not cut a bounce short
+        b.setGravityY(0);
         player.jumpCutApplied = true;
         player.coyoteTimer = 0;
         scene.playerView.dust.explode(6, b.center.x, b.bottom);
@@ -74,9 +76,9 @@ export default class Sycophant {
     const px = this.scene.player.body.center.x;
     this.sprite.setPosition(br.x, br.feetY);
     this.sprite.setFlipX(bowing ? false : px < br.x);
-    // bowing: bent forward, his back flat at backHeight
-    this.sprite.setAngle(bowing ? 70 : 0).setOrigin(bowing ? 0.3 : 0.5, 1);
-    this.sprite.setFrame(moving ? `run${Math.floor(this.t / 90) % 4}` : 'idle0');
+    // bowing: bent down to backHeight, right on the mat
+    this.sprite.setScale(BASE, bowing ? BASE * (br.p.backHeight / 40) : BASE);
+    this.sprite.setFrame(bowing ? 'freeze' : moving ? `run${Math.floor(this.t / 90) % 4}` : 'idle0');
     this.bubble.setPosition(br.x, br.feetY - (bowing ? 28 : 46));
   }
 

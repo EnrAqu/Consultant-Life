@@ -33,6 +33,7 @@ export default class SycophantBrain {
     this.x = x;
     this.feetY = feetY;
     this.mat = null;
+    this.prevFeetY = null;
     this.flatterTimer = 0;
     this.flatterIndex = 0;
   }
@@ -75,6 +76,7 @@ export default class SycophantBrain {
       }
     }
 
+    this.prevFeetY = this.state === 'bowing' ? this.prevFeetY : null;
     if (this.state === 'toMat') {
       this.feetY = this.mat.feetY;
       if (this.moveToward(this.mat.x, dt)) {
@@ -93,8 +95,16 @@ export default class SycophantBrain {
       actions.push({ type: 'stand' });
       return actions;
     }
-    const onBack = player.vy > 0 && Math.abs(player.x - this.x) < 14 && player.feetY >= this.backY - 6 && player.feetY <= this.backY + 10;
-    if (onBack) actions.push({ type: 'bounce', vy: -this.p.bounceVelocity });
+    // swept test: coming down, the feet crossed his back since the last frame. A big frame at 30 fps may already
+    // have landed you on the floor (grounded, vy = 0): that still counts as landing on him.
+    const prev = this.prevFeetY ?? player.feetY;
+    this.prevFeetY = player.feetY;
+    const down = player.vy > 0 || player.grounded;
+    const onBack = down && Math.abs(player.x - this.x) < 14 && prev <= this.backY + 10 && player.feetY >= this.backY - 6;
+    if (onBack) {
+      this.prevFeetY = this.backY;
+      actions.push({ type: 'bounce', vy: -this.p.bounceVelocity, feetY: this.backY });
+    }
     return actions;
   }
 }
