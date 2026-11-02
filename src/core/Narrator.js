@@ -1,5 +1,6 @@
 // above cause + levelId (2): "you keep dying here" and the milestone lines must win over a level's flavour lines
-const WEIGHTS = { runDeathsExact: 4, minSpot: 3 };
+// causeDeathsExact (5) beats them all: the first death of a kind that needs explaining (the client's hidden mail)
+const WEIGHTS = { causeDeathsExact: 5, runDeathsExact: 4, minSpot: 3 };
 const HISTORY_SIZE = 6;
 
 const MATCHERS = {
@@ -11,6 +12,7 @@ const MATCHERS = {
   runDeathsExact: (v, ctx) => ctx.runDeaths === v,
   minTotalDeaths: (v, ctx) => (ctx.totalDeaths ?? 0) >= v,
   minCauseDeaths: (v, ctx) => (ctx.causeDeaths ?? 0) >= v,
+  causeDeathsExact: (v, ctx) => ctx.causeDeaths === v,
 };
 
 function specificity(when) {
@@ -19,7 +21,7 @@ function specificity(when) {
 
 function defaultPriority(line) {
   if (line.event === 'budgetOver' || line.event === 'levelComplete') return 3;
-  if (line.when.minSpot !== undefined || line.when.runDeathsExact !== undefined) return 2;
+  if (line.when.minSpot !== undefined || line.when.runDeathsExact !== undefined || line.when.causeDeathsExact !== undefined) return 2;
   return 1;
 }
 

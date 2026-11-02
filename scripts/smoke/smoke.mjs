@@ -69,8 +69,8 @@ function check(name, ok, info) {
   const s1 = await state(page);
   check('running into first pit kills (pit, -0.5 GU) and respawns', s1.deaths >= 1 && s1.byCause.pit >= 1 && s1.gu === 20 - 0.5 * s1.deaths && s1.tile[0] < 5, s1);
 
-  // jump test: from spawn, run and jump the 2-gap
-  await teleport(page, 15, 14);
+  // jump test: from spawn, run and jump the 2-gap (taking off before 544 px: the client's hidden mail stays hidden, see 1d)
+  await teleport(page, 14, 14);
   await sleep(200);
   await page.keyboard.down('ArrowRight');
   await sleep(250);
@@ -277,6 +277,127 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
   check(`outfit ${outfit} renders`, key === `player_${outfit}`, key);
   await page.screenshot({ path: OUT + `shot-outfit-${outfit}.png`, clip: { x: 0, y: 300, width: 600, height: 240 } });
   await page.close();
+}
+
+// 1d. the client's pranks in level 1 (docs/LEVELS.md, 2026-11-02): take-offs fixed in pixels, not by key timing
+{
+  const fresh = () => open('?debug=1&standup=off');
+  const cause = (s, c) => s.byCause[c] ?? 0;
+  const pranks = (page) =>
+    page.evaluate(() => {
+      const g = globalThis.__game.scene.getScene('GameScene');
+      const hm = g.traps.find((t) => t.def.id === 'hm1');
+      const rs = g.traps.find((t) => t.def.id === 'rs1');
+      return { mail: hm.shown, mailVisible: hm.view.visible, plat: Math.round(rs.plat.x / 32), shift: rs.state, caption: rs.caption.visible, jump: g.player.lastJump && Math.round(g.player.lastJump.x) };
+    });
+  // hold the keys while the input is locked, then put the player on the floor at x0 running right with a buffered jump:
+  // the jump happens on the next update, a few px further on. hop: no jump key held, so the jump is cut at once.
+  const takeoff = async (page, x0, { hop = false, coyote = false } = {}) => {
+    await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').player.lockInput('smoke', true));
+    await page.keyboard.down('ArrowRight');
+    if (!hop) await page.keyboard.down('Space');
+    await sleep(120);
+    await page.evaluate(([x0, coyote]) => {
+      const g = globalThis.__game.scene.getScene('GameScene');
+      const pl = g.player;
+      pl.lockInput('smoke', false);
+      pl.body.reset(x0, 15 * 32 - 16);
+      pl.body.setVelocityX(260);
+      if (!coyote) {
+        pl.jumpBufferTimer = 110;
+        return;
+      }
+      // coyote: buffer the jump only once the body has left the edge of col 17 (x > 585)
+      const onUpdate = () => {
+        if (pl.x > 588 && !pl.grounded) {
+          pl.jumpBufferTimer = 110;
+          g.events.off('postupdate', onUpdate);
+        }
+      };
+      g.events.on('postupdate', onUpdate);
+    }, [x0, coyote]);
+  };
+  const release = async (page) => {
+    await page.keyboard.up('Space');
+    await page.keyboard.up('ArrowRight');
+  };
+
+  // (a) take off early in col 15: no mail, the 2-gap is cleared
+  {
+    const page = await fresh();
+    await takeoff(page, 496);
+    await sleep(700);
+    await release(page);
+    await sleep(300);
+    const s = await state(page);
+    const pr = await pranks(page);
+    check('1d(a) taking off from col 15 the client mail stays hidden and the gap is cleared', !pr.mail && s.deaths === 0 && s.tile[0] >= 20, { ...pr, tile: s.tile, deaths: s.deaths });
+    await page.close();
+  }
+  // (b) the comfortable jump from the edge of col 17: the mail pops over your head, you bonk and fall
+  {
+    const page = await fresh();
+    await takeoff(page, 572);
+    await sleep(160);
+    const pr = await pranks(page);
+    await page.screenshot({ path: OUT + 'shot-prank-mail.png' });
+    await sleep(600);
+    await release(page);
+    await sleep(300);
+    const s = await state(page);
+    check('1d(b) taking off at the edge of col 17 the client mail appears and kills (hiddenClient)', pr.mail && pr.mailVisible && cause(s, 'hiddenClient') === 1, { ...pr, byCause: s.byCause });
+    await page.close();
+  }
+  // (c) a coyote jump past the edge is caught too
+  {
+    const page = await fresh();
+    await takeoff(page, 560, { coyote: true });
+    await sleep(160);
+    const pr = await pranks(page);
+    await sleep(600);
+    await release(page);
+    await sleep(300);
+    const s = await state(page);
+    check('1d(c) a coyote jump past the edge of col 17 is caught as well', pr.mail && pr.jump > 585 && cause(s, 'hiddenClient') === 1, { ...pr, byCause: s.byCause });
+    await page.close();
+  }
+  // (d) a full running jump from the edge of col 24: the landing slides back to 25–27 with the caption, you overshoot
+  {
+    const page = await fresh();
+    await takeoff(page, 770);
+    await sleep(250);
+    const pr = await pranks(page);
+    await page.screenshot({ path: OUT + 'shot-prank-requirement.png' });
+    await sleep(600);
+    await release(page);
+    await sleep(300);
+    const s = await state(page);
+    check('1d(d) running jump from the edge of col 23: the requirement moves back (25–27), the caption shows, death by requirementChange', pr.plat === 25 && pr.caption && cause(s, 'requirementChange') === 1, { ...pr, byCause: s.byCause });
+    await page.close();
+  }
+  // (e) a short hop from the same edge lands on the moved platform; from there the step 30–31 is reachable, spikes avoided
+  {
+    const page = await fresh();
+    await takeoff(page, 770, { hop: true });
+    await sleep(280);
+    await release(page);
+    await sleep(300);
+    const s1 = await state(page);
+    const pr = await pranks(page);
+    // from the right end of the moved platform: jump holding right briefly, then let go so as not to reach the spikes
+    await teleport(page, 27, 14);
+    await sleep(250);
+    await page.keyboard.down('Space');
+    await page.keyboard.down('ArrowRight');
+    await sleep(260);
+    await page.keyboard.up('ArrowRight');
+    await sleep(250);
+    await page.keyboard.up('Space');
+    await sleep(400);
+    const s2 = await state(page);
+    check('1d(e) a short hop lands on the moved requirement, then the step 30–31 is reachable without dying', pr.plat === 25 && s1.deaths === 0 && s1.tile[0] >= 25 && s1.tile[0] <= 27 && s2.deaths === 0 && s2.tile[0] >= 30 && s2.tile[0] <= 31 && s2.tile[1] === 12, { pr, s1: s1.tile, s2: s2.tile, deaths: s2.deaths, byCause: s2.byCause });
+    await page.close();
+  }
 }
 
 // 2. standup freeze

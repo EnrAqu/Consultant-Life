@@ -11,6 +11,12 @@ export const NARRATOR_LINES = [
   { id: 'death_generic_3', event: 'death', text: 'Lo segno come "work in progress".' },
 
   // per cause
+  // the client's pranks (level 1). The first hidden-mail death says it is not the controls (no tell, on purpose)
+  { id: 'death_hiddenclient_first', event: 'death', when: { cause: 'hiddenClient', causeDeathsExact: 1 }, text: 'No, non è un bug dei comandi: il cliente era in CCN. Il cliente è sempre in CCN.' },
+  { id: 'death_hiddenclient_1', event: 'death', when: { cause: 'hiddenClient' }, text: 'Il Cliente: "E chi è mo questo?". Tu, da oggi: quello che salta prima.' },
+  { id: 'death_hiddenclient_2', event: 'death', when: { cause: 'hiddenClient' }, text: 'La mail del cliente arriva sempre nel momento più comodo. Per lui.' },
+  { id: 'death_reqchange_1', event: 'death', when: { cause: 'requirementChange' }, text: 'Il requisito è cambiato. Il burrone no.' },
+  { id: 'death_reqchange_2', event: 'death', when: { cause: 'requirementChange' }, text: '"È un problema?" Sì. Ma non per il cliente.' },
   { id: 'death_pit_1', event: 'death', when: { cause: 'pit' }, text: 'Il burrone era in scope. Era nella slide 47.' },
   { id: 'death_pit_2', event: 'death', when: { cause: 'pit' }, text: 'Hai toccato il fondo. Metaforicamente ce lo aspettavamo.' },
   { id: 'death_spike_1', event: 'death', when: { cause: 'spike' }, text: "Le deadline sono puntuali. Tu un po' meno." },

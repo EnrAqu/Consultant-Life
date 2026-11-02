@@ -16,6 +16,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.isDead = false;
     this.locks = new Set();
+    // every real jump, with where it started (centre x, feet): the client's pranks read the take-off in pixels
+    this.jumpCount = 0;
+    this.lastJump = null;
     this.resetTimers();
   }
 
@@ -30,8 +33,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumpCutApplied = true;
   }
 
+  // Only `blocked.down`: Phaser 3.90 sets it on the tilemap and on static and immovable bodies (every surface the player
+  // stands on), never on overlaps. `touching.down` was dropped because overlaps set it: falling through a trigger or
+  // kill zone counted as ground and allowed a mid-air jump (found 2026-11-02). A future movable (non-immovable)
+  // platform would need its own check.
   get grounded() {
-    return this.body.blocked.down || this.body.touching.down;
+    return this.body.blocked.down;
   }
 
   update(dt, input) {
@@ -57,6 +64,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
       body.setVelocityY(-PLAYER.jumpVelocity);
+      this.jumpCount++;
+      this.lastJump = { x: this.x, bottom: body.bottom };
       this.jumpBufferTimer = 0;
       this.coyoteTimer = 0;
       this.jumpCutApplied = false;

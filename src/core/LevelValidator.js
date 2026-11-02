@@ -34,6 +34,8 @@ export function trapSurfaces(entity) {
       rect(x + Number(dx), p.restRow - h + 1, 1, h);
     }
   }
+  // the client's requirement change: the landing platform is where it ends up when you land
+  if (type === 'requirementShift') rect(x + p.shift, y, p.width, 1);
   if (mode !== 'pivoted') return cells;
   if (type === 'deckCollapse') {
     for (const t of p.targets) rect(x + t.dx, t.row, 2, 1);
@@ -165,6 +167,10 @@ function entityColumns(e) {
       return [e.x - 1, e.x + 1];
     case 'aiDraft':
       return [e.x - 1, e.x + Math.max(0, ...(p.platforms ?? []).map((pl) => pl.dx + pl.w))];
+    case 'hiddenMail':
+      return [e.x - 1, e.x + 2];
+    case 'requirementShift':
+      return [Math.min(e.x, e.x + p.shift) - 1, Math.max(e.x, e.x + p.shift) + p.width];
     case 'rival':
       return [p.startCol, p.triggerCol];
     default:

@@ -350,6 +350,21 @@ export function generateAll(scene) {
     p.fill(0x94a3b8).rect(4, 24, 18, 2);
   });
 
+  // the client's pranks: a mail block (envelope, red border, "CCN" stripe) and a requirements sheet platform
+  make(scene, 'mailBlock', 32, 32, (p) => {
+    p.fill(COLORS.red).rect(0, 0, 32, 32);
+    p.fill(0xffffff).rect(2, 2, 28, 28);
+    p.fill(0xe2e8f0).tri(2, 2, 30, 2, 16, 16);
+    p.line(1.5, 0x94a3b8).seg(2, 2, 16, 16).seg(30, 2, 16, 16);
+    p.fill(COLORS.red).rect(6, 22, 20, 4);
+  });
+  make(scene, 'reqPlatform', 32, 32, (p) => {
+    p.fill(0x1d4ed8).rect(0, 0, 32, 32);
+    p.fill(0xdbeafe).rect(0, 0, 32, 29);
+    p.fill(0x2563eb).rect(0, 0, 32, 6);
+    p.fill(0x93c5fd).rect(4, 11, 22, 2).rect(4, 17, 16, 2).rect(4, 23, 20, 2);
+  });
+
   make(scene, 'scopeBlock', 32, 32, (p) => {
     p.fill(0xeab308).rect(0, 0, 32, 32);
     p.fill(COLORS.postit).rect(0, 0, 32, 29);

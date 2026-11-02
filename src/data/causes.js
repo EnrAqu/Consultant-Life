@@ -28,6 +28,9 @@ export const CAUSES = {
     lesson: 'Il micromanager ora ti precede e ti indica le trappole.',
   },
   clientSwitch: { label: 'il cliente che cambia idea', pivotable: false },
+  // the client's pranks (level 1): not pivotable, so the lesson chain to level 2 does not change
+  hiddenClient: { label: 'il cliente in copia nascosta', pivotable: false },
+  requirementChange: { label: 'il requisito che cambia a metà salto', pivotable: false },
   intern: { label: 'il budget formazione', pivotable: false },
   rival: { label: "l'arrivista", pivotable: false },
   escalation: { label: "l'escalation", pivotable: false },

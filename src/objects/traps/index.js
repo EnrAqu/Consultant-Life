@@ -4,6 +4,8 @@ import CollapsingDeck from './CollapsingDeck.js';
 import FakeKT from './FakeKT.js';
 import ApprovalGate from './ApprovalGate.js';
 import AiDraft from './AiDraft.js';
+import HiddenMail from './HiddenMail.js';
+import RequirementShift from './RequirementShift.js';
 
 export const TRAP_CLASSES = {
   replyAll: ReplyAllAvalanche,
@@ -12,4 +14,6 @@ export const TRAP_CLASSES = {
   fakeKT: FakeKT,
   approvalGate: ApprovalGate,
   aiDraft: AiDraft,
+  hiddenMail: HiddenMail,
+  requirementShift: RequirementShift,
 };
