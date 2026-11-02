@@ -19,7 +19,8 @@ description: Implementa una milestone di un piano (docs/ITERATION_N.md, docs/BUR
    - Se cambi la geometria di un livello, correggi le coordinate di test e smoke; non cancellare i controlli.
 6. Spunta la milestone nel piano (`- [x]`) e annota eventuali scostamenti. Se tocca un livello, aggiorna anche la sua scheda in `docs/LEVELS.md`.
 7. Se devi scegliere qualcosa che il piano non dice: scegli l'opzione più semplice, scrivila in `docs/DECISIONS.md` e segnalala nel resoconto.
-8. Commit locale per milestone, a nome dell'utente e senza righe `Co-Authored-By`/`Claude-Session`. Mai push senza richiesta esplicita.
+8. Commit locale per milestone, a nome dell'utente e senza righe `Co-Authored-By`/`Claude-Session`. Mai push senza richiesta esplicita (il permesso vale per quel giro di commit).
+9. **Aggiorna i playbook** toccati con quello che hai imparato (utente: "aggiorna sempre i playbook").
 
 ## Fermati e chiedi se
 - il piano contraddice una decisione registrata;

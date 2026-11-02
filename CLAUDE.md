@@ -22,7 +22,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |
-| `.claude/skills/*` | I playbook operativi (vedi sotto) | Quando un errore ricorrente va trasformato in regola |
+| `.claude/skills/*` | I playbook operativi (vedi sotto) | **Sempre**, alla fine di ogni lavoro: meccaniche nuove, trucchi di verifica, errori da non ripetere |
 
 **Precedenza in caso di conflitto:** `DECISIONS.md` > `LEVELS.md` (per i livelli) e i documenti di feature (`BURNOUT.md`, `MOBILE.md`, `FARM.md`, `PM_LINKEDIN.md`) > `ITERATION_N.md` (il più recente vince) > `IMPLEMENTATION_PLAN.md` > `PLAN.md`.
 
@@ -47,7 +47,8 @@ Flusso per una feature: `plan` → `review` → `plan` (applica i fix) → `impl
 - La logica pura sta in `src/core/` (senza Phaser) e ha test Vitest.
 - `localStorage` sempre dentro try/catch; il gioco deve funzionare anche senza.
 - Nessuna dipendenza nuova senza versione esatta (niente `^`/`~`).
-- Niente push né modifiche al repo remoto senza richiesta esplicita dell'utente.
+- Niente push né modifiche al repo remoto senza richiesta esplicita dell'utente (vale per quel giro di commit). Il lavoro mandato nel cloud va su un branch suo, mai su `main`.
+- **Aggiorna sempre i playbook** (`.claude/skills/*`) e questo file alla fine di un lavoro, con quello che è cambiato o che hai imparato — utente.
 - Commit a nome dell'utente con l'email noreply di GitHub (già in `git config` locale); **nessuna** riga `Co-Authored-By: Claude` o `Claude-Session` nei messaggi di commit.
 
 ## Comandi

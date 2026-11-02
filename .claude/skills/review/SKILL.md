@@ -30,6 +30,8 @@ Se questo playbook non gira già in un contesto separato, avvia un sotto-agente 
    - ritmo, senza tratti morti;
    - indizi leggibili alla risoluzione reale;
    - coordinate di test e smoke ancora sensate.
+9. Per la fisica, simula davvero (costanti di `PLAYER`, gravità, passi di Arcade a 60 e 30 fps) invece di stimare: punti di stacco, ricadute dopo una testata, coyote time. Controlla anche che nessuna zona di overlap faccia da "pavimento" (`grounded` è solo `blocked.down`).
+10. Segnala se l'esecutore deve aggiornare un playbook (regola nuova, trucco di verifica).
 
 ## Output
 Scrivi `docs/PLAN_REVIEW.md` per un piano, `docs/CODE_REVIEW_<oggetto>.md` per il codice (es. `CODE_REVIEW_LEVEL3.md`). In italiano: lista numerata con **gravità** (bloccante / importante / minore), **dove**, **problema**, **fix proposto**. Chiudi con un riassunto di massimo 15 righe.
