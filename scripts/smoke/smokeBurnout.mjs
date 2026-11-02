@@ -37,7 +37,13 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await die(page);
   await sleep(1600);
   const sc = await scenes(page);
-  check('one more death (+3%) goes to the burnout ending, and only there', sc.includes('EndingScene') && !sc.includes('GameScene') && !sc.includes('BudgetOverScene'), sc);
+  // you quit and become a farmer (docs/FARM.md): the farm first, then the burnout ending
+  check('one more death (+3%) goes to the farm, and only there', sc.includes('FarmScene') && !sc.includes('GameScene') && !sc.includes('BudgetOverScene') && !sc.includes('EndingScene'), sc);
+  await page.evaluate(() => globalThis.__game.scene.getScene('FarmScene').player.body.reset(121 * 32 + 16, 15 * 32 - 16));
+  await page.keyboard.down('ArrowRight'); await sleep(500); await page.keyboard.up('ArrowRight');
+  await page.waitForFunction(() => globalThis.__game.scene.isActive('EndingScene'), { timeout: 15000 }).catch(() => {});
+  const sc2 = await scenes(page);
+  check('the bench at the end of the farm goes to the burnout ending', sc2.includes('EndingScene') && !sc2.includes('FarmScene'), sc2);
   await sleep(1500);
   await page.screenshot({ path: OUT + 'burnout-ending.png' });
   await sleep(800);

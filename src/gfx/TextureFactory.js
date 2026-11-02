@@ -496,4 +496,106 @@ export function generateAll(scene) {
     p.fill(0x78350f).rect(6, 6, 13, 26).rect(21, 6, 13, 26).rect(6, 35, 13, 26).rect(21, 35, 13, 26);
     p.fill(COLORS.gold).circle(31, 36, 2);
   });
+
+  generateFarm(scene);
 }
+
+// ---------- the farm (docs/FARM.md) ----------
+
+function generateFarm(scene) {
+  // tiles (HD frames): dirt, dirt with grass on top, hay bale
+  make(scene, 'tilesFarmHD', 96, 32, (p) => {
+    p.fill(0x7c4a24).rect(0, 0, 32, 32);
+    p.fill(0x6b3f1f).rect(4, 6, 3, 2).rect(18, 14, 4, 2).rect(9, 24, 3, 2).rect(25, 27, 3, 2);
+    p.fill(0x7c4a24).rect(32, 0, 32, 32);
+    p.fill(0x6b3f1f).rect(38, 16, 3, 2).rect(52, 22, 4, 2).rect(44, 28, 3, 2);
+    p.fill(0x4d7c0f).rect(32, 0, 32, 8);
+    p.fill(0x65a30d).rect(32, 0, 32, 5);
+    p.fill(0x84cc16);
+    for (let x = 33; x < 64; x += 4) p.tri(x, 5, x + 1.5, 0, x + 3, 5);
+    p.fill(0xca8a04).round(64, 1, 32, 31, 3);
+    p.fill(0xeab308).round(65, 2, 30, 28, 3);
+    p.fill(0xfacc15);
+    for (let y = 6; y < 30; y += 5) p.rect(67, y, 26, 1.2);
+    p.fill(0xa16207).rect(72, 2, 2, 28).rect(86, 2, 2, 28);
+  });
+  const ft = scene.textures.get('tilesFarmHD');
+  ft.add('dirt', 0, 0, 0, 32 * S, 32 * S);
+  ft.add('grass', 0, 32 * S, 0, 32 * S, 32 * S);
+  ft.add('hay', 0, 64 * S, 0, 32 * S, 32 * S);
+
+  // far hills with a few trees (tiled horizontally, in front of the sun)
+  make(scene, 'bgHills', 240, 90, (p) => {
+    p.fill(0x86efac, 0.9).ellipse(60, 90, 200, 110).ellipse(200, 95, 180, 90);
+    p.fill(0x4ade80).ellipse(150, 100, 220, 90).ellipse(-10, 105, 160, 80).ellipse(250, 105, 160, 80);
+    p.fill(0x166534).circle(40, 52, 8).circle(48, 50, 7).circle(170, 58, 9);
+    p.fill(0x78350f).rect(43, 56, 2, 8).rect(169, 64, 2, 8);
+    p.fill(0xfde047, 0.5).rect(0, 82, 240, 2).rect(0, 86, 240, 1.5);
+  });
+  make(scene, 'sun', 64, 64, (p) => {
+    for (let r = 32; r > 18; r -= 2) p.fill(0xfef08a, 0.07).circle(32, 32, r);
+    p.fill(0xfde047).circle(32, 32, 16);
+    p.fill(0xfef9c3).circle(28, 28, 6);
+  });
+
+  const hen = (p, peck) => {
+    p.fill(0xf8fafc).ellipse(12, 15, 16, 12);
+    p.fill(0xe2e8f0).ellipse(9, 15, 7, 6);
+    const hx = peck ? 19 : 18;
+    const hy = peck ? 15 : 8;
+    p.fill(0xf8fafc).circle(hx, hy, 4);
+    p.fill(COLORS.red).round(hx - 2, hy - 6, 4, 3, 1);
+    p.fill(0xf59e0b).tri(hx + 3, hy - 1, hx + 6, hy + 0.5, hx + 3, hy + 2);
+    p.fill(0x111827).circle(hx + 1, hy - 1, 0.8);
+    p.fill(0xf59e0b).rect(9, 20, 1.5, 4).rect(14, 20, 1.5, 4);
+  };
+  make(scene, 'chicken', 48, 24, (p, g) => {
+    hen(p, false);
+    hen(pen(g, 24, 0), true);
+  });
+  const ch = scene.textures.get('chicken');
+  ch.add('walk', 0, 0, 0, 24 * S, 24 * S);
+  ch.add('peck', 0, 24 * S, 0, 24 * S, 24 * S);
+
+  make(scene, 'egg', 10, 12, (p) => {
+    p.fill(0xfef3c7).ellipse(5, 6.5, 9, 11);
+    p.fill(0xffffff, 0.8).ellipse(3.5, 4.5, 3, 4);
+  });
+  make(scene, 'tomato', 14, 14, (p) => {
+    p.fill(0xdc2626).circle(7, 8, 6);
+    p.fill(0xfca5a5, 0.7).circle(5, 6, 1.6);
+    p.fill(0x16a34a).tri(3, 3, 7, 2, 5, 5).tri(7, 2, 11, 3, 9, 5).rect(6.3, 0, 1.4, 3);
+  });
+  make(scene, 'carrot', 10, 18, (p) => {
+    p.fill(0x16a34a).tri(2, 0, 5, 6, 4, 0).tri(5, 0, 6, 6, 8, 0);
+    p.fill(0xf97316).tri(1, 6, 9, 6, 5, 18);
+    p.fill(0xc2410c).rect(3, 9, 3, 0.8).rect(4, 12, 2, 0.8);
+  });
+  make(scene, 'zucchina', 20, 10, (p) => {
+    p.fill(0x166534).round(1, 2, 18, 7, 3.5);
+    p.fill(0x22c55e, 0.6).rect(4, 4, 11, 1);
+    p.fill(0x854d0e).rect(17, 4, 3, 2);
+  });
+  make(scene, 'phone', 8, 14, (p) => {
+    p.fill(0x111827).round(0, 0, 8, 14, 1.5);
+    p.fill(0x38bdf8).rect(1, 1.5, 6, 10);
+    p.fill(0xffffff).rect(2, 3, 4, 1).rect(2, 5, 3, 1);
+  });
+  make(scene, 'bench', 48, 24, (p) => {
+    p.fill(0x78350f).rect(4, 14, 3, 10).rect(41, 14, 3, 10);
+    p.fill(0xa16207).round(0, 11, 48, 4, 1);
+    p.fill(0x92400e).round(0, 2, 48, 3, 1).round(0, 6, 48, 3, 1);
+    p.fill(0x78350f).rect(5, 2, 2, 10).rect(41, 2, 2, 10);
+  });
+  make(scene, 'coop', 64, 56, (p) => {
+    p.fill(0x991b1b).rect(6, 20, 52, 36);
+    p.fill(0xb91c1c).rect(6, 20, 52, 4);
+    p.fill(0x7f1d1d).tri(0, 22, 32, 0, 64, 22);
+    p.fill(0xfef3c7).round(26, 34, 12, 22, 5);
+    p.fill(0x451a03).round(28, 36, 8, 20, 4);
+    p.fill(0xfef3c7).rect(12, 28, 8, 8).rect(44, 28, 8, 8);
+    p.fill(0xa16207).rect(10, 50, 20, 2);
+  });
+  make(scene, 'pole', 4, 48, (p) => p.fill(0x78350f).rect(0, 0, 4, 48));
+}
+

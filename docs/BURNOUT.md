@@ -120,6 +120,8 @@ burnout: {
 - Testi del narratore: `burnoutOver` (2–3 righe), `burnoutHigh` (una volta a livello, al passaggio del tier 2).
 - Quando ci sarà il livello contadino: `burnoutOver()` andrà al livello `farm` invece che a `EndingScene`, e la scena del finale arriverà alla fine di quel livello.
 
+> **Aggiornamento 2026-11-02:** il livello contadino c'è (`docs/FARM.md`). `burnoutOver()` va a `FarmScene`; il segnaposto "Le galline sono in onboarding" è sostituito dai testi di `farmEndingText` (telefono nello stagno o in tasca, uova, ortaggi, notifiche ignorate).
+
 ## 6. HUD e personaggio
 
 ### HUD (`UIScene`)

@@ -5,11 +5,12 @@ import { formatDuration, formatGu } from '../core/format.js';
 import { stats, leaderboard, session } from '../state.js';
 import { LEVEL_ORDER, projectNumber } from '../levels/index.js';
 import { pressLabel } from '../input/TouchControls.js';
+import { farmEndingText } from '../core/FarmDay.js';
 
 const style = (size, color = '#e5e7eb', align = 'center') => ({ fontFamily: UI_FONT, fontSize: `${size}px`, color, align, resolution: TEXT_RESOLUTION, wordWrap: { width: 820 } });
 
-// The endings (ITERATION_5 §6). Partner (the Board) and burnout (docs/BURNOUT.md §5: you quit and become a farmer —
-// a placeholder until the farm level exists); the product company comes later.
+// The endings (ITERATION_5 §6). Partner (the Board) and burnout (docs/BURNOUT.md §5: you quit and become a farmer;
+// it comes after the farm level, docs/FARM.md, and its texts come from the farm's summary); the product company comes later.
 const ENDINGS = {
   partner: {
     title: 'Benvenuto nella partnership.',
@@ -21,7 +22,7 @@ const ENDINGS = {
   burnout: {
     title: 'Burnout.',
     color: '#86efac',
-    after: 'Hai mollato tutto. Ora fai il contadino.\n(Il livello dei campi arriverà presto. Le galline sono in onboarding.)',
+    // `after` and the farm line come from farmEndingText (core/FarmDay.js)
     restart: 'per ricominciare dal Progetto 1 (da junior, riposato)',
     outfit: null,
     burnoutLine: true,
@@ -33,8 +34,10 @@ export default class EndingScene extends Phaser.Scene {
     super('EndingScene');
   }
 
-  create({ ending = 'partner', levelId, run, gu, guMax }) {
-    const e = ENDINGS[ending] ?? ENDINGS.partner;
+  create({ ending = 'partner', levelId, run, gu, guMax, farm }) {
+    const base = ENDINGS[ending] ?? ENDINGS.partner;
+    const farmText = base.burnoutLine ? farmEndingText(farm) : null;
+    const e = farmText ? { ...base, after: farmText.after } : base;
     setupScreenCamera(this);
     fadeIn(this);
     this.cameras.main.setBackgroundColor('#0b0d12');
@@ -46,7 +49,7 @@ export default class EndingScene extends Phaser.Scene {
       .text(
         cx,
         e.burnoutLine ? 146 : 140,
-        `${e.burnoutLine ? `Burnout: 100% al Progetto ${projectNumber(levelId)}\n` : ''}Progetto ${projectNumber(levelId)} — morti: ${run.deaths}   tempo: ${formatDuration(run.timeMs)}   GU residue: ${formatGu(gu)} / ${guMax}   ` +
+        `${e.burnoutLine ? `Burnout: 100% al Progetto ${projectNumber(levelId)}${farmText.stats ? ` — ${farmText.stats}` : ''}\n` : ''}Progetto ${projectNumber(levelId)} — morti: ${run.deaths}   tempo: ${formatDuration(run.timeMs)}   GU residue: ${formatGu(gu)} / ${guMax}   ` +
           `Ore non fatturabili (totale): ${stats.getPersistent().totalDeaths}`,
         style(14, '#9ca3af'),
       )

@@ -18,7 +18,8 @@ const num = (key) => {
 
 export const DEBUG = {
   debug: q.get('debug') === '1',
-  level: ['level1', 'level2', 'level3', 'level4', 'level5'].includes(q.get('level')) ? q.get('level') : null,
+  // 'farm': the extra level after a 100% burnout (docs/FARM.md)
+  level: ['level1', 'level2', 'level3', 'level4', 'level5', 'farm'].includes(q.get('level')) ? q.get('level') : null,
   pivot: PIVOTS.includes(q.get('pivot')) ? q.get('pivot') : null,
   standupOff: q.get('standup') === 'off',
   resetStats: q.get('resetStats') === '1',

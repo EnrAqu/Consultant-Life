@@ -16,6 +16,11 @@ export default class BootScene extends Phaser.Scene {
       this.scene.start('EndingScene', { ending: DEBUG.ending, levelId: 'level5', run: { deaths: 0, timeMs: 0 }, gu: 15, guMax: 15 });
       return;
     }
+    if (DEBUG.level === 'farm') {
+      // debug: straight to the farm, as if the burnout had ended Project 5
+      this.scene.start('FarmScene', { from: { levelId: 'level5', run: { deaths: 0, timeMs: 0 }, gu: 15, guMax: 15 } });
+      return;
+    }
     this.scene.start('GameScene', { levelId: DEBUG.level ?? 'level1', pivotCause: DEBUG.pivot });
   }
 }

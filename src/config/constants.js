@@ -103,3 +103,11 @@ export const DEPTH = {
 };
 
 export const TEXT_RESOLUTION = 2;
+
+// The farm (docs/FARM.md): the extra level after a 100% burnout. The phone buzzes at fixed times from the first move.
+export const FARM = {
+  phoneFirstMs: 4000,
+  phoneIntervalMs: 8000,
+  notificationMs: 3500,
+  sunsetMs: 3200,
+};

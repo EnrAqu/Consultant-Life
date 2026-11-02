@@ -14,7 +14,7 @@ import { stats, narrator, leaderboard, session } from '../state.js';
 import Player from '../objects/Player.js';
 import PlayerView from '../objects/PlayerView.js';
 import { OUTFITS } from '../data/outfits.js';
-import { fadeIn, fadeTo } from './sceneUtils.js';
+import { fadeIn, fadeTo, buildTileLayers } from './sceneUtils.js';
 import Pickup from '../objects/Pickup.js';
 import Deal from '../objects/Deal.js';
 import Checkpoint from '../objects/Checkpoint.js';
@@ -41,6 +41,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // the farm puts the office HUD to sleep (a new campaign from the burnout ending wakes it up)
+    if (this.scene.isSleeping('UIScene')) this.scene.wake('UIScene');
     const def = resolveLevel(LEVELS[this.levelId], this.pivotCause);
     const level = parseLevel(def);
     this.def = def;
@@ -137,28 +139,13 @@ export default class GameScene extends Phaser.Scene {
   // ---------- building ----------
 
   buildTilemap(level) {
-    const map = this.make.tilemap({ data: level.tiles, tileWidth: TILE, tileHeight: TILE });
-    const tileset = map.addTilesetImage('tiles', 'tiles', TILE, TILE, 0, 0);
-    // collision only: the visible tiles are drawn in HD by a blitter
-    this.layer = map.createLayer(0, tileset, 0, 0).setVisible(false);
-    this.layer.setCollision([0, TILE_ONEWAY]);
-    this.layer.forEachTile((tile) => {
-      if (tile.index === TILE_ONEWAY) tile.setCollision(false, false, true, false);
+    // office look: wall blocks (with a lit top edge where nothing sits on them) and one-way desks
+    this.layer = buildTileLayers(this, level.tiles, 'tilesHD', (t, x, y, tiles) => {
+      if (t === TILE_SOLID) return y > 0 && tiles[y - 1][x] === TILE_SOLID ? 0 : 1;
+      return t === TILE_ONEWAY ? 2 : -1;
     });
-
     const bg = this.add.tileSprite(0, 0, this.worldW, this.worldH, 'bgWindows').setOrigin(0, 0).setScrollFactor(0.3, 1);
     bg.setTileScale(1 / TEXTURE_SCALE).setDepth(DEPTH.background);
-    // HD visual layer: a second tilemap with big tiles, scaled down to the logical grid
-    const visual = level.tiles.map((row, y) =>
-      row.map((t, x) => {
-        if (t === TILE_SOLID) return y > 0 && level.tiles[y - 1][x] === TILE_SOLID ? 0 : 1;
-        return t === TILE_ONEWAY ? 2 : -1;
-      }),
-    );
-    const hd = TILE * TEXTURE_SCALE;
-    const vmap = this.make.tilemap({ data: visual, tileWidth: hd, tileHeight: hd });
-    const vset = vmap.addTilesetImage('tilesHD', 'tilesHD', hd, hd, 0, 0);
-    vmap.createLayer(0, vset, 0, 0).setScale(1 / TEXTURE_SCALE).setDepth(DEPTH.tiles);
   }
 
   buildObjects(level) {
@@ -369,7 +356,9 @@ export default class GameScene extends Phaser.Scene {
     this.narrate('burnoutOver');
     const run = this.stats.getRun();
     bus.emit(EV.BURNOUT_OVER, { levelId: this.levelId, run });
-    this.time.delayedCall(600, () => fadeTo(this, 'EndingScene', { ending: 'burnout', levelId: this.levelId, run, gu: this.budget.gu, guMax: this.budget.max }));
+    // you quit and become a farmer: the farm level, then the burnout ending (docs/FARM.md)
+    const from = { levelId: this.levelId, run: { ...run }, gu: this.budget.gu, guMax: this.budget.max };
+    this.time.delayedCall(600, () => fadeTo(this, 'FarmScene', { from }));
   }
 
   // ---------- state helpers ----------

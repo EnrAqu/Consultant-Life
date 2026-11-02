@@ -191,3 +191,20 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | Prova | `?debug=1&level=level5[&cp=cp3][&escalation=off][&deals=3]` |
 
 **Registro:** —
+
+## Livello extra — "Il contadino"
+| | |
+|---|---|
+| File | `src/levels/farm.js` (130 colonne, orizzontale) · scene `src/scenes/FarmScene.js` e `FarmHudScene.js` · logica `src/core/FarmDay.js` |
+| Carriera / GU / burnout min | contadino (outfit `farmer`) · niente GU · niente burnout. **Fuori da `LEVEL_ORDER`**: niente pivot, Lessons Learned né classifica |
+| Nato da | `docs/FARM.md` · `docs/BURNOUT.md` §5 |
+| Come ci si arriva | solo con il burnout al 100% (`GameScene.burnoutOver`); alla panchina va al finale burnout |
+| Contenuto | pollaio (3 galline, 5 uova), orto (4 ortaggi), spaventapasseri ex Partner, stagno (zona 101–111: E butta il telefono), panchina (col 124). Telefono: primo messaggio 4 s dopo il primo movimento, poi ogni 8 s, in ordine fisso |
+| Checkpoint | nessuno (non si muore) |
+| Test | `tests/Farm.test.js`: telefono, faccende, riepilogo, testi del finale, cielo; mappa senza burroni né spine, pile ≤ 2, faccende raggiungibili |
+| Smoke | `smokeFarm.mjs`, `smokeBurnout.mjs` (morte al 100% → fattoria → finale) |
+| Prova | `?debug=1&level=farm` |
+
+**Registro:**
+- **2026-11-02 — Prima versione** (utente: "sviluppa il livello del contadino"; scelte: faccende + tramonto, telefono da ignorare o buttare, nessuna morte, finale burnout rivisto). Dettaglio in `docs/FARM.md`.
+
