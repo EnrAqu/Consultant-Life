@@ -18,7 +18,7 @@ I valori stanno in `BURNOUT` in `src/config/constants.js`. La storia è in `DECI
 
 | Regola | Valore |
 |---|---|
-| Sale | morte **+1%**; eventi sociali **+3%** (escalation, junior perso al netto, micromanager, "Hai 5 minuti?", standup che sfora, falso KT, cambio cliente) — utente, "più attivo" |
+| Sale | morte **+3%**; eventi sociali **+5%** (escalation, junior perso al netto, micromanager, "Hai 5 minuti?", standup che sfora, falso KT, cambio cliente) — utente, "più attivo" poi "non sono mai riuscito a morire per lui" (2026-11-02) |
 | Scende | caffè −2%; KT vero −3% (una volta per livello); livello senza morti −5% sulla partenza del livello dopo (mai su un retry) |
 | Tra i livelli | si trascina; partenza = `max(trascinato, minimo)`, minimi `levelMin = [0, 15, 30, 45, 60]` |
 | Nuova campagna | si riparte da 0 (livello 1 non da retry) |

@@ -37,7 +37,7 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await die(page);
   await sleep(1600);
   const sc = await scenes(page);
-  check('one more death (+1%) goes to the burnout ending, and only there', sc.includes('EndingScene') && !sc.includes('GameScene') && !sc.includes('BudgetOverScene'), sc);
+  check('one more death (+3%) goes to the burnout ending, and only there', sc.includes('EndingScene') && !sc.includes('GameScene') && !sc.includes('BudgetOverScene'), sc);
   await sleep(1500);
   await page.screenshot({ path: OUT + 'burnout-ending.png' });
   await sleep(800);
@@ -58,7 +58,7 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await sleep(300);
   await waitGame(page); await sleep(400);
   const s = await state(page);
-  check('retrying level 1 after Budget sforato keeps 21%', s.level === 'level1' && s.burnout === 21, s);
+  check('retrying level 1 after Budget sforato keeps 23%', s.level === 'level1' && s.burnout === 23, s);
   await page.close();
 }
 
@@ -84,7 +84,7 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await die(page); await sleep(600);
   await teleport(page, 83, 11); await sleep(400);
   const s2 = await state(page);
-  check('taking it again after a respawn gives nothing more (only the death +1%)', s2.burnout === s1.burnout + 1, { s1: s1.burnout, s2: s2.burnout });
+  check('taking it again after a respawn gives nothing more (only the death +3%)', s2.burnout === s1.burnout + 3, { s1: s1.burnout, s2: s2.burnout });
   await page.close();
 }
 
@@ -110,14 +110,14 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').addBurnout('micromanager'));
   await sleep(150);
   const s = await state(page);
-  check('at 58% the player has eye bags (tier 1)', s.tier === 1 && s.key.endsWith('_t1') && s.burnout === 58, s);
+  check('at 60% the player has eye bags (tier 1)', s.tier === 1 && s.key.endsWith('_t1') && s.burnout === 60, s);
   await page.screenshot({ path: OUT + 'burnout-tier1.png' });
   await page.close();
 }
 
 // crossing 80%: the warning line is not covered by the death line (review #1); tier 2 HUD at 960×540
 {
-  const page = await open('?debug=1&standup=off&burnout=79.75');
+  const page = await open('?debug=1&standup=off&burnout=79');
   await page.setViewport({ width: 960, height: 540 });
   await die(page);
   await sleep(2200);

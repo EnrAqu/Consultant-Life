@@ -9,7 +9,7 @@ Feature a parte (playbook `.claude/skills/burnout/`). Design rivisto con l'utent
 
 | Regola | Valore |
 |---|---|
-| Sale con | **morte +1%** (anche ↺ ricomincia). **+3%**: presa dell'escalation, junior perso (netto, vedi §4), micromanager che ti becca, "Hai 5 minuti?" che ti ferma, standup che sfora, KT finto, cliente che cambia idea al traguardo. *"Non è morire che ti brucia, è come lavori"* |
+| Sale con | **morte +3%** (anche ↺ ricomincia). **+5%**: presa dell'escalation, junior perso (netto, vedi §4), micromanager che ti becca, "Hai 5 minuti?" che ti ferma, standup che sfora, KT finto, cliente che cambia idea al traguardo. *"Non è morire che ti brucia, è come lavori"* |
 | Scende con | caffè −2% (non torna al respawn), KT vero −3% (**una volta per livello**), livello finito senza morti −5% (applicato **sul valore di partenza** del livello dopo, quindi anche sotto il minimo) |
 | Tra un livello e l'altro | non si azzera: si trascina |
 | Minimo di partenza | livelli 1–5: **0 / 15 / 30 / 45 / 60%**. Si parte da `max(trascinato, minimo)` |
@@ -43,7 +43,7 @@ export default class Burnout {
 ```js
 export const BURNOUT = {
   levelMin: [0, 15, 30, 45, 60],
-  gain: { death: 1, escalation: 3, teamLoss: 3, micromanager: 3, fiveMinutes: 3, standupOverrun: 3, fakeKT: 3, clientSwitch: 3 },
+  gain: { death: 3, escalation: 5, teamLoss: 5, micromanager: 5, fiveMinutes: 5, standupOverrun: 5, fakeKT: 5, clientSwitch: 5 },
   relief: { coffee: 2, realKT: 3, cleanLevel: 5 },
 };
 // max (100) e soglie del personaggio (50, 80) stanno in core/Burnout.js: BURNOUT_MAX, BURNOUT_TIERS
@@ -154,6 +154,8 @@ Criteri: `npm test`, `npm run build`, `npm run smoke` senza errori in console. P
 - Burnout nelle statistiche persistenti o in classifica.
 
 > **Aggiornamento 2026-11-01 (utente):** "vorrei il burnout più attivo": morte **+1%**, eventi sociali **+3%**. Il burnout arriva prima (vedi i conti della review #1) e va bene così: il gioco verrà complicato di conseguenza.
+
+> **Aggiornamento 2026-11-02 (utente):** "non sono mai riuscito a morire per lui". Con +1% le GU finivano sempre prima (0,5 GU a morte: livello 1 al massimo 40%, livello 5 al massimo 90%). Ora morte **+3%**, eventi sociali **+5%**: nel livello 1 il burnout arriva prima del budget dopo ~34 morti, nel livello 5 (partenza 60%) dopo ~14.
 
 ## 9. Esito della review (`docs/PLAN_REVIEW.md`)
 
