@@ -7,7 +7,7 @@ const g = createGrid(W);
 g.ground(0, 17).put(2, 14, 'P');
 // S1 — gaps 2 and 3, step +2, three spikes, coffee
 g.ground(20, 23).ground(30, 37, 13);
-// (the landing 27–29 is the client's requirement platform rs1: it slides back 2 when you jump for it)
+// (the landing 28–29 is the client's requirement platform rs1, 2 wide: it slides back to 26–27 when you jump for it)
 g.put(32, 12, '^').put(33, 12, '^').put(34, 12, '^').put(36, 12, 'o');
 // S2 — ReplyAll #1 corridor (cols 42–51), then "rispondi a tutti... di nuovo": a second inbox at the exit (cols 52–54)
 g.ground(38, 54);
@@ -41,9 +41,10 @@ export default {
     // the client's pranks (user, 2026-11-02). The mail has no tell on purpose (registered exception): taking off
     // from the edge of col 17 (x ≥ 544, coyote jumps included) bonks you into the pit; take off from col 16 or earlier.
     { id: 'hm1', type: 'hiddenMail', x: 17, y: 14, params: { takeoffPx: [544, 610], pitRect: { dx: 1, dy: 1, w: 2, h: 2 } } },
-    // the landing slides back 2 columns when you jump for it from cols 22–24: a short hop or an air brake lands on it.
+    // the landing (2 wide, user: "più piccola") slides back 2 columns when you jump for it from cols 22–24: only a short
+    // hop or an early air brake lands on it.
     // Camouflaged as floor until it moves (user)
-    { id: 'rs1', type: 'requirementShift', x: 27, y: 15, params: { width: 3, shift: -2, speed: 10, camouflage: true, takeoffPx: [704, 800], pitRect: { dx: -3, dy: 1, w: 6, h: 2 } } },
+    { id: 'rs1', type: 'requirementShift', x: 28, y: 15, params: { width: 2, shift: -2, speed: 10, camouflage: true, takeoffPx: [704, 800], pitRect: { dx: -4, dy: 1, w: 6, h: 2 } } },
     {
       id: 'ra1', type: 'replyAll', x: 42, y: 14,
       params: { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 },

@@ -23,7 +23,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | Carriera / GU / burnout min | junior · 20 GU · 0% |
 | Nato da | `IMPLEMENTATION_PLAN.md` §6.4 · `ITERATION_2.md` §6 (ponte di email) · `ITERATION_4.md` §1 (ritmo) |
 | Tema | **progetto da junior** (`skin: 'junior'`): le email sono ticket AMS, i CR sono fix sul codice di Marco (che non c'è più), il deck è la `Documentazione_v12_DEF.docx`. Etichette e lezioni in `src/data/causes.js` (`causeLabel`/`causeLesson`), frasi `junior_*` del narratore |
-| Trappole | replyAll ×5 (ra1, ra1b, il ponte `ra2`, ra3, ra4), scopeCreep ×3, deckCollapse ×2 (dk1, dk2), fakeKT; scherzetti del cliente: `hiddenMail` hm1 (burrone 18–19) e hm2 (salto dal gradino del fix, burrone 179–181), senza indizio; `requirementShift` rs1 (atterraggio 27–29 → 25–27, camuffato da pavimento). Non ha slot: è il primo livello |
+| Trappole | replyAll ×5 (ra1, ra1b, il ponte `ra2`, ra3, ra4), scopeCreep ×3, deckCollapse ×2 (dk1, dk2), fakeKT; scherzetti del cliente: `hiddenMail` hm1 (burrone 18–19) e hm2 (salto dal gradino del fix, burrone 179–181), senza indizio; `requirementShift` rs1 (atterraggio di 2 colonne 28–29 → 26–27, camuffato da pavimento). Non ha slot: è il primo livello |
 | Checkpoint | cp0 (col 95) |
 | Test | `tests/LevelParser.test.js`: completabile, e completabile **solo** grazie al ponte di email; `tests/causes.test.js`: testi della skin; `tests/Pranks.test.js`: scherzetti |
 | Smoke | `smoke.mjs` (default senza `?level`; sezione 1c: tradimenti e combo; 1d: scherzetti, stacchi fissati in pixel), `smokeBurnout.mjs` |
@@ -130,6 +130,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
   - `hm2` sul salto dal gradino del fix (col 178) nel burrone 179–181: scatta se si stacca dagli ultimi 40 px (x 5704–5743). La catena reale del finale (stacco a col 177,9) passa; chi indugia sul bordo, spinto dal fix, prende la mail. Il limite destro tiene conto della discesa di 2 righe: da x ≥ 5744 la ricaduta finirebbe comunque su col 182.
   - `rs1` con `camouflage: true`: tile `top` + riempimento fino al fondo della mappa (2 righe), si muovono insieme. Sembra pavimento finché non scivola; la didascalia resta.
   - Smoke 1d(a) controlla il camuffamento, 1d(f) la seconda mail. `npm run smoke` 103/103, 170 test.
+- **2026-11-02 — Piattaforma del requisito più piccola** (utente: "vorrei fosse difficile sopravvivere la prima volta"): `rs1` larga 2 (28–29 → 26–27) invece di 3. Si salva solo chi fa un saltello o frena presto in aria. Dalla posizione finale al gradino 30: 2 colonne vuote, salita di 2 (come prima). Smoke 103/103.
 
 ## Livello 2 — "La rivincita"
 | | |

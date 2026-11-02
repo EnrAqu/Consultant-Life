@@ -373,7 +373,7 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
     await release(page);
     await sleep(300);
     const s = await state(page);
-    check('1d(d) running jump from the edge of col 23: the requirement moves back (25–27), the caption shows, death by requirementChange', pr.plat === 25 && pr.caption && cause(s, 'requirementChange') === 1, { ...pr, byCause: s.byCause });
+    check('1d(d) running jump from the edge of col 23: the requirement moves back (26–27), the caption shows, death by requirementChange', pr.plat === 26 && pr.caption && cause(s, 'requirementChange') === 1, { ...pr, byCause: s.byCause });
     await page.close();
   }
   // (e) a short hop from the same edge lands on the moved platform; from there the step 30–31 is reachable, spikes avoided
@@ -396,7 +396,7 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
     await page.keyboard.up('Space');
     await sleep(400);
     const s2 = await state(page);
-    check('1d(e) a short hop lands on the moved requirement, then the step 30–31 is reachable without dying', pr.plat === 25 && s1.deaths === 0 && s1.tile[0] >= 25 && s1.tile[0] <= 27 && s2.deaths === 0 && s2.tile[0] >= 30 && s2.tile[0] <= 31 && s2.tile[1] === 12, { pr, s1: s1.tile, s2: s2.tile, deaths: s2.deaths, byCause: s2.byCause });
+    check('1d(e) a short hop lands on the moved requirement, then the step 30–31 is reachable without dying', pr.plat === 26 && s1.deaths === 0 && s1.tile[0] >= 26 && s1.tile[0] <= 27 && s2.deaths === 0 && s2.tile[0] >= 30 && s2.tile[0] <= 31 && s2.tile[1] === 12, { pr, s1: s1.tile, s2: s2.tile, deaths: s2.deaths, byCause: s2.byCause });
     await page.close();
   }
 }

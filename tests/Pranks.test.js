@@ -11,8 +11,8 @@ import { NARRATOR_LINES } from '../src/data/narratorLines.js';
 describe("the client's pranks", () => {
   const rs1 = LEVELS.level1.entities.find((e) => e.id === 'rs1');
 
-  it('the validator sees the requirement platform where it lands (27–29 slid back 2 → 25–27)', () => {
-    expect(trapSurfaces(rs1)).toEqual([{ x: 25, y: 15 }, { x: 26, y: 15 }, { x: 27, y: 15 }]);
+  it('the validator sees the requirement platform where it lands (28–29 slid back 2 → 26–27)', () => {
+    expect(trapSurfaces(rs1)).toEqual([{ x: 26, y: 15 }, { x: 27, y: 15 }]);
   });
 
   it('level 1 stays completable with "normal" jumps, and not without the requirement platform', () => {
