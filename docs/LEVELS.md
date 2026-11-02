@@ -199,7 +199,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | Carriera / GU / burnout min | contadino (outfit `farmer`) · niente GU · niente burnout. **Fuori da `LEVEL_ORDER`**: niente pivot, Lessons Learned né classifica |
 | Nato da | `docs/FARM.md` · `docs/BURNOUT.md` §5 |
 | Come ci si arriva | solo con il burnout al 100% (`GameScene.burnoutOver`); alla panchina va al finale burnout |
-| Contenuto | pollaio (3 galline, 5 uova), orto (4 ortaggi), spaventapasseri ex Partner, stagno (zona 101–111: E butta il telefono), panchina (col 124). Telefono: primo messaggio 4 s dopo il primo movimento, poi ogni 8 s, in ordine fisso |
+| Contenuto | pollaio (3 galline, 5 uova), orto (4 ortaggi), spaventapasseri ex Partner, stagno (zona 101–111: E butta il telefono), panchina (col 124). Telefono: primo messaggio 2,5 s dopo il primo movimento, poi ogni 4,5 s, in ordine fisso |
 | Checkpoint | nessuno (non si muore) |
 | Test | `tests/Farm.test.js`: telefono, faccende, riepilogo, testi del finale, cielo; mappa senza burroni né spine, pile ≤ 2, faccende raggiungibili |
 | Smoke | `smokeFarm.mjs`, `smokeBurnout.mjs` (morte al 100% → fattoria → finale) |

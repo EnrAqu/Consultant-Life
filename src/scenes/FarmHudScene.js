@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, TEXT_RESOLUTION, UI_FONT } from '../config/constants.js';
-import { setupScreenCamera } from './sceneUtils.js';
+import { setupScreenCamera, fadeIn } from './sceneUtils.js';
 
 const text = (scene, x, y, str, style = {}) =>
   scene.add.text(x, y, str, { fontFamily: UI_FONT, fontSize: '15px', color: '#1f2937', resolution: TEXT_RESOLUTION, ...style });
@@ -16,6 +16,7 @@ export default class FarmHudScene extends Phaser.Scene {
 
   create() {
     setupScreenCamera(this);
+    fadeIn(this);
     this.farm = this.scene.get('FarmScene');
     this.chores = text(this, 16, 14, '', { fontSize: '16px', fontStyle: 'bold', color: '#fefce8', stroke: '#365314', strokeThickness: 4 });
     this.unread = text(this, 16, 38, '', { fontSize: '14px', color: '#fefce8', stroke: '#365314', strokeThickness: 3 });
@@ -51,7 +52,8 @@ export default class FarmHudScene extends Phaser.Scene {
       if (n) {
         this.cardFrom.setText(n.from);
         this.cardText.setText(n.text);
-        this.cardBg.height = Math.max(58, this.cardText.y + this.cardText.height + 10);
+        // setSize, not .height: in Phaser 3.90 only setSize also resizes the rectangle's outline
+        this.cardBg.setSize(CARD_W, Math.max(58, this.cardText.y + this.cardText.height + 10));
         this.card.setVisible(true);
         this.buzzMs = 300;
       } else this.card.setVisible(false);

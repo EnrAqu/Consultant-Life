@@ -130,10 +130,20 @@ export default class UIScene extends Phaser.Scene {
       [EV.DEALS_CHANGED]: ({ count, required }) => this.dealsText.setText(required ? `Pipeline: ${count}/${required}` : ''),
     });
     bus.emit(EV.UI_READY);
+    // waking up after the farm (docs/FARM.md): forget the narrator line and toast left over from before the sleep
+    this.events.on('wake', () => {
+      this.narrLeft = 0;
+      this.toastLeft = 0;
+      this.narrBox.setVisible(false);
+      this.narrText.setVisible(false);
+      this.toastText.setVisible(false);
+    });
   }
 
   hideAll() {
-    this.time.delayedCall(700, () => {
+    this.hideTimer?.remove();
+    this.hideTimer = this.time.delayedCall(700, () => {
+      this.hideTimer = null;
       this.hud.setVisible(false);
       this.standup.setVisible(false);
       this.kt.setVisible(false);
@@ -143,6 +153,9 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onLevelStart(e) {
+    // a hide still pending from the previous level (e.g. frozen while the farm kept this scene asleep) must not fire now
+    this.hideTimer?.remove();
+    this.hideTimer = null;
     this.hud.setVisible(true);
     this.warning = false;
     this.standup.setVisible(false);

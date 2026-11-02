@@ -106,8 +106,9 @@ export const TEXT_RESOLUTION = 2;
 
 // The farm (docs/FARM.md): the extra level after a 100% burnout. The phone buzzes at fixed times from the first move.
 export const FARM = {
-  phoneFirstMs: 4000,
-  phoneIntervalMs: 8000,
+  // the farm takes ~15 s straight to the bench, ~30 s with the chores (review #2): the messages must keep up
+  phoneFirstMs: 2500,
+  phoneIntervalMs: 4500,
   notificationMs: 3500,
   sunsetMs: 3200,
 };

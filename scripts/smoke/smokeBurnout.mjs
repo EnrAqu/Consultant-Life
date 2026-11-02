@@ -51,6 +51,9 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await waitGame(page); await sleep(400);
   const s1 = await state(page);
   check('the new campaign starts from Project 1 at 0%, rested', s1.level === 'level1' && s1.burnout === 0 && s1.tier === 0, s1);
+  // after the real path (death → farm → ending) the office HUD is awake and visible again (review FARM #3)
+  const hud = await page.evaluate(() => { const gm = globalThis.__game; return { awake: gm.scene.isActive('UIScene') && !gm.scene.isSleeping('UIScene'), visible: gm.scene.getScene('UIScene').hud.visible }; });
+  check('after the farm the office HUD is back on Project 1', hud.awake && hud.visible, hud);
   await page.close();
 }
 

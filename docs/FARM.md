@@ -6,7 +6,7 @@ Sostituisce la schermata segnaposto ("Le galline sono in onboarding").
 ## 1. Scelte dell'utente (2026-11-02)
 | Domanda | Scelta |
 |---|---|
-| Cosa fa il giocatore | **Faccende + tramonto**: livello orizzontale corto (~1–2 min); raccogli uova e ortaggi (facoltativi, contati a fine livello), poi ti siedi sulla panchina al tramonto e parte il finale |
+| Cosa fa il giocatore | **Faccende + tramonto**: livello orizzontale corto (~15 s di corsa, ~30 s con le faccende); raccogli uova e ortaggi (facoltativi, contati a fine livello), poi ti siedi sulla panchina al tramonto e parte il finale |
 | Il telefono | **Ignora o butta**: vibra a orari fissi con messaggi ironici dall'ex ufficio e si ignora senza conseguenze; allo stagno lo puoi buttare (una riga in più nel finale) |
 | Morte | **Mai**: niente burroni né pericoli; terreno continuo, balle di fieno facoltative da saltare |
 | Finale | **Finale burnout rivisto**: la schermata burnout di `EndingScene` con un testo vero e le statistiche del contadino |
@@ -36,12 +36,13 @@ Una **scena a parte**, non un livello di `GameScene`: così GU, standup, burnout
 Terreno continuo (righe 15–16) su tutte le colonne: **non si può cadere**. Le pile di fieno sono alte al massimo 2 tile (salto ≈ 620²/(2·1800) = 107 px ≈ 3,3 tile).
 
 ```
-col  0    5    10   15   20   25   30   35   40   45   50   55   60   65   70 ... 84 ... 101-111 ... 124  129
-12   ........................e...........................................v.
-13   ........................##....e......e#.................v.............##.
-14   ..P...............e.....##....#...e..##.......v....v...###..........###....  (S)   ~~~stagno~~~   G
-15   ################################################################################################################
+   0         10        20        30        40        50        60        70        80        90        100       110       120
+12 ........................e...........................................v.............................................................
+13 ........................##....e.......e..................v..........##............................................................
+14 ..P...............e.....##....#...e..##.......v....v....###.........###...................##................................G.....
+15 ##################################################################################################################################
 ```
+(e = uovo, v = ortaggio; stagno 103–109 disegnato sul terreno, zona 101–111; spaventapasseri a col 84)
 - **S0 Cascina** (0–14): spawn a col 2. Cartello: "Cascina. Wi-Fi: assente. Riunioni in calendario: 0."
 - **S1 Pollaio** (15–41): 3 galline, 5 uova: (18,14), (24,12) sulla pila 24–25 alta 2, (30,13) sulla balla 30, (34,14), (38,13) sulla balla 37–38. Cartello: "Pollaio. Le galline non fanno standup."
 - **S2 Orto** (42–75): 4 ortaggi: pomodoro (46,14), carota (51,14), zucchina (57,13) sull'aiuola 56–58, pomodoro (68,12) sulla pila 68–69 alta 2 (gradino a 70). Cartello: "Orto. Nessun KPI. Cresce lo stesso."
@@ -65,10 +66,12 @@ export default class FarmDay {
                      //   se il telefono è ancora in tasca arriva un ultimo messaggio (lastMessage, received + 1)
 }
 export function progress(x, from, to)       // 0..1, limitato
-export function skyColor(t)                 // pomeriggio → oro (interi 0xRRGGBB)
+export const SKY                            // colori: afternoon, golden, sunset, night
+export function skyColor(t)                 // pomeriggio → oro (interi 0xRRGGBB), mentre cammini
+export function sunsetColor(t)              // oro → viola → notte, sulla panchina
 export function farmEndingText(summary)     // { after, stats } per EndingScene
 ```
-Costanti in `constants.js`: `FARM = { phoneFirstMs: 4000, phoneIntervalMs: 8000, notificationMs: 3500, sunsetMs: 3200 }`.
+Costanti in `constants.js`: `FARM = { phoneFirstMs: 2500, phoneIntervalMs: 4500, notificationMs: 3500, sunsetMs: 3200 }` (ritarati dopo la review #2: il livello dura ~15 s di corsa, ~30 s con le faccende; prima erano 4000/8000 e si vedevano 2–4 messaggi su 8).
 
 Messaggi (ordine fisso, `src/data/farm.js`):
 1. Marco (ex team): Hai 5 minuti?
@@ -107,3 +110,10 @@ Criteri: `npm test`, `npm run build`, `npm run smoke` senza errori in console. P
 ## 7. Dopo (backlog)
 - Musica/uccellini (non c'è audio nel gioco).
 - Varianti del finale in base alle faccende (tutte le uova, nessuna…).
+
+## 8. Esito della review (`docs/CODE_REVIEW_FARM.md`)
+- **#1 bordo della notifica** — accolto: `setSize` al posto di `.height`.
+- **#2 ritmo del telefono** — accolto: primo messaggio a 2,5 s, poi ogni 4,5 s (da confermare al playtest).
+- **#3 `UIScene` addormentata con i timer congelati** — accolto: `hideAll` tiene il suo timer e `onLevelStart` lo annulla; al risveglio si azzerano narratore e toast; `smokeBurnout` controlla l'HUD visibile dopo il percorso reale.
+- Minori accolti: testi fluttuanti con contorno; schizzo più corto; HUD della fattoria con dissolvenza; niente scatto laterale sulla panchina; mappa ASCII e `sunsetColor`/`SKY` nel piano.
+- Lasciati: tasto touch ↺ visibile ma inattivo, si cammina sull'acqua dello stagno (è grafica sul terreno), GU nel finale del debug `?level=farm`, smoke per posa del telefono / Shift / "E" touch.

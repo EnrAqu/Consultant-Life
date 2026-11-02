@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { TILE, DEPTH, FARM, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD } from '../config/constants.js';
+import { TILE, DEPTH, FARM, FADE_MS as FARM_FADE_MS, TEXT_RESOLUTION, TEXTURE_SCALE, WORLD_ZOOM, UI_FONT, CAMERA_LERP, CAMERA_LOOK_AHEAD } from '../config/constants.js';
 import { parseLevel, TILE_SOLID } from '../core/LevelParser.js';
 import FarmDay, { progress, skyColor, sunsetColor } from '../core/FarmDay.js';
 import { PHONE_MESSAGES, FINAL_MESSAGE } from '../data/farm.js';
@@ -211,7 +211,7 @@ export default class FarmScene extends Phaser.Scene {
       },
       onComplete: () => {
         phone.destroy();
-        const splash = this.add.particles(cx, cy, 'dust', { speed: { min: 40, max: 110 }, angle: { min: 230, max: 310 }, lifespan: 500, gravityY: 400, scale: { start: BASE, end: 0 }, tint: 0x7dd3fc, emitting: false }).setDepth(DEPTH.fx);
+        const splash = this.add.particles(cx, cy, 'dust', { speed: { min: 40, max: 110 }, angle: { min: 230, max: 310 }, lifespan: 350, gravityY: 300, scale: { start: BASE, end: 0 }, tint: 0x7dd3fc, emitting: false }).setDepth(DEPTH.fx);
         splash.explode(14);
         this.time.delayedCall(800, () => splash.destroy());
         this.floatText('blub.', cx, cy - 20, '#e0f2fe', 1400);
@@ -226,7 +226,6 @@ export default class FarmScene extends Phaser.Scene {
     // with the phone still in your pocket you read its last message (phone pose); without it, you just watch the sunset
     if (!this.day.phoneThrown) p.lockInput('bench', true);
     p.stopMotion();
-    p.body.reset(this.bench.x, p.y);
     p.setFlipX(false);
     this.summary = this.day.finish();
     this.notification = this.summary.lastMessage ? { ...this.summary.lastMessage, leftMs: FARM.notificationMs } : null;
@@ -244,12 +243,16 @@ export default class FarmScene extends Phaser.Scene {
         cam.setBackgroundColor(sunsetColor(k));
         this.placeSun(sunFrom + (1.05 - sunFrom) * k);
       },
-      onComplete: () => fadeTo(this, 'EndingScene', { ending: 'burnout', ...this.from, farm: this.summary }),
+      onComplete: () => {
+        this.scene.get('FarmHudScene')?.cameras.main.fadeOut(FARM_FADE_MS, 0, 0, 0);
+        fadeTo(this, 'EndingScene', { ending: 'burnout', ...this.from, farm: this.summary });
+      },
     });
   }
 
   floatText(str, x, y, color, ms = 900) {
-    const fx = label(this, x, y, str, 11, color, { fontStyle: 'bold' }).setOrigin(0.5).setDepth(DEPTH.fx);
+    // outlined: readable on the light sky and over the signs
+    const fx = label(this, x, y, str, 11, color, { fontStyle: 'bold', stroke: '#1f2937', strokeThickness: 3 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
     this.tweens.add({ targets: fx, y: y - 14, alpha: 0, duration: ms, onComplete: () => fx.destroy() });
   }
 
