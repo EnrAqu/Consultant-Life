@@ -41,8 +41,9 @@ export default {
     // the client's pranks (user, 2026-11-02). The mail has no tell on purpose (registered exception): taking off
     // from the edge of col 17 (x ≥ 544, coyote jumps included) bonks you into the pit; take off from col 16 or earlier.
     { id: 'hm1', type: 'hiddenMail', x: 17, y: 14, params: { takeoffPx: [544, 610], pitRect: { dx: 1, dy: 1, w: 2, h: 2 } } },
-    // the landing slides back 2 columns when you jump for it from cols 22–24: a short hop or an air brake lands on it
-    { id: 'rs1', type: 'requirementShift', x: 27, y: 15, params: { width: 3, shift: -2, speed: 10, takeoffPx: [704, 800], pitRect: { dx: -3, dy: 1, w: 6, h: 2 } } },
+    // the landing slides back 2 columns when you jump for it from cols 22–24: a short hop or an air brake lands on it.
+    // Camouflaged as floor until it moves (user)
+    { id: 'rs1', type: 'requirementShift', x: 27, y: 15, params: { width: 3, shift: -2, speed: 10, camouflage: true, takeoffPx: [704, 800], pitRect: { dx: -3, dy: 1, w: 6, h: 2 } } },
     {
       id: 'ra1', type: 'replyAll', x: 42, y: 14,
       params: { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 },
@@ -89,6 +90,9 @@ export default {
       id: 'ra4', type: 'replyAll', x: 173, y: 12,
       params: { triggerDx: -4, triggerWidth: 1, startDelayMs: 150, count: 12, intervalMs: 100, columns: [0, 1, 2, 3, 4, 5], spawnHeight: 6, fallSpeed: 14, restRow: 12 },
     },
+    // the client again, at the end (user): over the jump off the fix step into the last pit (179–181). Taking off from
+    // the last 40 px of col 178 (x 5704–5743) bonks you into the pit; the fix chain takes off from col 177 and passes.
+    { id: 'hm2', type: 'hiddenMail', x: 178, y: 12, params: { takeoffPx: [5704, 5744], pitRect: { dx: 1, dy: 3, w: 3, h: 2 } } },
     {
       id: 'dk2', type: 'deckCollapse', x: 184, y: 14,
       params: {

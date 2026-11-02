@@ -23,7 +23,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | Carriera / GU / burnout min | junior · 20 GU · 0% |
 | Nato da | `IMPLEMENTATION_PLAN.md` §6.4 · `ITERATION_2.md` §6 (ponte di email) · `ITERATION_4.md` §1 (ritmo) |
 | Tema | **progetto da junior** (`skin: 'junior'`): le email sono ticket AMS, i CR sono fix sul codice di Marco (che non c'è più), il deck è la `Documentazione_v12_DEF.docx`. Etichette e lezioni in `src/data/causes.js` (`causeLabel`/`causeLesson`), frasi `junior_*` del narratore |
-| Trappole | replyAll ×5 (ra1, ra1b, il ponte `ra2`, ra3, ra4), scopeCreep ×3, deckCollapse ×2 (dk1, dk2), fakeKT; scherzetti del cliente: `hiddenMail` hm1 (burrone 18–19, senza indizio) e `requirementShift` rs1 (atterraggio 27–29 → 25–27). Non ha slot: è il primo livello |
+| Trappole | replyAll ×5 (ra1, ra1b, il ponte `ra2`, ra3, ra4), scopeCreep ×3, deckCollapse ×2 (dk1, dk2), fakeKT; scherzetti del cliente: `hiddenMail` hm1 (burrone 18–19) e hm2 (salto dal gradino del fix, burrone 179–181), senza indizio; `requirementShift` rs1 (atterraggio 27–29 → 25–27, camuffato da pavimento). Non ha slot: è il primo livello |
 | Checkpoint | cp0 (col 95) |
 | Test | `tests/LevelParser.test.js`: completabile, e completabile **solo** grazie al ponte di email; `tests/causes.test.js`: testi della skin; `tests/Pranks.test.js`: scherzetti |
 | Smoke | `smoke.mjs` (default senza `?level`; sezione 1c: tradimenti e combo; 1d: scherzetti, stacchi fissati in pixel), `smokeBurnout.mjs` |
@@ -126,6 +126,10 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
   - Verifica: 170 test Vitest (`tests/Pranks.test.js`, 4 nuovi), build, `npm run smoke` verde con i 5 controlli 1d. Screenshot: `shot-prank-mail.png`, `shot-prank-requirement.png`.
   - Review del codice (`docs/CODE_REVIEW_PRANKS_CODE.md`, 12 punti minori): accolti `grounded = blocked.down` senza `markStanding` (inutile e fragile nei frame senza step fisico), commento di `level1.js` (sicuro da col 16), test con la piattaforma ferma a 27–29, nome dello smoke (d). Annotati: etichetta `requirementChange` = "il requisito che cambia a metà salto"; la frase "non è un bug dei comandi" torna alla prima morte da mail di ogni partita; busta e foglio senza scritte (bastano le didascalie). Lasciati: smoke di reset e di confine, `body.reset` invece della velocità (da rivedere se la piattaforma si riusa altrove).
   - Da provare al playtest: il salto dalla piattaforma spostata al gradino 30–31 (prima ci si saliva da fermi contro il muro) e il primo salto della partita.
+- **2026-11-02 — Seconda mail e piattaforma camuffata** (utente: "un'altra mail come all'inizio, ma verso la fine"; "nascondi il pezzettino che si muove").
+  - `hm2` sul salto dal gradino del fix (col 178) nel burrone 179–181: scatta se si stacca dagli ultimi 40 px (x 5704–5743). La catena reale del finale (stacco a col 177,9) passa; chi indugia sul bordo, spinto dal fix, prende la mail. Il limite destro tiene conto della discesa di 2 righe: da x ≥ 5744 la ricaduta finirebbe comunque su col 182.
+  - `rs1` con `camouflage: true`: tile `top` + riempimento fino al fondo della mappa (2 righe), si muovono insieme. Sembra pavimento finché non scivola; la didascalia resta.
+  - Smoke 1d(a) controlla il camuffamento, 1d(f) la seconda mail. `npm run smoke` 103/103, 170 test.
 
 ## Livello 2 — "La rivincita"
 | | |

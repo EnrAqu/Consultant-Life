@@ -288,20 +288,21 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
       const g = globalThis.__game.scene.getScene('GameScene');
       const hm = g.traps.find((t) => t.def.id === 'hm1');
       const rs = g.traps.find((t) => t.def.id === 'rs1');
-      return { mail: hm.shown, mailVisible: hm.view.visible, plat: Math.round(rs.plat.x / 32), shift: rs.state, caption: rs.caption.visible, jump: g.player.lastJump && Math.round(g.player.lastJump.x) };
+      const hm2 = g.traps.find((t) => t.def.id === 'hm2');
+      return { mail2: hm2.shown, camo: Boolean(rs.fill), mail: hm.shown, mailVisible: hm.view.visible, plat: Math.round(rs.plat.x / 32), shift: rs.state, caption: rs.caption.visible, jump: g.player.lastJump && Math.round(g.player.lastJump.x) };
     });
   // hold the keys while the input is locked, then put the player on the floor at x0 running right with a buffered jump:
   // the jump happens on the next update, a few px further on. hop: no jump key held, so the jump is cut at once.
-  const takeoff = async (page, x0, { hop = false, coyote = false } = {}) => {
+  const takeoff = async (page, x0, { hop = false, coyote = false, floorRow = 15 } = {}) => {
     await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').player.lockInput('smoke', true));
     await page.keyboard.down('ArrowRight');
     if (!hop) await page.keyboard.down('Space');
     await sleep(120);
-    await page.evaluate(([x0, coyote]) => {
+    await page.evaluate(([x0, coyote, floorRow]) => {
       const g = globalThis.__game.scene.getScene('GameScene');
       const pl = g.player;
       pl.lockInput('smoke', false);
-      pl.body.reset(x0, 15 * 32 - 16);
+      pl.body.reset(x0, floorRow * 32 - 16);
       pl.body.setVelocityX(260);
       if (!coyote) {
         pl.jumpBufferTimer = 110;
@@ -315,7 +316,7 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
         }
       };
       g.events.on('postupdate', onUpdate);
-    }, [x0, coyote]);
+    }, [x0, coyote, floorRow]);
   };
   const release = async (page) => {
     await page.keyboard.up('Space');
@@ -331,7 +332,7 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
     await sleep(300);
     const s = await state(page);
     const pr = await pranks(page);
-    check('1d(a) taking off from col 15 the client mail stays hidden and the gap is cleared', !pr.mail && s.deaths === 0 && s.tile[0] >= 20, { ...pr, tile: s.tile, deaths: s.deaths });
+    check('1d(a) taking off from col 15 the client mail stays hidden and the gap is cleared; the requirement looks like floor', pr.camo && !pr.mail && s.deaths === 0 && s.tile[0] >= 20, { ...pr, tile: s.tile, deaths: s.deaths });
     await page.close();
   }
   // (b) the comfortable jump from the edge of col 17: the mail pops over your head, you bonk and fall
@@ -398,6 +399,32 @@ for (const outfit of ['consultant', 'manager', 'seniorManager', 'partner', 'farm
     check('1d(e) a short hop lands on the moved requirement, then the step 30–31 is reachable without dying', pr.plat === 25 && s1.deaths === 0 && s1.tile[0] >= 25 && s1.tile[0] <= 27 && s2.deaths === 0 && s2.tile[0] >= 30 && s2.tile[0] <= 31 && s2.tile[1] === 12, { pr, s1: s1.tile, s2: s2.tile, deaths: s2.deaths, byCause: s2.byCause });
     await page.close();
   }
+}
+
+// 1d(f). the client again at the end: the jump off the fix step (col 178 edge) into the last pit
+{
+  const page = await open('?debug=1&standup=off');
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').player.lockInput('smoke', true));
+  await page.keyboard.down('ArrowRight');
+  await page.keyboard.down('Space');
+  await sleep(120);
+  await page.evaluate(() => {
+    const pl = globalThis.__game.scene.getScene('GameScene').player;
+    pl.lockInput('smoke', false);
+    pl.body.reset(5712, 13 * 32 - 16);
+    pl.body.setVelocityX(260);
+    pl.jumpBufferTimer = 110;
+  });
+  await sleep(160);
+  const shown = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((t) => t.def.id === 'hm2').shown);
+  await page.screenshot({ path: OUT + 'shot-prank-mail2.png' });
+  await sleep(700);
+  await page.keyboard.up('Space');
+  await page.keyboard.up('ArrowRight');
+  await sleep(300);
+  const s = await state(page);
+  check('1d(f) taking off at the edge of the fix step (col 178) the second client mail appears and kills (hiddenClient)', shown && (s.byCause.hiddenClient ?? 0) === 1, { shown, byCause: s.byCause });
+  await page.close();
 }
 
 // 2. standup freeze

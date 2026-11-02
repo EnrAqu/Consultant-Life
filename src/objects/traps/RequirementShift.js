@@ -9,6 +9,7 @@ const CAPTION = 'Il cliente ha cambiato il requisito, è un problema?';
 // Normal: a jump taken off from takeoffPx (centre x, rightwards) slides it by `shift` columns (fixed direction per
 // platform, negative = back towards you) at `speed` columns/s, once, until respawn. Tell: the movement itself and the
 // caption, both visible mid-jump; a short hop or an air brake still lands on it. No pivoted mode.
+// camouflage (user, 2026-11-02): it looks like the floor (top tile + fill down to the bottom of the map) until it moves.
 // The validator sees it at its final position (trapSurfaces), where it is when you land.
 export default class RequirementShift extends BaseTrap {
   static type = 'requirementShift';
@@ -19,7 +20,14 @@ export default class RequirementShift extends BaseTrap {
     this.homeX = this.tx * TILE;
     this.targetX = (this.tx + p.shift) * TILE;
     this.y = this.ty * TILE;
-    this.plat = this.addPlatform(this.tx, this.ty, p.width, 1, 'reqPlatform');
+    if (p.camouflage) {
+      this.plat = this.addPlatform(this.tx, this.ty, p.width, 1, 'tilesHD', true, 'top');
+      const rows = scene.def.map.length - this.ty - 1;
+      this.fill = rows > 0 ? this.addPlatform(this.tx, this.ty + 1, p.width, rows, 'tilesHD', true, 'solid') : null;
+    } else {
+      this.plat = this.addPlatform(this.tx, this.ty, p.width, 1, 'reqPlatform');
+      this.fill = null;
+    }
     this.caption = scene.add
       .text(0, 0, CAPTION, { fontFamily: UI_FONT, fontStyle: 'bold', fontSize: '12px', color: '#facc15', resolution: TEXT_RESOLUTION * 2 })
       .setOrigin(0.5, 1)
@@ -38,6 +46,7 @@ export default class RequirementShift extends BaseTrap {
   setX(x) {
     this.x = x;
     this.plat.body.reset(x, this.y);
+    this.fill?.body.reset(x, this.y + TILE);
     this.caption.setPosition(x + (this.p.width * TILE) / 2, this.y - 40);
   }
 
