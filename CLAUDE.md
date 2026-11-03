@@ -19,6 +19,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/FARM.md` | Livello extra "Il contadino" (dopo il burnout al 100%): `FarmScene`, telefono, stagno, panchina, finale | Playbook `plan` / `implement` |
 | `docs/IT_HR_EXTERNAL.md` | Piano di IT (livelli 2–3), HR (3–4) e fornitore esterno (4–5): riavvio forzato, VPN, ticket, team building, corso, contractor | Playbook `plan` / `implement` |
+| `docs/LEADERBOARD_API_PROMPT.md` | Prompt per far costruire a Claude l'API della classifica condivisa su Azure (Functions + Table Storage) | Utente |
 | `docs/HIRING.md` | Assumere junior nel livello 4: agenzia interinale (fino al checkpoint) e annuncio su LinkedIn | Playbook `plan` / `level` |
 | `docs/JUNIOR_QUESTION.md` | Il junior che si ferma con una domanda stupida (livelli 3 e 5): 0,5 GU per tornare a prenderlo | Playbook `plan` / `level` |
 | `docs/PM_LINKEDIN.md` | Il PM e LinkedIn: barre del Gantt e post che crollano (livelli 2–3), richieste di risorse (livello 4: PM alla scrivania, recruiter), pivot | Playbook `plan` / `level` |
