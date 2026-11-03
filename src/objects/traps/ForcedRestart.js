@@ -35,7 +35,7 @@ export default class ForcedRestart extends BaseTrap {
 
   toast(n) {
     this.lastSecond = n;
-    bus.emit(EV.TOAST, { text: `[IT] Il PC si riavvierà tra ${n}…`, durationMs: 1000, color: '#93c5fd' });
+    bus.emit(EV.TOAST, { text: `[IT] Il PC si riavvierà tra ${n}…`, durationMs: 1500, color: '#93c5fd' });
   }
 
   // a death right after the freeze is the restart's fault

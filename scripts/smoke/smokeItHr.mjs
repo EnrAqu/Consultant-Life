@@ -165,6 +165,38 @@ void G;
   await page.close();
 }
 
+// review IT_HR #1: finishing level 3 with juniors at the team building: they come with you to level 4
+{
+  const page = await open('?debug=1&level=level3&standup=off&cp=cp1&pivot=it');
+  await teleport(page, 174, 14); await sleep(300);
+  await page.keyboard.down('ArrowRight');
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.members.filter((m) => m.state === 'away').length >= 1);
+  await page.keyboard.up('ArrowRight');
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(209 * 32 + 16, 15 * 32 - 16); });
+  await page.keyboard.down('ArrowRight'); await sleep(300); await page.keyboard.up('ArrowRight');
+  const ll = await waitFor(page, () => globalThis.__game.scene.isActive('LessonsLearnedScene'));
+  await sleep(1500);
+  await page.keyboard.press('Space');
+  await waitFor(page, () => globalThis.__game.scene.isActive('GameScene') && globalThis.__game.scene.getScene('GameScene').levelId === 'level4');
+  await sleep(500);
+  const s = await state(page);
+  check('L3 → L4: juniors still at the team building at the goal come along (team 3 in level 4)', ll && s.team === 3, s);
+  await page.close();
+}
+
+// review IT_HR #2: after a death the solved ticket stays open
+{
+  const page = await open('?debug=1&level=level3&standup=off&cp=cp1');
+  await teleport(page, 184, 14);
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotTicket').solved);
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').die('spike'));
+  await waitFor(page, () => !globalThis.__game.scene.getScene('GameScene').player.isDead);
+  await sleep(3000);
+  const s = await state(page);
+  check('L3: after a death the solved IT ticket stays open', s.ticket.state === 'open' && !s.ticket.barrier, s);
+  await page.close();
+}
+
 await browser.close();
 console.log(results.join('\n'));
 console.log('\nERRORS:\n' + (errors.length ? errors.join('\n') : 'none'));

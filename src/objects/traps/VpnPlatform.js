@@ -37,7 +37,8 @@ export default class VpnPlatform extends BaseTrap {
   apply() {
     const on = this.brain.isOn(this.clock);
     if (on !== this.on) {
-      if (this.on && !on) this.offAt = this.clock;
+      // the death is IT's only if it dropped you (review IT_HR #3)
+      if (this.on && !on && this.riding()) this.offAt = this.clock;
       this.on = on;
       this.plat.body.enable = on;
       this.plat.setAlpha(on ? 1 : 0.25);
@@ -45,6 +46,12 @@ export default class VpnPlatform extends BaseTrap {
     const dots = this.brain.dots(this.clock);
     const text = this.pivoted ? 'VPN ● split tunneling' : on ? `VPN ${'●'.repeat(dots)}${'○'.repeat(3 - dots)}` : 'VPN disconnessa';
     if (this.label.text !== text) this.label.setText(text).setColor(on ? '#4ade80' : '#f87171');
+  }
+
+  riding() {
+    const pb = this.scene.player?.body;
+    const b = this.plat.body;
+    return Boolean(pb && Math.abs(pb.bottom - b.top) <= 3 && pb.right > b.left && pb.left < b.right);
   }
 
   update(dt) {

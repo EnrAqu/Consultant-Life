@@ -62,6 +62,8 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 - Un costo di burnout legato a una trappola che si ripete a ogni vita (es. il PM +10%) va pagato **una volta per livello**, non a ogni tentativo.
 - I junior che si perdono passano da `Team.lose`. Se il burnout l'hai già addebitato tu, usa `prepaid = true`, così il checkpoint non lo addebita una seconda volta. Lo stato `away` (team building) non è una perdita.
 - Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`, es. il fornitore) e solo poi alla delega.
+- **Ogni stato nuovo del team** (`away`, `staying` con ritorno…) va controllato in **tutti** i conteggi di fine livello e del checkpoint (`count`, `aliveCount`, `netLoss`, `session.team`), con uno smoke che finisce il livello in quello stato.
+- Un ostacolo a tempo (ticket, corso…) **non si azzera al respawn** se il checkpoint è prima di lui: una volta superato resta superato.
 
 ## Verifica nel container cloud
 - Chrome gira da root: serve `--no-sandbox`. Usa un wrapper come `CHROME_PATH` (uno script che lancia `/opt/pw-browsers/chromium-*/chrome-linux64/chrome --no-sandbox "$@"`), senza toccare gli script.

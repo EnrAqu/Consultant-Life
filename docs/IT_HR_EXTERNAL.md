@@ -189,3 +189,21 @@ Verifica:
   - fornitore con difetto e attestato;
   - pivot `hr`.
 - Gli smoke hanno timeout larghi: in un container lento il tempo di gioco scorre a circa 0,3× quello reale.
+
+## 11. Esito della review del codice (`docs/CODE_REVIEW_IT_HR.md`)
+- **#1 (bloccante) junior al team building persi per sempre a fine livello:** accolto. `Team.recallAway()` in `completeLevel` li riporta nel team; c'è uno smoke da livello 3 a livello 4.
+- **#2 ticket da rifare a ogni morte:** accolto. Una volta risolto resta aperto dopo la morte (smoke).
+- **#3 morti nel burrone attribuite all'IT anche senza colpa:** accolto. Contano per l'IT solo se la VPN si è disconnessa con te sopra.
+- **#4 delegare il ticket costava un junior:** accolto con una scelta mia, da confermare con l'utente. Il junior delegato torna in fondo alla fila quando la barriera si apre.
+- **#5 incidente HR del livello 3:** accolto. Conta anche quando apri il ticket IT con il team al team building (`Team.blameHr`, una volta per vita).
+- **#6 fornitore:** accolto.
+  - E funziona solo a terra davanti alla scrivania.
+  - Con meno GU del costo dice "non te lo puoi permettere" e non sfora il budget.
+- **#7 fornitore con la lezione `hr`:** accolto. "Niente da costruire".
+- **#8 corso HR a metà salto:** accolto. Parte solo a terra.
+- **#9 i junior attraversano le barriere chiuse:** accolto. Ticket e corso chiusi bloccano la delega come il varco.
+- **#11 conto alla rovescia e testi:** accolto. Il toast dura 1,5 s e il testo dell'attestato è corretto.
+- **Lasciati:**
+  - #10: la barriera che si richiude spinge indietro chi ci sta davanti, che è il suo scopo;
+  - la spia E e il tasto touch per il fornitore;
+  - parte di #12: test a input reale sui gradini.

@@ -58,7 +58,8 @@ export default class HrCourse extends BaseTrap {
   }
 
   onTrigger() {
-    if (this.state !== 'closed') return;
+    // never frozen mid-air (review IT_HR #8)
+    if (this.state !== 'closed' || !this.scene.player.grounded) return;
     const scene = this.scene;
     if (this.hasCert) {
       this.state = 'open';
@@ -84,7 +85,7 @@ export default class HrCourse extends BaseTrap {
       if (b.right > c.x - 8 && b.left < c.x + 8 && b.bottom > c.y - 8 && b.top < c.y + 8) {
         this.hasCert = true;
         c.setVisible(false);
-        bus.emit(EV.TOAST, { text: 'Attestato preso: il corso HR è saltato', durationMs: 1800, color: '#fde68a' });
+        bus.emit(EV.TOAST, { text: this.state === 'closed' ? 'Attestato preso: il corso HR è saltato' : "Attestato preso. Il corso l'avevi già fatto.", durationMs: 1800, color: '#fde68a' });
       }
     }
     if (this.state === 'course') {

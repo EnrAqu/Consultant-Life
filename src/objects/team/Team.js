@@ -79,6 +79,19 @@ export default class Team {
     this.emit();
   }
 
+  // end of the level: whoever is at the team building comes back first (review IT_HR #1: they were lost for good)
+  recallAway() {
+    for (const m of this.members.filter((x) => x.state === 'away')) this.comeBack(m);
+  }
+
+  // HR's fault (one `hr` incident per life): delegating, or opening the IT ticket yourself, with the team away
+  blameHr() {
+    if (this.hrSaid || !this.members.some((m) => m.state === 'away')) return false;
+    this.hrSaid = true;
+    this.scene.stats.recordIncident('hr');
+    return true;
+  }
+
   comeBack(member) {
     if (member.state !== 'away' || !this.members.includes(member)) return;
     member.state = 'follow';
@@ -133,7 +146,14 @@ export default class Team {
       if (m.state === 'going') this.updateGoing(m, dt);
       if (m.state === 'staying' && m.stayLeft !== undefined) {
         m.stayLeft -= dt;
-        if (m.stayLeft <= 0) {
+        if (m.stayLeft <= 0 && m.comeBack) {
+          // the job is done (the IT ticket): back at the end of the line (review IT_HR #4)
+          m.state = 'follow';
+          m.comeBack = false;
+          this.members.splice(this.members.indexOf(m), 1);
+          this.members.push(m);
+          this.emit();
+        } else if (m.stayLeft <= 0) {
           m.state = 'gone';
           m.sprite.setVisible(false);
         }
@@ -166,7 +186,9 @@ export default class Team {
       return t && { y: row !== undefined ? (row + 1) * TILE : undefined, ...t, owner: o };
     });
     // a closed "Approvazione richiesta" gate is a wall for juniors too
-    const blockers = scene.traps.filter((tr) => tr.type === 'approvalGate' && !tr.open).map((tr) => tr.tx * TILE + 16);
+    // …and so are the IT ticket and the HR course while closed (review IT_HR #9)
+    const closed = (tr) => (tr.type === 'approvalGate' ? !tr.open : ['itTicket', 'hrCourse'].includes(tr.type) && tr.barrier.body.enable);
+    const blockers = scene.traps.filter(closed).map((tr) => tr.tx * TILE + 16);
     // in a tower, only targets on your floor (review 5 #5: horizontal levels keep delegating from a raised platform)
     return pickDelegateTarget(player.body.center.x, player.flipX ? -1 : 1, targets, 10, { blockers, playerY: scene.def.vertical ? player.body.bottom : null });
   }
@@ -198,8 +220,7 @@ export default class Team {
       // everyone at the team building: that is HR's doing (one `hr` incident per life, review A)
       if (this.members.some((m) => m.state === 'away')) {
         bus.emit(EV.TOAST, { text: 'Sono tutti al team building. Torneranno motivatissimi.', durationMs: 1800, color: '#d8b4fe' });
-        if (!this.hrSaid) scene.stats.recordIncident('hr');
-        this.hrSaid = true;
+        this.blameHr();
         return;
       }
       bus.emit(EV.TOAST, { text: 'Nessuno a cui delegare. Assumi uno stagista.', durationMs: 1800 });
@@ -248,6 +269,7 @@ export default class Team {
     if (result.stay) {
       m.state = 'staying';
       m.stayLeft = result.staySeconds ? result.staySeconds * 1000 : undefined;
+      m.comeBack = Boolean(result.comeBack);
       m.sprite.setFrame('idle0');
     } else {
       // the trap gets them (or they get stuck in a call): lost for good

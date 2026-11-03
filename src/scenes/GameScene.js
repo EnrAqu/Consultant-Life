@@ -605,6 +605,7 @@ export default class GameScene extends Phaser.Scene {
     const run = this.stats.getRun();
     // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
     const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
+    this.team?.recallAway();
     const team = this.team ? { count: this.team.count, size: this.teamAtStart } : null;
     if (team) session.team = Math.max(1, team.count);
     const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max, burnout: this.burnout.value, clean };

@@ -45,13 +45,24 @@ export default class Contractor {
     this.refresh();
   }
 
+  // at his desk, on his floor (not from a platform above, review IT_HR #6)
   near() {
-    return Math.abs(this.scene.player.body.center.x - this.x) <= TILE * 1.2 && this.scene.player.grounded;
+    const b = this.scene.player.body;
+    return Math.abs(b.center.x - this.x) <= TILE * 1.2 && this.scene.player.grounded && Math.abs(b.bottom - this.floorY) <= 2;
+  }
+
+  // with the `hr` lesson there is no certificate to reach (review IT_HR #7)
+  get useless() {
+    return this.scene.traps.some((t) => t.type === 'hrCourse' && t.pivoted);
   }
 
   refresh() {
     const key = touch.enabled ? 'Tocca E' : 'E';
     const b = this.brain.state;
+    if (this.useless) {
+      if (this.sign.text !== 'Fornitore esterno: niente da costruire') this.sign.setText('Fornitore esterno: niente da costruire');
+      return;
+    }
     const text = {
       idle: `Fornitore esterno — ${key}: ingaggia (${this.p.cost} GU)`,
       hired: 'Timezone offshore: risponde domattina…',
@@ -64,7 +75,11 @@ export default class Contractor {
 
   // E at his desk (GameScene asks the NPCs before delegating). Returns true if he took the action.
   onAction() {
-    if (!this.near()) return false;
+    if (!this.near() || this.useless) return false;
+    if (this.brain.state === 'idle' && this.scene.budget.gu <= this.p.cost) {
+      bus.emit(EV.TOAST, { text: `Il fornitore costa ${this.p.cost} GU: non te lo puoi permettere`, durationMs: 1800, color: '#fde68a' });
+      return true;
+    }
     const ev = this.brain.act();
     if (!ev) return false;
     if (ev === 'hire') {

@@ -33,9 +33,13 @@ export default class ItTicket extends BaseTrap {
     this.barrier.setAlpha(open ? 0.2 : 1);
   }
 
+  // once solved it stays solved for the level (review IT_HR #2: dying in the VPN pit meant waiting again every life)
   reset() {
     this.brain.reset();
-    this.setOpen(false);
+    // after a death a solved ticket stays open for good
+    this.permanent = Boolean(this.solved);
+    if (this.permanent) this.brain.state = 'open';
+    this.setOpen(this.permanent);
     this.refresh();
   }
 
@@ -49,7 +53,9 @@ export default class ItTicket extends BaseTrap {
   }
 
   onTrigger() {
-    if (this.brain.touch()) this.refresh();
+    if (!this.brain.touch()) return;
+    this.scene.team?.blameHr();
+    this.refresh();
   }
 
   delegateTarget() {
@@ -59,12 +65,15 @@ export default class ItTicket extends BaseTrap {
   onDelegate() {
     this.brain.touch();
     this.refresh();
-    return { stay: true, staySeconds: (this.brain.workMs + this.brain.openMs) / 1000 };
+    return { stay: true, staySeconds: this.brain.workMs / 1000, comeBack: true };
   }
 
   update(dt) {
-    const ev = this.brain.update(dt);
-    if (ev === 'open') this.setOpen(true);
+    const ev = this.permanent ? null : this.brain.update(dt);
+    if (ev === 'open') {
+      this.setOpen(true);
+      this.solved = true;
+    }
     if (ev === 'close') {
       this.setOpen(false);
       const px = this.scene.player.body.center.x;
