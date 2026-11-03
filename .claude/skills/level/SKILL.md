@@ -64,7 +64,9 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 - Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`, es. il fornitore) e solo poi alla delega.
 - **Ogni stato nuovo del team** (`away`, `staying` con ritorno…) va controllato in **tutti** i conteggi di fine livello e del checkpoint (`count`, `aliveCount`, `netLoss`, `session.team`), con uno smoke che finisce il livello in quello stato.
 - Un ostacolo a tempo (ticket, corso…) **non si azzera al respawn** se il checkpoint è prima di lui: una volta superato resta superato.
-- Una trappola che scatta su una colonna deve scattare quando la si **attraversa** (col o col+1), non con `>= col`: un respawn o un teletrasporto oltre il punto la farebbe scattare subito.
+- Una trappola che scatta su una colonna deve scattare quando la si **attraversa** (posizione precedente e attuale da parti opposte, spostamento ≤ 3 colonne), non con `>= col`. Un respawn, un teletrasporto o il primo frame di uno sprite nuovo (i junior nascono a x = 0) la farebbero scattare subito.
+- Prima di fissare il punto di una trappola, controlla **cosa costa davvero tornare indietro** lì: porte, burroni, arrivista, escalation.
+- Confrontando gli smoke su un worktree, crea prima `scripts/smoke/shots/`: senza, lo smoke va in crash e `grep FAIL` dà 0, cioè un falso verde.
 
 ## Verifica nel container cloud
 - Chrome gira da root: serve `--no-sandbox`. Usa un wrapper come `CHROME_PATH` (uno script che lancia `/opt/pw-browsers/chromium-*/chrome-linux64/chrome --no-sandbox "$@"`), senza toccare gli script.

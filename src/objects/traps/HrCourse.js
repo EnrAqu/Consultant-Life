@@ -6,9 +6,9 @@ const HEIGHT = 4;
 const BASE = 1 / TEXTURE_SCALE;
 
 // HR: the mandatory course (docs/IT_HR_EXTERNAL.md §3.2), level 4 slot with cause `hr`. A barrier with the HR rep:
-// walk up to it and the course starts — "Sicurezza sul lavoro, modulo 7 di 12": frozen `courseMs`, burnout +10%
+// walk up to it and the course starts — "Sicurezza sul lavoro, modulo 7 di 12": frozen `courseMs`, burnout +6%
 // (user), incident `hr`, then it opens. With the certificate (pickup at certX/certY, on the contractor's stairs) it opens
-// at once. Course and certificate hold for the whole level (review A): the +10% is paid at most once.
+// at once. Course and certificate hold for the whole level (review A): the +6% is paid at most once.
 // Pivoted: the certificate is already on Workday, the barrier is open.
 export default class HrCourse extends BaseTrap {
   static type = 'hrCourse';

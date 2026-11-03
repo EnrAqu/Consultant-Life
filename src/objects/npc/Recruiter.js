@@ -7,7 +7,7 @@ const BUBBLE_MS = 2200;
 
 // The LinkedIn recruiter (docs/PM_LINKEDIN.md §9), level 4 slot with cause `linkedin`. His "#OpenToWork" zone
 // (columns zoneFrom..zoneTo, green band on the floor, banner overhead): a junior following you who stays `poachMs` in
-// a row inside it accepts "un'opportunità imperdibile" and resigns (a team loss: +5% burnout at the checkpoint, as
+// a row inside it accepts "un'opportunità imperdibile" and resigns (a team loss: +4% burnout at the checkpoint, as
 // always). A red bar over the most exposed junior shows the clock. Counter: cross without stopping; the trail stops
 // while you are frozen, so being hooked inside the zone costs you the team.
 // Pivoted ("hai evitato un'opportunità, errore" — now you take it): the first time you walk in he hires one for you.

@@ -159,21 +159,30 @@ import StallBrain from '../src/core/StallBrain.js';
 import { JUNIOR_QUESTIONS } from '../src/data/juniorQuestions.js';
 
 describe('StallBrain — the junior who stops with a question', () => {
-  it('the last junior stops at the stall point; go back, he asks, 1.8 s later he is back; once per life', () => {
-    const b = new StallBrain({ col: 136, row: 14, explainMs: 1800 });
-    expect(b.update(16, { last: { key: 'j', col: 135, row: 14 }, playerNear: false })).toBe(null);
-    expect(b.update(16, { last: { key: 'j', col: 136, row: 12 }, playerNear: false })).toBe(null);
-    expect(b.update(16, { last: { key: 'j', col: 136, row: 14 }, playerNear: false })).toBe('stall');
+  it('the last junior stops when he crosses the stall column (either way, ±1 row); go back, he asks, 1.8 s later he is back; once per life', () => {
+    const b = new StallBrain({ col: 113, row: 14, explainMs: 1800 });
+    const at = (col, row = 14, key = 'j') => ({ last: { key, col, row }, playerNear: false });
+    expect(b.update(16, at(110))).toBe(null);
+    expect(b.update(16, at(112))).toBe(null);
+    // in the air, one row up, jumping straight from 112 to 115: still a crossing
+    expect(b.update(16, at(115, 13))).toBe('stall');
     expect(b.key).toBe('j');
     expect(b.update(5000, { last: null, playerNear: false })).toBe(null);
     expect(b.update(16, { last: null, playerNear: true })).toBe('ask');
     expect(b.update(1799, { last: null, playerNear: true })).toBe(null);
     expect(b.update(1, { last: null, playerNear: true })).toBe('resume');
-    expect(b.update(16, { last: { key: 'k', col: 136, row: 14 }, playerNear: false })).toBe(null);
     b.reset();
-    // a respawn past the point (checkpoint 183) does not trigger it; crossing it does
-    expect(b.update(16, { last: { key: 'k', col: 183, row: 14 }, playerNear: false })).toBe(null);
-    expect(b.update(16, { last: { key: 'k', col: 137, row: 14 }, playerNear: false })).toBe('stall');
+    // a respawn past the point never crosses it, nor does a new sprite jumping from x = 0 to the checkpoint
+    expect(b.update(16, at(0))).toBe(null);
+    expect(b.update(16, at(183))).toBe(null);
+    expect(b.update(16, at(184))).toBe(null);
+    // crossing leftwards (level 5 floor 2) counts too; far above or below does not
+    b.reset();
+    b.update(16, at(115, 5));
+    expect(b.update(16, at(112, 5))).toBe(null);
+    b.reset();
+    b.update(16, at(115));
+    expect(b.update(16, at(112))).toBe('stall');
   });
 
   it('the questions are stupid and in a fixed order', () => {
@@ -188,6 +197,9 @@ describe('StallBrain — the junior who stops with a question', () => {
       const lv = parseLevel(resolveLevel(LEVELS[id]));
       expect(lv.tiles[stall.y][stall.x], id).toBe(-1);
       expect(lv.tiles[stall.y + 1][stall.x], id).not.toBe(-1);
+      // not inside a trap's columns (review JUNIOR_STALL #2–4): going back must cost the 0.5 GU, not a death
+      const danger = LEVELS[id].entities.filter((e) => ['fiveMinutes', 'micromanager', 'scopeCreep', 'replyAll', 'deckCollapse'].includes(e.type) && !e.slot && e.type === 'fiveMinutes');
+      for (const d of danger) expect(Math.abs(d.x - stall.x), `${id} ${d.id}`).toBeGreaterThan(4);
     }
   });
 });

@@ -4,10 +4,14 @@ Richiesta dell'utente (2026-11-03): *"dal livello 3 in poi lo junior si ferma e 
 
 ## Regole
 - **Dove:** un punto per livello (entità `juniorStall`, solo grafica e logica, niente geometria):
-  - livello 3, col 136: dopo il burrone dello scope creep, prima della porta 140;
-  - livello 4, col 160: dopo il secondo varco, mentre l'arrivista corre al traguardo;
-  - livello 5, piano 2 (riga 61), col 26: con l'escalation che sale.
-- **Scatto:** quando l'**ultimo** junior della fila *attraversa* la colonna (col o col+1, sulla riga del punto) si ferma. Un respawn oltre il punto non lo fa scattare. Una volta per vita.
+  - livello 3, col **113**: subito dopo il checkpoint 112, prima della sporgenza dello scope creep;
+  - livello 4, col **149**: prima della piastra 152 e del varco 156;
+  - livello 5, piano 2 (riga 61), col **14**: ogni percorso dall'arrivo (17–25) ai gradini (9–11) la attraversa, verso sinistra.
+- **Scatto:** si ferma quando l'**ultimo** junior della fila *attraversa* il bordo sinistro della colonna:
+  - in entrambe le direzioni, con i piedi entro ±1 riga dal punto (anche in salto);
+  - non conta un salto di più di 3 colonne in un passo (respawn, teletrasporto, il primo frame di un junior nuovo);
+  - una volta per vita.
+- **Domanda solo se torni:** la fa solo quando lo raggiungi dopo esserti allontanato almeno una volta.
 - **Indizio:**
   - un grande "?" giallo sulla testa e il fumetto "Ehm… ho una domanda";
   - il toast "Un junior si è fermato: torna a prenderlo";
@@ -22,3 +26,19 @@ Richiesta dell'utente (2026-11-03): *"dal livello 3 in poi lo junior si ferma e 
 ## Verifica
 - `tests/ItHrExternal.test.js`: `StallBrain` (scatto solo attraversando, domanda, ritorno, una volta per vita), domande, punti su un pavimento nei livelli 3–5.
 - `smokeItHr.mjs`: nel livello 3 l'ultimo junior si ferma a 136 (team 3 → 2); tornando indietro chiede "Ma il PC si accende premendo il tasto ON?", −0,5 GU, poi team 3.
+
+## Esito della review (`docs/CODE_REVIEW_JUNIOR_STALL.md`)
+- **Accolti:**
+  - **#1 scatto fragile:** ora conta l'attraversamento in entrambe le direzioni, con ±1 riga, e ignora i salti di più di 3 colonne.
+  - **#2–#4 posizioni ingiuste:** si torna indietro senza morire.
+    - Al livello 3 il punto era nel raggio della porta 140, con il burrone 145 davanti.
+    - Al livello 4 tornare indietro dava sempre la gara all'arrivista.
+    - Al livello 5 l'escalation arrivava sempre.
+  - **La domanda partiva subito se eri fermo lì:** ora parte solo dopo che ti sei allontanato.
+  - **Commenti rimasti a +5% e +10%:** corretti.
+- **Trovato dopo la review:** il primo frame di un junior nuovo è a x = 0, e il salto verso il checkpoint contava come attraversamento (un −0,5 GU fantasma all'inizio dal checkpoint 183). Corretto con il limite di 3 colonne.
+- **Lasciati:**
+  - il junior recuperato riappare nella sua posizione nella scia;
+  - con l'unico junior fermo, lo stagista del livello 4 ne assume uno;
+  - la perdita addebitata al checkpoint anche se poi lo recuperi.
+- **Da chiedere all'utente:** i sollievi del burnout (caffè −2, KT vero −3, livello senza morti −5) restano così?

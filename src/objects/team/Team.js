@@ -21,7 +21,7 @@ export default class Team {
       .setVisible(false);
     this.bubbleLeft = 0;
     this.savedCount = count;
-    // juniors whose loss was already charged to the burnout on the spot (the PM's +10%): netLoss skips them
+    // juniors whose loss was already charged to the burnout on the spot (the PM's +6%): netLoss skips them
     this.prepaid = 0;
     this.setCount(count);
     this.resetTrail();

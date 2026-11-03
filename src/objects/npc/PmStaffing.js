@@ -7,7 +7,7 @@ const BUBBLE_MS = 2200;
 
 // "Mi presti una risorsa?" (docs/PM_LINKEDIN.md §8), level 4 slot with cause `pm`. The PM sits at his desk (a solid
 // tile in the map) with the sign "Cercasi risorse – urgente"; the floor tiles either side of it are his "area
-// risorse" (yellow carpet). Step on it and he takes the last junior in your line: burnout +10% on the spot (the loss
+// risorse" (yellow carpet). Step on it and he takes the last junior in your line: burnout +6% on the spot (was +10%, user 2026-11-03) (the loss
 // included: Team.lose(..., prepaid)). Counter: jump over his desk from before the carpet, or stop on the desk.
 // Pivoted ("il PM ripianifica a tuo favore"): he lends you one of his juniors. He asks once per level.
 export default class PmStaffing {

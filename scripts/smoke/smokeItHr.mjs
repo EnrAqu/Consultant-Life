@@ -197,18 +197,17 @@ void G;
   await page.close();
 }
 
-// the junior who stops with a question (docs/JUNIOR_QUESTION.md): level 3, col 136
+// the junior who stops with a question (docs/JUNIOR_QUESTION.md): level 3, col 113 (right after checkpoint 112)
 {
   const page = await open('?debug=1&level=level3&standup=off&cp=cp0');
-  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five4').brain.occupy());
-  await teleport(page, 134, 14); await sleep(400);
-  // run to col 142 (the pit 145–148 is right after) and let the line catch up past 136
+  await teleport(page, 110, 14); await sleep(400);
+  // walk to col 117 (the scope ledge starts at 118) and let the line catch up past 113
   await page.keyboard.down('ArrowRight');
-  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.x >= 141 * 32);
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.x >= 116 * 32);
   await page.keyboard.up('ArrowRight');
   const stalled = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.members.some((m) => m.state === 'stalled'));
   const s0 = await state(page);
-  check('L3: the last junior stops at col 136 with a question (team 3 → 2)', stalled && s0.team === 2, s0);
+  check('L3: the last junior stops at col 113 with a question (team 3 → 2)', stalled && s0.team === 2, s0);
   await page.screenshot({ path: OUT + 'junior-stall.png' });
   // go back to him
   await page.keyboard.down('ArrowLeft');

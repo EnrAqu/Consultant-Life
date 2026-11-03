@@ -36,6 +36,7 @@ export default class JuniorStall {
     this.release();
     this.brain.reset();
     this.member = null;
+    this.leftHim = false;
     this.mark.setVisible(false);
     this.bubble.setVisible(false);
   }
@@ -57,7 +58,10 @@ export default class JuniorStall {
     const last = lastM ? { key: lastM, col: Math.floor(lastM.sprite.x / TILE), row: Math.round(lastM.sprite.y / TILE) - 1 } : null;
     const m = this.member;
     const pb = scene.player.body;
-    const playerNear = Boolean(m && Math.abs(pb.center.x - m.sprite.x) < 24 && Math.abs(pb.bottom - m.sprite.y) < 20);
+    const dx = m ? Math.abs(pb.center.x - m.sprite.x) : Infinity;
+    // he asks when you come back for him, not if you were standing next to him when he stopped (review JUNIOR_STALL)
+    if (m && dx > 2 * TILE) this.leftHim = true;
+    const playerNear = Boolean(m && this.leftHim && dx < 24 && Math.abs(pb.bottom - m.sprite.y) < 20);
     const ev = this.brain.update(dt, { last, playerNear });
     if (ev === 'stall') {
       this.member = this.brain.key;
