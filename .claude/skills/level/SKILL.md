@@ -52,6 +52,23 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 ## Fisica da ricordare
 - `Player.grounded` è solo `body.blocked.down` (tilemap, corpi statici e immobili). Non usare `touching.down`: Arcade lo accende anche sulle sovrapposizioni con zone di innesco e di morte, e permetteva salti a mezz'aria. Una piattaforma calpestabile **non immobile** richiederebbe un controllo apposito.
 - Le zone (`addTrigger`, `killZones`) sono overlap: non sostengono il giocatore.
+- **Piattaforme che si muovono** (barra del PM): muoverle in modo cinematico, cioè `body.reset` a ogni frame sulla posizione del brain. Il giocatore va trasportato spostando solo `player.x`: il `friction` di Arcade non lo trascina in modo affidabile, e spostare anche `body.x` conta lo spostamento due volte.
+- **Piattaforme che compaiono e spariscono** (VPN, gradini del fornitore, barra del PM): renderle one-way (`checkCollision` solo `up`), così riapparendo o scivolando sul pavimento non spingono né intrappolano il giocatore.
+- **Blocchi del giocatore** (riavvio, corso, chiamate): mai a metà salto. Aspettare l'atterraggio, oppure mettere il lock solo a terra.
+
+## Catena dei pivot e incidenti
+- Uno slot scatta con la lezione di `entity.cause ?? entity.type`: se la trappola del livello N+1 è diversa da quella del livello N ma insegna la stessa lezione, usa `cause` (es. `pmStaffing` con `cause: 'pm'`).
+- Un incidente (`stats.recordIncident`) deve contare **solo se fa danno** (morte entro poco, ticket richiuso con te davanti…) e al massimo una volta per vita. Altrimenti decide lui la lezione del livello dopo.
+- Un costo di burnout legato a una trappola che si ripete a ogni vita (es. il PM +10%) va pagato **una volta per livello**, non a ogni tentativo.
+- I junior che si perdono passano da `Team.lose`. Se il burnout l'hai già addebitato tu, usa `prepaid = true`, così il checkpoint non lo addebita una seconda volta. Lo stato `away` (team building) non è una perdita.
+- Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`, es. il fornitore) e solo poi alla delega.
+
+## Verifica nel container cloud
+- Chrome gira da root: serve `--no-sandbox`. Usa un wrapper come `CHROME_PATH` (uno script che lancia `/opt/pw-browsers/chromium-*/chrome-linux64/chrome --no-sandbox "$@"`), senza toccare gli script.
+- Il tempo di gioco può scorrere a circa 0,3× il tempo reale (fps 5–10): negli smoke usa `waitForFunction` con timeout larghi (30 s) invece di sleep fissi, e controlla in pagina, non con lo stato letto a ogni passo.
+- I controlli a tempo degli smoke vecchi falliscono anche senza modifiche: confronta l'elenco dei FAIL con quello del commit di prima (`git stash -u`, build, smoke, `git stash pop`) prima di dire che è una regressione.
+- Teletrasportando il giocatore i junior restano indietro (e l'arrivista ne prende uno): negli smoke rimettili accanto al giocatore con `team.restore()`.
+- Non usare `pkill -f` con un pattern che compare nel tuo stesso comando: uccide la shell.
 
 ## Non fare
 - Non toccare altri livelli, a meno che la catena dei pivot lo richieda. In quel caso dillo e chiedi.
