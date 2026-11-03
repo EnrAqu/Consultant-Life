@@ -78,7 +78,8 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   const page = await open('?debug=1&standup=off&level=level3');
   const s0 = await state(page);
   check('level 3 starts with the manager outfit', s0.outfit === 'manager' && s0.gu === 15, s0);
-  await teleport(page, 41, 14); await sleep(200);
+  // col 46: the PM's pit is 41–45 (docs/PM_LINKEDIN.md)
+  await teleport(page, 46, 14); await sleep(200);
   await page.keyboard.down('ArrowRight'); await sleep(900);
   const s = await state(page);
   await page.screenshot({ path: OUT + 'i3-five.png' });

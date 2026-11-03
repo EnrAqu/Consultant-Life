@@ -497,6 +497,20 @@ export function generateAll(scene) {
     p.fill(COLORS.gold).circle(31, 36, 2);
   });
 
+  // the PM (docs/PM_LINKEDIN.md): teal polo, his Gantt bar; LinkedIn post tiles
+  makePlayerSheet(scene, 'pm', { ...OUTFITS.consultant, top: 0x0d9488, topDark: 0x0f766e, badge: true, hair: 0x78350f }, 'npc_pm');
+  make(scene, 'ganttBar', 32, 32, (p) => {
+    p.fill(0x134e4a).rect(0, 0, 32, 32);
+    p.fill(0x14b8a6).rect(0, 0, 32, 29);
+    p.fill(0x5eead4).rect(0, 0, 32, 4);
+    p.fill(0x0f766e).rect(0, 8, 32, 1).rect(0, 20, 32, 1).rect(31, 0, 1, 29);
+  });
+  make(scene, 'linkedinTile', 32, 32, (p) => {
+    p.fill(0xcbd5e1).rect(0, 0, 32, 32);
+    p.fill(0xffffff).rect(0, 0, 32, 30);
+    p.fill(0x0a66c2).rect(0, 0, 32, 5);
+    p.fill(0xe2e8f0).rect(3, 22, 26, 2).rect(3, 26, 18, 2);
+  });
   generateFarm(scene);
 }
 

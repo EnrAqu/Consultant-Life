@@ -36,6 +36,13 @@ export function trapSurfaces(entity) {
   }
   // the client's requirement change: the landing platform is where it ends up when you land
   if (type === 'requirementShift') rect(x + p.shift, y, p.width, 1);
+  // the PM's Gantt bar: at home when you land on it; pivoted it carries you along the whole ride
+  if (type === 'pm') {
+    if (mode === 'pivoted') rect(x + Math.min(0, p.shift), y, p.width + Math.abs(p.shift), 1);
+    else rect(x, y, p.width, 1);
+  }
+  // a LinkedIn post is there when you land on it (it collapses later)
+  if (type === 'linkedin') rect(x, y, p.width, 1);
   if (mode !== 'pivoted') return cells;
   if (type === 'deckCollapse') {
     for (const t of p.targets) rect(x + t.dx, t.row, 2, 1);
@@ -171,6 +178,10 @@ function entityColumns(e) {
       return [e.x - 1, e.x + 2];
     case 'requirementShift':
       return [Math.min(e.x, e.x + p.shift) - 1, Math.max(e.x, e.x + p.shift) + p.width];
+    case 'pm':
+      return [Math.min(e.x, e.x + p.shift) - 1, Math.max(e.x, e.x + p.shift) + p.width];
+    case 'linkedin':
+      return [e.x - 1, e.x + p.width];
     case 'rival':
       return [p.startCol, p.triggerCol];
     default:

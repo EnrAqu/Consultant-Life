@@ -88,7 +88,8 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   const s2 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] > 12);
   check('you can walk through the open gate', s2.tile[0] > 12, s2);
   // delegate the "hai 5 minuti?" colleague at door 47
-  await teleport(page, 41, 14); await sleep(400);
+  // col 46: the PM's pit is 41–45 (docs/PM_LINKEDIN.md)
+  await teleport(page, 46, 14); await sleep(400);
   await page.keyboard.press('KeyE');
   // wait for the junior to reach the door, then walk past it
   await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.state === 'occupied', { timeout: 4000 }).catch(() => {});

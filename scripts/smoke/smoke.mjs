@@ -474,10 +474,17 @@ for (const pivot of ['', 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT']) {
     await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'mm1').brain.occupy(20000));
     await teleport(page, 50, 14);
     await sleep(200);
-    await hold(page, 'ArrowRight', 2600);
+    // run across the bridge (60–65): record the furthest column reached in-page (the PM's pit starts at 67,
+    // docs/PM_LINKEDIN.md, and a slow machine may run past col 66 before the key is released)
+    await page.evaluate(() => {
+      const g = globalThis.__game.scene.getScene('GameScene');
+      g.__maxCol = 0;
+      g.events.on('update', () => { if (!g.player.isDead) g.__maxCol = Math.max(g.__maxCol, Math.floor(g.player.x / 32)); });
+    });
+    await hold(page, 'ArrowRight', 4000);
     await sleep(300);
-    const s2 = await state(page);
-    check('pivoted deck bridge lets a running player cross', s2.tile[0] >= 67 && s2.deaths === 0, s2);
+    const s2 = { ...(await state(page)), maxCol: await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').__maxCol) };
+    check('pivoted deck bridge lets a running player cross', s2.maxCol >= 66 && !s2.byCause.deckCollapse, s2);
     await page.screenshot({ path: OUT + 'shot-l2-deck.png' });
   }
   if (pivot === 'replyAll') {

@@ -34,6 +34,18 @@ export const CAUSES = {
   intern: { label: 'il budget formazione', pivotable: false },
   rival: { label: "l'arrivista", pivotable: false },
   escalation: { label: "l'escalation", pivotable: false },
+  // the PM and LinkedIn (docs/PM_LINKEDIN.md): born in level 2, lessons with slots in level 3
+  pm: {
+    label: 'il PM che ripianifica',
+    pivotable: true,
+    lesson: 'Il PM ora ripianifica a tuo favore: le barre del Gantt ti portano avanti.',
+  },
+  linkedin: {
+    label: 'i post virali su LinkedIn',
+    pivotable: true,
+    // the user's line (2026-11-03): the post that kills you was "an opportunity"; from now on the posts hold
+    lesson: "LinkedIn: hai evitato un'opportunità, errore.",
+  },
   fiveMinutes: {
     label: 'i "hai 5 minuti?"',
     pivotable: true,

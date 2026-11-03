@@ -139,13 +139,14 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | Carriera / GU / burnout min | consultant · 15 GU · 15% |
 | Nato da | `IMPLEMENTATION_PLAN.md` §6.4 · `ITERATION_2.md` §4 · `ITERATION_3.md` §1 (micromanager, zona 47–66) · `ITERATION_4.md` §3 (traguardo che tradisce) |
 | Slot (pivot dal livello 1) | slotA replyAll · slotB scopeCreep · slotC deckCollapse · slotD fakeKT |
-| Altro | micromanager a torcia, traguardo che tradisce (`goal.trolls`, cartello portato di 14 colonne) |
+| Altro | micromanager a torcia, traguardo che tradisce (`goal.trolls`, cartello portato di 14 colonne), **PM** (`pm1`, barra del Gantt sul burrone 67–72), **LinkedIn** (`li1`, `li2` sponsorizzato, burrone 96–103) |
 | Checkpoint | cp0 |
-| Test | `tests/LevelParser.test.js`: completabile con ogni pivot |
-| Smoke | `smoke.mjs`, `smoke3.mjs`, `smoke4.mjs`, `smokeBurnout.mjs` |
+| Test | `tests/LevelParser.test.js`: completabile con ogni pivot; `tests/PmLinkedin.test.js`: non completabile senza barra né post |
+| Smoke | `smoke.mjs`, `smoke3.mjs`, `smoke4.mjs`, `smokeBurnout.mjs`, `smokePmLinkedin.mjs` |
 | Prova | `?debug=1&level=level2[&pivot=…][&cp=cp0]` |
 
-**Registro:** —
+**Registro:**
+- **2026-11-03 — Più denso, stessa lunghezza: il PM e LinkedIn** (utente: "complicare il livello 2, nuove trappole, introdurre il PM e LinkedIn"). Burrone 67–72 con la barra del PM che scivola indietro (poi una sola colonna prima delle spine); burrone 96–103 con due post LinkedIn (il secondo sponsorizzato, crolla al primo like) prima della consegna. Le cause `pm` e `linkedin` sono pivotabili: il livello 3 ha gli slot. Catena dei pivot in entrata invariata (gli slot del livello 2 restano quelli delle 4 cause del livello 1). Dettaglio in `docs/PM_LINKEDIN.md`. Classifica del livello 2: chiedere all'utente se azzerarla.
 
 ## Livello 3 — "Il primo team"
 | | |
@@ -153,14 +154,15 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | File | `src/levels/level3.js` (180 colonne, orizzontale) |
 | Carriera / GU / burnout min | manager · 15 GU · 30% |
 | Nato da | `ITERATION_3.md` §3 · `ITERATION_4.md` §4 (team, delega, varco, stagista) |
-| Slot (pivot dal livello 2) | mmA/mmB/slotMM micromanager · slotA replyAll · slotB scopeCreep · slotC deckCollapse · five4 fiveMinutes · slotD fakeKT |
+| Slot (pivot dal livello 2) | mmA/mmB/slotMM micromanager · slotA replyAll · slotB scopeCreep · slotC deckCollapse · five4 fiveMinutes · slotD fakeKT · **slotPM pm** (burrone 41–45) · **slotLI linkedin** (burrone 59–64) |
 | Altro | 4 porte "Hai 5 minuti?", stagista, varco di approvazione |
 | Checkpoint | cp0 |
-| Test | `tests/LevelParser.test.js`: completabile con tutte le combinazioni di pivot; chiuso se il varco resta chiuso |
-| Smoke | `smoke3.mjs`, `smoke4.mjs`, `smokeBurnout.mjs` |
-| Prova | `?debug=1&level=level3[&pivot=…]` |
+| Test | `tests/LevelParser.test.js`: completabile con tutte le combinazioni di pivot (anche `pm`, `linkedin`); chiuso se il varco resta chiuso; `tests/PmLinkedin.test.js` |
+| Smoke | `smoke3.mjs`, `smoke4.mjs`, `smokeBurnout.mjs`, `smokePmLinkedin.mjs` |
+| Prova | `?debug=1&level=level3[&pivot=…]` (anche `pivot=pm`, `pivot=linkedin`) |
 
-**Registro:** —
+**Registro:**
+- **2026-11-03 — Slot del PM e di LinkedIn** (le cause nuove del livello 2 sono pivotabili, scelta dell'utente). Burrone 41–45 con la barra del Gantt (normale: scivola indietro; pivoted: ti porta avanti di 2) e burrone 59–64 con un post (normale: crolla al terzo like; pivoted: non crolla). In modalità normale sono due trappole in più. Livello 4 senza slot nuovi (come già per micromanager e KT). Dettaglio in `docs/PM_LINKEDIN.md`.
 
 ## Livello 4 — "Il cliente strategico"
 | | |

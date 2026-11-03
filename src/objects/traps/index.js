@@ -6,6 +6,8 @@ import ApprovalGate from './ApprovalGate.js';
 import AiDraft from './AiDraft.js';
 import HiddenMail from './HiddenMail.js';
 import RequirementShift from './RequirementShift.js';
+import PmGantt from './PmGantt.js';
+import LinkedinPost from './LinkedinPost.js';
 
 export const TRAP_CLASSES = {
   replyAll: ReplyAllAvalanche,
@@ -16,4 +18,6 @@ export const TRAP_CLASSES = {
   aiDraft: AiDraft,
   hiddenMail: HiddenMail,
   requirementShift: RequirementShift,
+  pm: PmGantt,
+  linkedin: LinkedinPost,
 };

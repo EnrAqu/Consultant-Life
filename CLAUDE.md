@@ -18,12 +18,13 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/MOBILE.md` | Versione mobile: controlli su schermo (`src/input/TouchControls.js`) | Playbook `plan` / `implement` |
 | `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/FARM.md` | Livello extra "Il contadino" (dopo il burnout al 100%): `FarmScene`, telefono, stagno, panchina, finale | Playbook `plan` / `implement` |
+| `docs/PM_LINKEDIN.md` | Trappole del PM (barre del Gantt) e di LinkedIn (post che crollano): livelli 2 e 3, pivot | Playbook `plan` / `level` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |
 | `src/` | Codice del gioco (Phaser 3 + Vite) | Playbook `implement` |
 | `.claude/skills/*` | I playbook operativi (vedi sotto) | Quando un errore ricorrente va trasformato in regola |
 
-**Precedenza in caso di conflitto:** `DECISIONS.md` > `LEVELS.md` (per i livelli) e i documenti di feature (`BURNOUT.md`, `MOBILE.md`, `FARM.md`) > `ITERATION_N.md` (il più recente vince) > `IMPLEMENTATION_PLAN.md` > `PLAN.md`.
+**Precedenza in caso di conflitto:** `DECISIONS.md` > `LEVELS.md` (per i livelli) e i documenti di feature (`BURNOUT.md`, `MOBILE.md`, `FARM.md`, `PM_LINKEDIN.md`) > `ITERATION_N.md` (il più recente vince) > `IMPLEMENTATION_PLAN.md` > `PLAN.md`.
 
 ## Playbook (un solo agente, più playbook)
 

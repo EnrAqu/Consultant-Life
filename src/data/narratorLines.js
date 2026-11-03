@@ -36,6 +36,11 @@ export const NARRATOR_LINES = [
   { id: 'junior_deck_2', event: 'death', when: { cause: 'deckCollapse', levelId: 'level1' }, text: 'Il manuale utente era aggiornato. Al 2019.' },
   { id: 'death_deck_1', event: 'death', when: { cause: 'deckCollapse' }, text: 'La v7 era quella buona. La v8 ti è caduta addosso.' },
   { id: 'death_deck_2', event: 'death', when: { cause: 'deckCollapse' }, text: 'Sessanta slide di backup. Tutte su di te.' },
+  // the PM and LinkedIn (docs/PM_LINKEDIN.md)
+  { id: 'death_pm_1', event: 'death', when: { cause: 'pm' }, text: 'Il PM ha ripianificato. Tu non eri nel nuovo Gantt.' },
+  { id: 'death_pm_2', event: 'death', when: { cause: 'pm' }, text: 'La milestone è slittata. Tu sei slittato di sotto.' },
+  { id: 'death_linkedin_1', event: 'death', when: { cause: 'linkedin' }, text: 'Il post è diventato virale. Tu sei diventato un caso di studio.' },
+  { id: 'death_linkedin_2', event: 'death', when: { cause: 'linkedin' }, text: 'Hai messo like al post sbagliato. Con tutto il corpo.' },
   { id: 'death_self_1', event: 'death', when: { cause: 'selfRestart' }, text: 'Dimissioni accettate. Ti riassumiamo subito, stessa RAL.' },
   { id: 'death_self_2', event: 'death', when: { cause: 'selfRestart' }, text: 'Ripartire da zero è molto agile. Costa uguale.' },
 
