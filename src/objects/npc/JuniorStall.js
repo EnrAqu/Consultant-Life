@@ -7,7 +7,7 @@ const COST = 0.5;
 // one question per stop, in a fixed order for the whole page (deterministic, never random)
 let questionIndex = 0;
 
-// The junior who stops (docs/JUNIOR_QUESTION.md, user 2026-11-03). Levels 3–5: when the last junior in line reaches
+// The junior who stops (docs/JUNIOR_QUESTION.md, user 2026-11-03). Levels 3 and 5: when the last junior in line reaches
 // the stall point he stops, with a big "?" over his head. Go back to him and he asks a stupid question: you explain it
 // standing still for 1.8 s and lose 0.5 GU, then he rejoins at the end of the line. Leave him and he is a lost junior
 // (the usual burnout at the checkpoint or at the end of the level). Once per life.

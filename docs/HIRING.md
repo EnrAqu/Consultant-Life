@@ -13,13 +13,13 @@ Richiesta dell'utente (2026-11-03): *"invece di togliere una meccanica ne aggiun
 - Il PM che si prende un interinale costa comunque +6%, ma non lo segna come `prepaid` (non c'è niente da addebitare al checkpoint).
 - Una volta per vita: alla morte gli interinali spariscono (`restore`) e l'agenzia si riarma.
 
-## B. Annuncio su LinkedIn — `jobPost` (col 150, slot con causa `linkedin`)
+## B. Annuncio su LinkedIn — `jobPost` (col 140, slot con causa `linkedin`)
 - **E** al chiosco: costa **1 GU** (causa `jobPost`, non pivotabile). Il chiosco mostra "Cercasi junior con 10 anni di esperienza. Candidature: 247…".
 - Dopo **6 s** un junior **vero** parte di corsa dal chiosco e si mette in fondo alla fila (stato `joining`, poi `follow`). Resta, anche nel livello dopo.
 - Se il livello finisce mentre corre, viene comunque contato (`recallAway`).
 - **Con la lezione `linkedin`** (scelta dell'agente, l'utente non l'ha specificata) l'annuncio è **gratis**.
 - Senza GU sufficienti: "L'annuncio costa 1 GU: non te lo puoi permettere".
-- Una volta per vita.
+- Una volta per vita; pagato una volta: dopo una morte l'annuncio continua e il junior assunto resta (come lo stagista, `savedCount + 1`).
 
 ## File
 `src/core/HireBrain.js` (logica, testata), `src/objects/npc/HiringDesk.js` (`TempAgency`, `JobPost`), `Team.addTemps` / `dismissTemps` / `addRunner`.
@@ -31,3 +31,18 @@ Il tasto E va prima alle scrivanie (`onAction`), poi alla delega.
   - l'agenzia dà 2 interinali (team 5) che al checkpoint 106 se ne vanno (team 3, nessun burnout, nessuna perdita);
   - l'annuncio costa 1 GU e dopo 6 s il team è 4;
   - con il pivot `linkedin` l'annuncio è gratis.
+
+## Esito della review (`docs/CODE_REVIEW_HIRING.md`)
+- **Accolti:**
+  - **#1 (bloccante) delegando partiva sempre un junior vero:** ora parte prima un interinale.
+  - **#2 il chiosco accanto alla piastra 152 rubava l'E:** spostato a col 140. Senza GU l'E torna alla delega, anche per il fornitore.
+  - **#3 un interinale congedato a metà delega lasciava il bersaglio prenotato:** ora lo libera.
+  - **#4 il junior di LinkedIn spariva alla morte:** resta, come lo stagista, e conta in `aliveCount` mentre corre. Un annuncio pagato non si ripaga.
+  - **Lo stagista con soli interinali:** ora lo stagista li ignora.
+  - **Testi:** corretti.
+- **Da decidere con l'utente:** l'arrivista dovrebbe prendere prima gli interinali?
+- **Lasciati:**
+  - con 5+ junior e 2 interinali la scia (6 posti) li sovrappone;
+  - il checkpoint 106 saltato tiene gli interinali fino a fine livello;
+  - un interinale perso fa dire al narratore "junior perso".
+

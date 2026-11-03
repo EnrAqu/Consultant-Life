@@ -1,4 +1,4 @@
-# Il junior che si ferma con una domanda (livelli 3–5)
+# Il junior che si ferma con una domanda (livelli 3 e 5)
 
 Richiesta dell'utente (2026-11-03): *"dal livello 3 in poi lo junior si ferma e tu lo devi andare a riprendere; quando lo vai a riprendere ti fa una domanda stupida ('Ma il PC si accende premendo il tasto ON?', 'Come sono fatte le persone?'…). Tornare indietro e poi andare avanti costa 0,5 giornate uomo."*
 

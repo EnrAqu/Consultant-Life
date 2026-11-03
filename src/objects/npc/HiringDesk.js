@@ -40,7 +40,9 @@ class HiringDesk {
     return Math.abs(b.center.x - this.x) <= TILE * 1.2 && this.scene.player.grounded && Math.abs(b.bottom - this.floorY) <= 2;
   }
 
+  // a death re-arms the desk only if nothing was paid yet (review HIRING #4); subclasses may override
   reset() {
+    if (this.keepsHire && this.brain.state !== 'idle') return;
     this.brain.reset();
     this.refresh();
   }
@@ -60,7 +62,8 @@ class HiringDesk {
     if (!this.scene.team || !this.near()) return false;
     if (this.brain.state === 'idle' && this.cost > 0 && this.scene.budget.gu <= this.cost) {
       bus.emit(EV.TOAST, { text: `L'annuncio costa ${this.cost} GU: non te lo puoi permettere`, durationMs: 1800, color: '#93c5fd' });
-      return true;
+      // E still delegates (review HIRING #2)
+      return false;
     }
     if (this.brain.act() !== 'hire') return false;
     this.onHire();
@@ -82,14 +85,15 @@ export class TempAgency extends HiringDesk {
   cost = 0;
 
   text(state, key) {
-    return state === 'idle' ? `Agenzia interinale — ${key}: accetta 2 interinali (gratis, fino al prossimo checkpoint)` : 'Interinali assegnati. Contratto a termine.';
+    const n = this.p.count ?? 2;
+    return state === 'idle' ? `Agenzia interinale — ${key}: accetta ${n} interinali (gratis, fino al prossimo checkpoint)` : 'Interinali assegnati. Contratto a termine.';
   }
 
   onHire() {}
 
   onArrive() {
     this.scene.team.addTemps(this.p.count ?? 2);
-    bus.emit(EV.TOAST, { text: 'Arrivano 2 interinali: contratto fino al prossimo checkpoint', durationMs: 2000, color: '#fdba74' });
+    bus.emit(EV.TOAST, { text: `Arrivano ${this.p.count ?? 2} interinali: contratto fino al prossimo checkpoint`, durationMs: 2000, color: '#fdba74' });
     this.scene.narrate('tempAgency');
   }
 }
@@ -99,6 +103,8 @@ export class JobPost extends HiringDesk {
   texture = 'itKiosk';
   tint = 0x93c5fd;
   signColor = '#dbeafe';
+  // paid once: after a death the ad keeps running and the hired junior stays (like the intern)
+  keepsHire = true;
 
   get cost() {
     return this.pivoted ? 0 : this.p.cost ?? 1;
@@ -117,6 +123,8 @@ export class JobPost extends HiringDesk {
 
   onArrive() {
     this.scene.team.addRunner(this.x, this.floorY);
+    // the hire survives a death, like the intern's
+    this.scene.team.savedCount += 1;
     bus.emit(EV.TOAST, { text: 'Assunto un junior da LinkedIn: ti sta raggiungendo', durationMs: 2000, color: '#93c5fd' });
     this.scene.narrate('jobPost');
   }

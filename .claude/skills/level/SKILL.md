@@ -61,7 +61,10 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 - Un incidente (`stats.recordIncident`) deve contare **solo se fa danno** (morte entro poco, ticket richiuso con te davanti…) e al massimo una volta per vita. Altrimenti decide lui la lezione del livello dopo.
 - Un costo di burnout legato a una trappola che si ripete a ogni vita (es. il PM +10%) va pagato **una volta per livello**, non a ogni tentativo.
 - I junior che si perdono passano da `Team.lose`. Se il burnout l'hai già addebitato tu, usa `prepaid = true`, così il checkpoint non lo addebita una seconda volta. Lo stato `away` (team building) non è una perdita.
-- Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`, es. il fornitore) e solo poi alla delega.
+- Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`: fornitore, agenzia, annuncio) e solo poi alla delega.
+  - Nessuna scrivania con E entro 3 colonne da una piastra o da un bersaglio di delega obbligato.
+  - Il toast "non te lo puoi permettere" non deve mangiare l'E: `onAction` ritorna `false` e la delega parte.
+- Un membro del team che sparisce durante una delega (interinale congedato, junior perso) deve **liberare la prenotazione** del bersaglio (`owner.delegateReserved = false`).
 - **Ogni stato nuovo del team** (`away`, `staying` con ritorno…) va controllato in **tutti** i conteggi di fine livello e del checkpoint (`count`, `aliveCount`, `netLoss`, `session.team`), con uno smoke che finisce il livello in quello stato.
 - Stati del team oggi:
   - `follow`;

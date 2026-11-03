@@ -226,6 +226,8 @@ describe('Hiring desks — temp agency and LinkedIn job post', () => {
     const gate1 = LEVELS.level4.entities.find((e) => e.id === 'gate1');
     expect(agency.x).toBeLessThan(gate1.x + (gate1.params.plateDx ?? -4));
     expect(resolveLevel(LEVELS.level4, 'linkedin').entities.find((e) => e.id === 'slotJob').mode).toBe('pivoted');
-    expect(LEVELS.level4.entities.find((e) => e.id === 'slotJob').x).toBeLessThan(152);
+    // at least 3 columns from every plate and delegation target you must use (review HIRING #2)
+    const job = LEVELS.level4.entities.find((e) => e.id === 'slotJob');
+    for (const g of LEVELS.level4.entities.filter((e) => e.type === 'approvalGate')) expect(Math.abs(job.x - (g.x + (g.params.plateDx ?? -4))), g.id).toBeGreaterThan(3);
   });
 });

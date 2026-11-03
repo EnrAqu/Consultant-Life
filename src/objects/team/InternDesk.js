@@ -49,7 +49,8 @@ export default class InternDesk {
     }
     if (!this.armed) return;
     this.armed = false;
-    if (team.count > 0) {
+    // temps do not make a team (review HIRING)
+    if (team.followers.some((m) => !m.temp)) {
       bus.emit(EV.TOAST, { text: 'Hai già un team. Il budget formazione è congelato.', durationMs: 1600 });
       return;
     }

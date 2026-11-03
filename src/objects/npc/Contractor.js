@@ -78,7 +78,7 @@ export default class Contractor {
     if (!this.near() || this.useless) return false;
     if (this.brain.state === 'idle' && this.scene.budget.gu <= this.p.cost) {
       bus.emit(EV.TOAST, { text: `Il fornitore costa ${this.p.cost} GU: non te lo puoi permettere`, durationMs: 1800, color: '#fde68a' });
-      return true;
+      return false;
     }
     const ev = this.brain.act();
     if (!ev) return false;

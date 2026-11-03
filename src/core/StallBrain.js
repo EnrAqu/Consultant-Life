@@ -1,4 +1,4 @@
-// The junior who stops (docs/JUNIOR_QUESTION.md, levels 3–5). When the last junior in line crosses the stall column
+// The junior who stops (docs/JUNIOR_QUESTION.md, levels 3 and 5). When the last junior in line crosses the stall column
 // (either way, feet within `rowTol` rows of `row`) he stops with a question. Go back to him: you explain for
 // `explainMs` (the scene charges 0.5 GU) and he rejoins. Leave him and he is a lost junior. Once per life. Pure logic.
 // Review JUNIOR_STALL #1: "exactly on col/col+1 and on the exact row" missed jumps and whole routes (level 5).

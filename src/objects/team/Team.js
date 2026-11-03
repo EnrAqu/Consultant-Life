@@ -69,7 +69,7 @@ export default class Team {
   // following you, running to a delegated trap or away at the HR team building: not lost (yet)
   // temps (the agency, docs/HIRING.md) never count: their leaving is not a loss and they never go to the next level
   get aliveCount() {
-    return this.members.filter((m) => !m.temp && (m.state === 'follow' || m.state === 'going' || m.state === 'away')).length;
+    return this.members.filter((m) => !m.temp && ['follow', 'going', 'away', 'joining'].includes(m.state)).length;
   }
 
   // the temp agency: n juniors on a contract until the next checkpoint (orange shirts)
@@ -87,6 +87,8 @@ export default class Team {
   dismissTemps() {
     const temps = this.members.filter((m) => m.temp && m.state !== 'gone');
     for (const m of temps) {
+      // a temp still on a delegation lets go of its target (review HIRING #3)
+      if ((m.state === 'going' || m.state === 'staying') && m.target?.owner) m.target.owner.delegateReserved = false;
       m.state = 'gone';
       m.sprite.setVisible(false);
     }
@@ -279,7 +281,8 @@ export default class Team {
   delegate() {
     const scene = this.scene;
     const player = scene.player;
-    const first = this.followers[0];
+    // a temp goes first: that is what they are for (review HIRING #1)
+    const first = this.followers.find((m) => m.temp) ?? this.followers[0];
     if (!first) {
       // everyone at the team building: that is HR's doing (one `hr` incident per life, review A)
       if (this.members.some((m) => m.state === 'away')) {

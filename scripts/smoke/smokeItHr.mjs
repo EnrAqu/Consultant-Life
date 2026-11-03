@@ -243,7 +243,7 @@ void G;
 }
 {
   const page = await open('?debug=1&level=level4&standup=off&cp=cp0');
-  await teleport(page, 150, 14); await sleep(400);
+  await teleport(page, 140, 14); await sleep(400);
   const gu0 = (await state(page)).gu;
   await page.keyboard.press('KeyE');
   await sleep(300);
@@ -255,11 +255,26 @@ void G;
 }
 {
   const page = await open('?debug=1&level=level4&standup=off&cp=cp0&pivot=linkedin');
-  await teleport(page, 150, 14); await sleep(400);
+  await teleport(page, 140, 14); await sleep(400);
   const gu0 = (await state(page)).gu;
   await page.keyboard.press('KeyE');
   await sleep(300);
   check('L4 pivot=linkedin: the job post is free', (await state(page)).gu === gu0, gu0);
+  await page.close();
+}
+
+{
+  // review HIRING #1: with temps in the line, E at plate 72 sends a temp, not a real junior
+  const page = await open('?debug=1&level=level4&standup=off');
+  await teleport(page, 62, 14); await sleep(400);
+  await page.keyboard.press('KeyE');
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 5);
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(70 * 32 + 16, 15 * 32 - 16); g.player.setFlipX(false); });
+  await sleep(400);
+  await page.keyboard.press('KeyE');
+  await sleep(600);
+  const sent = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.members.filter((m) => m.state === 'going' || m.state === 'staying').map((m) => Boolean(m.temp)));
+  check('L4: delegating with temps sends a temp first', sent.length === 1 && sent[0] === true, sent);
   await page.close();
 }
 
