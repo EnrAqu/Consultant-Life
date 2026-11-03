@@ -28,6 +28,7 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
    - burnout minimo, GU di partenza, carriera e outfit, cartelli e frasi del narratore;
    - la classifica del livello: chiedi se azzerarla;
    - **le coordinate nei test e negli smoke** (teleport, colonne, `cp`): cambiando la geometria si rompono.
+   - **Scherzetti del cliente** (`hiddenMail`, `requirementShift`, livello 1): si leggono dallo **stacco del salto in pixel** (`player.jumpCount`/`lastJump`, coyote compreso), non da trigger zone. Sono un'eccezione registrata a "crudele ma giusto" (la mail non ha indizio), quindi **solo dove l'utente li chiede**. Per il punto d'innesco fai i conti della ricaduta dopo la testata (orizzontale ~260 px/s, caduta con gravità 1800 + 700): oltre una certa x si atterra comunque dall'altra parte.
 4. **Dimensione.**
    - Geometria, parametri o spostamenti di entità esistenti: procedi.
    - Una **meccanica nuova** (nuova entità, nuovo brain, nuova causa): passa prima dal playbook `plan`, con la sezione nel documento giusto, e poi da `review` sul piano.
@@ -37,14 +38,20 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
    - `npm run build`;
    - `npm run smoke`: a macchina scarica; se un controllo a tempo fallisce, rilancialo prima di concludere;
    - uno screenshot della zona cambiata, dalla cartella `scripts/smoke/shots/` o da uno script nella scratchpad.
+   - Nei controlli smoke che dipendono da **dove si stacca il salto**, fissa lo stacco in pixel (input bloccato, tasti premuti, poi `body.reset(x0, …)` + `setVelocityX(260)` + `jumpBufferTimer`), come in `smoke.mjs` 1d: con i tempi dei tasti il punto di stacco varia di decine di pixel.
 7. **Test e smoke aggiornati.** Ogni comportamento nuovo del livello ha almeno un controllo automatico. Le coordinate vecchie vanno corrette, non i controlli cancellati.
 8. **Review in contesto separato** (playbook `review` sul livello) se la modifica non è banale. Applica i punti o registra perché li respingi.
 9. **Chiudi:**
    - Registro della scheda: la voce passa da "In corso" a data e riassunto, e si aggiornano i campi della tabella cambiati;
    - una riga in `DECISIONS.md` (data, decisione, motivo, "— utente" se l'ha chiesta l'utente);
    - commit locale a nome dell'utente, senza righe `Co-Authored-By`/`Claude-Session`;
-   - **niente push** se l'utente non lo chiede.
+   - **niente push** se l'utente non lo chiede. Il permesso vale per quel giro: un "pusha" non copre i commit successivi;
+   - **aggiorna i playbook** (questo e gli altri toccati) con quello che hai imparato: nuove meccaniche, trucchi di verifica, errori da non ripetere (utente: "aggiorna sempre i playbook").
 10. **Resoconto:** cosa è cambiato, i comandi con il loro esito e l'URL di debug per provarlo (es. `?debug=1&level=level3&cp=cp0`), più cosa va provato a mano.
+
+## Fisica da ricordare
+- `Player.grounded` è solo `body.blocked.down` (tilemap, corpi statici e immobili). Non usare `touching.down`: Arcade lo accende anche sulle sovrapposizioni con zone di innesco e di morte, e permetteva salti a mezz'aria. Una piattaforma calpestabile **non immobile** richiederebbe un controllo apposito.
+- Le zone (`addTrigger`, `killZones`) sono overlap: non sostengono il giocatore.
 
 ## Non fare
 - Non toccare altri livelli, a meno che la catena dei pivot lo richieda. In quel caso dillo e chiedi.
