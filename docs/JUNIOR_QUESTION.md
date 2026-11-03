@@ -5,7 +5,7 @@ Richiesta dell'utente (2026-11-03): *"dal livello 3 in poi lo junior si ferma e 
 ## Regole
 - **Dove:** un punto per livello (entità `juniorStall`, solo grafica e logica, niente geometria):
   - livello 3, col **113**: subito dopo il checkpoint 112, prima della sporgenza dello scope creep;
-  - livello 4, col **149**: prima della piastra 152 e del varco 156;
+  - ~~livello 4~~: tolto (utente, 2026-11-03);
   - livello 5, piano 2 (riga 61), col **14**: ogni percorso dall'arrivo (17–25) ai gradini (9–11) la attraversa, verso sinistra.
 - **Scatto:** si ferma quando l'**ultimo** junior della fila *attraversa* il bordo sinistro della colonna:
   - in entrambe le direzioni, con i piedi entro ±1 riga dal punto (anche in salto);

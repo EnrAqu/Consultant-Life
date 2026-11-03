@@ -26,11 +26,11 @@ describe('StandupSchedule', () => {
 
   it('every third standup overruns (6s) and the next one stays on schedule', () => {
     const s = new StandupSchedule(STANDUP);
-    const ev = run(s, 85000);
+    const ev = run(s, 115000);
     const starts = ev.filter((e) => e.type === 'start');
     expect(starts.map((e) => e.durationMs)).toEqual([3000, 3000, 6000, 3000]);
-    // 4th standup at 10:20 → 80s of game time
-    expect(s.clockLabel).toBe('10:25');
+    // every 30 minutes (user, 2026-11-03): 09:20, 09:50, 10:20, 4th at 10:50 → 110 s of game time
+    expect(s.clockLabel).toBe('10:55');
   });
 
   it('clock keeps running during standup and reset restores start', () => {

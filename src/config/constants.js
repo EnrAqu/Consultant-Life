@@ -69,7 +69,8 @@ export const STANDUP = {
   clockStart: 9 * 60,
   minutesPerRealSecond: 1,
   firstAt: 9 * 60 + 20,
-  interval: 20,
+  // user, 2026-11-03: longer breaks between standups (20 → 30 game minutes = 30 s)
+  interval: 30,
   warningLeadMinutes: 3,
   durationMs: 3000,
   overrunEvery: 3,

@@ -190,8 +190,9 @@ describe('StallBrain — the junior who stops with a question', () => {
     expect(JUNIOR_QUESTIONS[1]).toMatch(/Come sono fatte le persone/);
   });
 
-  it('a stall point in levels 3, 4 and 5, all on a floor you can stand on', () => {
-    for (const id of ['level3', 'level4', 'level5']) {
+  it('a stall point in levels 3 and 5 (not 4: user 2026-11-03), all on a floor you can stand on', () => {
+    expect(LEVELS.level4.entities.some((e) => e.type === 'juniorStall')).toBe(false);
+    for (const id of ['level3', 'level5']) {
       const stall = LEVELS[id].entities.find((e) => e.type === 'juniorStall');
       expect(stall, id).toBeTruthy();
       const lv = parseLevel(resolveLevel(LEVELS[id]));
