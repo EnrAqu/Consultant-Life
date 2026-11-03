@@ -110,7 +110,8 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   check('Lessons Learned 2 leads to level 3', s.level === 'level3', s);
   const lb = await page.evaluate(() => JSON.parse(localStorage.getItem('ragebait.leaderboard.v1')));
   check('debug runs stay out of the leaderboard', !lb?.entries?.some((e) => e.levelId === 'level2'), lb);
-  await teleport(page, 175, 14); await hold(page, 'ArrowRight', 200); await sleep(1500);
+  // level 3 goal at 210 (S7, docs/IT_HR_EXTERNAL.md)
+  await teleport(page, 209, 14); await hold(page, 'ArrowRight', 200); await page.waitForFunction(() => globalThis.__game.scene.isActive('LessonsLearnedScene'), { timeout: 10000 }).catch(() => {});
   const ll3 = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
   check('level 3 complete opens Lessons Learned 3', ll3.includes('LessonsLearnedScene'), ll3);
   await sleep(800);
@@ -118,7 +119,7 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   await page.keyboard.press('Space'); await sleep(900);
   const s4 = await state(page);
   check('Lessons Learned 3 leads to level 4 (Senior Manager)', s4.level === 'level4' && s4.outfit === 'seniorManager', s4);
-  await teleport(page, 178, 14); await hold(page, 'ArrowLeft', 250); await sleep(1500);
+  await teleport(page, 178, 14); await hold(page, 'ArrowLeft', 250); await page.waitForFunction(() => globalThis.__game.scene.isActive('LessonsLearnedScene'), { timeout: 10000 }).catch(() => {});
   const ll4 = await page.evaluate(() => globalThis.__game.scene.getScenes(true).map((s) => s.scene.key));
   check('level 4 (from the client side) opens Lessons Learned 4', ll4.includes('LessonsLearnedScene'), ll4);
   await sleep(800);
