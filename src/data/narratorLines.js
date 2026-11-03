@@ -57,6 +57,8 @@ export const NARRATOR_LINES = [
   { id: 'hr_course_2', event: 'hrCourse', text: 'Modulo 7 di 12. Gli altri 11 li fai stanotte.' },
   { id: 'junior_q_1', event: 'juniorQuestion', text: 'Mezza giornata per spiegare come si accende un PC. Fatturabile? No.' },
   { id: 'junior_q_2', event: 'juniorQuestion', text: 'Non esistono domande stupide. Esistono junior a 0,5 GU l\'una.' },
+  { id: 'temp_agency_1', event: 'tempAgency', text: 'Interinali: motivatissimi fino al prossimo checkpoint. Esattamente fino lì.' },
+  { id: 'job_post_1', event: 'jobPost', text: 'Annuncio su LinkedIn: 247 candidature, 3 lette, 1 assunto. Quello che ha risposto per primo.' },
   { id: 'death_self_1', event: 'death', when: { cause: 'selfRestart' }, text: 'Dimissioni accettate. Ti riassumiamo subito, stessa RAL.' },
   { id: 'death_self_2', event: 'death', when: { cause: 'selfRestart' }, text: 'Ripartire da zero è molto agile. Costa uguale.' },
 

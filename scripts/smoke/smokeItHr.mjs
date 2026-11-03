@@ -222,6 +222,47 @@ void G;
   await page.close();
 }
 
+// hiring (docs/HIRING.md): the temp agency (2 temps until the checkpoint), the LinkedIn job post (1 GU, a real junior)
+{
+  const page = await open('?debug=1&level=level4&standup=off');
+  await teleport(page, 62, 14); await sleep(400);
+  const b0 = (await state(page)).burnout;
+  await page.keyboard.press('KeyE');
+  const temps = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 5);
+  const s1 = await state(page);
+  await page.screenshot({ path: OUT + 'hiring-temps.png' });
+  // to the checkpoint: the contract ends
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(104 * 32 + 16, 15 * 32 - 16); g.team.resetTrail(); });
+  await page.keyboard.down('ArrowRight');
+  const left = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 3);
+  await page.keyboard.up('ArrowRight');
+  const s2 = await state(page);
+  const net = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.netLoss());
+  check('L4: the agency gives 2 temps (team 5); at checkpoint 106 they leave (team 3), no burnout, no loss', temps && s1.team === 5 && left && s2.team === 3 && s2.burnout === b0 && net === 0, { s1, s2, net });
+  await page.close();
+}
+{
+  const page = await open('?debug=1&level=level4&standup=off&cp=cp0');
+  await teleport(page, 150, 14); await sleep(400);
+  const gu0 = (await state(page)).gu;
+  await page.keyboard.press('KeyE');
+  await sleep(300);
+  const gu1 = (await state(page)).gu;
+  const joined = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 4);
+  check('L4: the LinkedIn job post costs 1 GU; 6 s later a real junior joins (team 4)', gu1 === gu0 - 1 && joined, { gu0, gu1, s: await state(page) });
+  await page.screenshot({ path: OUT + 'hiring-jobpost.png' });
+  await page.close();
+}
+{
+  const page = await open('?debug=1&level=level4&standup=off&cp=cp0&pivot=linkedin');
+  await teleport(page, 150, 14); await sleep(400);
+  const gu0 = (await state(page)).gu;
+  await page.keyboard.press('KeyE');
+  await sleep(300);
+  check('L4 pivot=linkedin: the job post is free', (await state(page)).gu === gu0, gu0);
+  await page.close();
+}
+
 await browser.close();
 console.log(results.join('\n'));
 console.log('\nERRORS:\n' + (errors.length ? errors.join('\n') : 'none'));

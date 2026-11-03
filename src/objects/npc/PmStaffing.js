@@ -99,7 +99,8 @@ export default class PmStaffing {
     const last = followers[followers.length - 1];
     this.say('Mi presti una risorsa? Due settimane, giuro.');
     scene.stats.recordIncident('pm');
-    team.lose(last, true, true);
+    // a temp is not charged at the checkpoint, so it is not prepaid either (the +6% is the PM's all the same)
+    team.lose(last, true, !last.temp);
     scene.floatText('-1 junior', last.sprite.x, last.sprite.y - 30);
     bus.emit(EV.TOAST, { text: 'Il PM si è preso un junior "per due settimane"', durationMs: 2000, color: '#fde68a' });
     if (scene.addBurnout('pmResource')) return;

@@ -253,7 +253,9 @@ export default class GameScene extends Phaser.Scene {
         this.spawnPoint = c.spawn;
         if (this.chargeTeamLosses()) return;
         this.team?.snapshot();
-        bus.emit(EV.TOAST, { text: 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
+        // the temps' contract ends at the checkpoint (docs/HIRING.md): not a loss
+        const temps = this.team?.dismissTemps() ?? 0;
+        bus.emit(EV.TOAST, { text: temps ? 'Checkpoint. Contratto degli interinali scaduto: grazie per la collaborazione.' : 'Checkpoint: pausa caffè registrata', durationMs: 2000 });
         this.narrate('checkpoint');
       });
     }
@@ -606,6 +608,8 @@ export default class GameScene extends Phaser.Scene {
     // debug runs (checkpoints, god mode, custom budget…) never enter the leaderboard
     const ranks = DEBUG.anyOverride ? null : leaderboard.record({ levelId: this.levelId, timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu });
     this.team?.recallAway();
+    // the temps' contract ends with the level (docs/HIRING.md)
+    this.team?.dismissTemps();
     const team = this.team ? { count: this.team.count, size: this.teamAtStart } : null;
     if (team) session.team = Math.max(1, team.count);
     const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max, burnout: this.burnout.value, clean };

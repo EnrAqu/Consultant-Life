@@ -187,6 +187,9 @@ function entityColumns(e) {
       return [e.x - 1, e.x + p.width];
     case 'hrCourse':
       return [e.x - 2, e.x];
+    case 'tempAgency':
+    case 'jobPost':
+      return [e.x - 1, e.x + 1];
     case 'juniorStall':
       return [e.x - 1, e.x + 1];
     case 'contractor':

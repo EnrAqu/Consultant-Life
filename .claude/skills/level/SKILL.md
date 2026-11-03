@@ -63,6 +63,15 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 - I junior che si perdono passano da `Team.lose`. Se il burnout l'hai già addebitato tu, usa `prepaid = true`, così il checkpoint non lo addebita una seconda volta. Lo stato `away` (team building) non è una perdita.
 - Il tasto **E** va prima agli NPC che lo vogliono (`onAction()`, es. il fornitore) e solo poi alla delega.
 - **Ogni stato nuovo del team** (`away`, `staying` con ritorno…) va controllato in **tutti** i conteggi di fine livello e del checkpoint (`count`, `aliveCount`, `netLoss`, `session.team`), con uno smoke che finisce il livello in quello stato.
+- Stati del team oggi:
+  - `follow`;
+  - `going` e `staying` (delega; `comeBack` per chi torna);
+  - `away` (team building);
+  - `stalled` (junior fermo);
+  - `joining` (assunto da LinkedIn, corre verso la fila);
+  - `doomed` e `gone`.
+
+  Gli interinali hanno `temp: true` e non contano mai. Controllali tutti quando aggiungi una meccanica sul team.
 - Un ostacolo a tempo (ticket, corso…) **non si azzera al respawn** se il checkpoint è prima di lui: una volta superato resta superato.
 - Una trappola che scatta su una colonna deve scattare quando la si **attraversa** (posizione precedente e attuale da parti opposte, spostamento ≤ 3 colonne), non con `>= col`. Un respawn, un teletrasporto o il primo frame di uno sprite nuovo (i junior nascono a x = 0) la farebbero scattare subito.
 - Prima di fissare il punto di una trappola, controlla **cosa costa davvero tornare indietro** lì: porte, burroni, arrivista, escalation.

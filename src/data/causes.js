@@ -34,6 +34,8 @@ export const CAUSES = {
   intern: { label: 'il budget formazione', pivotable: false },
   // the junior's stupid question (docs/JUNIOR_QUESTION.md): 0.5 GU, not a lesson
   juniorQuestion: { label: 'le domande dei junior', pivotable: false },
+  // the LinkedIn job post (docs/HIRING.md): 1 GU, not a lesson
+  jobPost: { label: 'gli annunci su LinkedIn', pivotable: false },
   rival: { label: "l'arrivista", pivotable: false },
   escalation: { label: "l'escalation", pivotable: false },
   // the PM and LinkedIn (docs/PM_LINKEDIN.md): born in level 2, lessons with slots in level 3

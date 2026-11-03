@@ -204,3 +204,28 @@ describe('StallBrain — the junior who stops with a question', () => {
     }
   });
 });
+
+import HireBrain from '../src/core/HireBrain.js';
+
+describe('Hiring desks — temp agency and LinkedIn job post', () => {
+  it('E hires once per life; the junior arrives after the delay', () => {
+    const b = new HireBrain({ delayMs: 6000 });
+    expect(b.update(10000)).toBe(null);
+    expect(b.act()).toBe('hire');
+    expect(b.act()).toBe(null);
+    expect(b.update(5999)).toBe(null);
+    expect(b.update(1)).toBe('arrive');
+    expect(b.update(1)).toBe(null);
+    b.reset();
+    expect(b.act()).toBe('hire');
+    expect(new HireBrain({ delayMs: 0 }).update(0)).toBe(null);
+  });
+
+  it('level 4: the agency before gate 1 and checkpoint 106; the job post is a `linkedin` slot before gate 156', () => {
+    const agency = LEVELS.level4.entities.find((e) => e.type === 'tempAgency');
+    const gate1 = LEVELS.level4.entities.find((e) => e.id === 'gate1');
+    expect(agency.x).toBeLessThan(gate1.x + (gate1.params.plateDx ?? -4));
+    expect(resolveLevel(LEVELS.level4, 'linkedin').entities.find((e) => e.id === 'slotJob').mode).toBe('pivoted');
+    expect(LEVELS.level4.entities.find((e) => e.id === 'slotJob').x).toBeLessThan(152);
+  });
+});

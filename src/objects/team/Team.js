@@ -67,8 +67,40 @@ export default class Team {
   }
 
   // following you, running to a delegated trap or away at the HR team building: not lost (yet)
+  // temps (the agency, docs/HIRING.md) never count: their leaving is not a loss and they never go to the next level
   get aliveCount() {
-    return this.members.filter((m) => m.state === 'follow' || m.state === 'going' || m.state === 'away').length;
+    return this.members.filter((m) => !m.temp && (m.state === 'follow' || m.state === 'going' || m.state === 'away')).length;
+  }
+
+  // the temp agency: n juniors on a contract until the next checkpoint (orange shirts)
+  addTemps(n) {
+    for (let i = 0; i < n; i++) {
+      const m = this.makeMember();
+      m.temp = true;
+      m.sprite.setTint(0xfdba74);
+      this.members.push(m);
+    }
+    this.emit();
+  }
+
+  // contract over (checkpoint, end of the level): the temps leave, nothing charged
+  dismissTemps() {
+    const temps = this.members.filter((m) => m.temp && m.state !== 'gone');
+    for (const m of temps) {
+      m.state = 'gone';
+      m.sprite.setVisible(false);
+    }
+    if (temps.length) this.emit();
+    return temps.length;
+  }
+
+  // the LinkedIn job post: a junior runs in from (x, y) and joins the end of the line
+  addRunner(x, y) {
+    const m = this.makeMember();
+    m.state = 'joining';
+    m.sprite.setPosition(x, y);
+    this.members.push(m);
+    this.emit();
   }
 
   // HR team building (docs/IT_HR_EXTERNAL.md §3.1): away for a while, then back at the end of the line
@@ -99,6 +131,8 @@ export default class Team {
   // end of the level: whoever is at the team building comes back first (review IT_HR #1: they were lost for good)
   recallAway() {
     for (const m of this.members.filter((x) => x.state === 'away')) this.comeBack(m);
+    // …and so does the junior hired on LinkedIn who is still running to you
+    for (const m of this.members.filter((x) => x.state === 'joining')) m.state = 'follow';
   }
 
   // HR's fault (one `hr` incident per life): delegating, or opening the IT ticket yourself, with the team away
@@ -158,6 +192,19 @@ export default class Team {
     });
 
     this.hitByTraps();
+
+    // a junior hired through LinkedIn runs to the end of the line
+    for (const m of this.members.filter((x) => x.state === 'joining')) {
+      const target = this.trail.positionFor(this.followers.length);
+      const dx = target.x - m.sprite.x;
+      const step = (RUN_SPEED * dt) / 1000;
+      if (Math.abs(dx) <= step) {
+        m.state = 'follow';
+        this.emit();
+      } else {
+        m.sprite.setPosition(m.sprite.x + Math.sign(dx) * step, this.floorAt(m.sprite.x, target.y) ?? target.y).setFlipX(dx < 0).setFrame(`run${Math.floor(this.trail.t / 80) % 4}`).setVisible(true);
+      }
+    }
 
     for (const m of this.members) {
       if (m.state === 'going') this.updateGoing(m, dt);

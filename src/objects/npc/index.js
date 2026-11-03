@@ -8,6 +8,7 @@ import Recruiter from './Recruiter.js';
 import TeamBuilding from './TeamBuilding.js';
 import Contractor from './Contractor.js';
 import JuniorStall from './JuniorStall.js';
+import { TempAgency, JobPost } from './HiringDesk.js';
 
 export const NPC_CLASSES = {
   micromanager: Micromanager,
@@ -20,4 +21,6 @@ export const NPC_CLASSES = {
   teamBuilding: TeamBuilding,
   contractor: Contractor,
   juniorStall: JuniorStall,
+  tempAgency: TempAgency,
+  jobPost: JobPost,
 };
