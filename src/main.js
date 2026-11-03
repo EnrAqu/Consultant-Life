@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GRAVITY, COLORS, PHYSICS_FPS } from './config/constants.js';
 import { DEBUG } from './config/debug.js';
 import BootScene from './scenes/BootScene.js';
+import HomeScene from './scenes/HomeScene.js';
 import GameScene from './scenes/GameScene.js';
 import UIScene from './scenes/UIScene.js';
 import LessonsLearnedScene from './scenes/LessonsLearnedScene.js';
@@ -25,7 +26,7 @@ const game = new Phaser.Game({
   fps: { target: 60, smoothStep: false },
   physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, fps: PHYSICS_FPS, debug: DEBUG.debug } },
   // FarmHudScene after FarmScene: it draws on top of the farm
-  scene: [BootScene, GameScene, FarmScene, UIScene, FarmHudScene, LessonsLearnedScene, BudgetOverScene, EndingScene],
+  scene: [BootScene, HomeScene, GameScene, FarmScene, UIScene, FarmHudScene, LessonsLearnedScene, BudgetOverScene, EndingScene],
 });
 
 // Exposed only in debug mode, for automated smoke tests.

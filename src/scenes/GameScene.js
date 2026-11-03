@@ -10,7 +10,8 @@ import StandupSchedule from '../core/StandupSchedule.js';
 import { formatGu } from '../core/format.js';
 import { CAUSES, causeLabel } from '../data/causes.js';
 import { bus, EV, listen } from '../events/EventBus.js';
-import { stats, narrator, leaderboard, session } from '../state.js';
+import { stats, narrator, leaderboard, leaderboardApi, session } from '../state.js';
+import { startOnlineRun } from '../services/leaderboardApi.js';
 import Player from '../objects/Player.js';
 import PlayerView from '../objects/PlayerView.js';
 import { OUTFITS } from '../data/outfits.js';
@@ -113,6 +114,8 @@ export default class GameScene extends Phaser.Scene {
       enabled: !DEBUG.standupOff,
     });
     this.stats.startRun(this.levelId);
+    // the online leaderboard's token for this attempt (docs/LEADERBOARD.md): asked now, never blocking; debug runs (gameplay overrides) never go online
+    this.onlineRun = DEBUG.anyOverride ? null : startOnlineRun(leaderboardApi, this.levelId);
     this.pauseReasons = new Set();
     this.ended = false;
     this.budgetLowSaid = false;
@@ -612,7 +615,8 @@ export default class GameScene extends Phaser.Scene {
     this.team?.dismissTemps();
     const team = this.team ? { count: this.team.count, size: this.teamAtStart } : null;
     if (team) session.team = Math.max(1, team.count);
-    const payload = { levelId: this.levelId, next, run, ranks, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max, burnout: this.burnout.value, clean };
+    const online = ranks && this.onlineRun ? { attempt: this.onlineRun, result: { timeMs: Math.round(run.timeMs), deaths: run.deaths, guLeft: this.budget.gu } } : null;
+    const payload = { levelId: this.levelId, next, run, ranks, online, team, dominant: this.stats.dominantPivotCause(), gu: this.budget.gu, guMax: this.budget.max, burnout: this.burnout.value, clean };
     bus.emit(EV.LEVEL_COMPLETE, payload);
     this.time.delayedCall(LEVEL_COMPLETE_DELAY_MS, () => {
       fadeTo(this, next ? 'LessonsLearnedScene' : 'EndingScene', { ending: 'partner', ...payload });

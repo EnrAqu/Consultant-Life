@@ -1,6 +1,6 @@
 # Consultant Life — Playbook di progetto
 
-Platformer 2D browser, genere "rage game", a tema consulenza. Costo zero: sito statico, nessun backend.
+Platformer 2D browser, genere "rage game", a tema consulenza. Costo quasi zero: sito statico; l'unico backend è l'API della classifica online (repo `Consultant-Life-Leaderboard`, `docs/LEADERBOARD.md`), e il gioco funziona anche senza.
 Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in **inglese**.
 
 ## Mappa dei file
@@ -19,6 +19,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/FARM.md` | Livello extra "Il contadino" (dopo il burnout al 100%): `FarmScene`, telefono, stagno, panchina, finale | Playbook `plan` / `implement` |
 | `docs/IT_HR_EXTERNAL.md` | Piano di IT (livelli 2–3), HR (3–4) e fornitore esterno (4–5): riavvio forzato, VPN, ticket, team building, corso, contractor | Playbook `plan` / `implement` |
+| `docs/LEADERBOARD.md` | Classifica online: client (`src/services/leaderboardApi.js`, `src/scenes/onlineScore.js`), nome, flusso token → invio → top, fallback locale | Playbook `plan` / `implement` |
 | `docs/LEADERBOARD_API_PROMPT.md` | Prompt per far costruire a Claude l'API della classifica condivisa su Azure (Functions + Table Storage) | Utente |
 | `docs/HIRING.md` | Assumere junior nel livello 4: agenzia interinale (fino al checkpoint) e annuncio su LinkedIn | Playbook `plan` / `level` |
 | `docs/JUNIOR_QUESTION.md` | Il junior che si ferma con una domanda stupida (livelli 3 e 5): 0,5 GU per tornare a prenderlo | Playbook `plan` / `level` |
@@ -47,7 +48,7 @@ Flusso per una feature: `plan` → `review` → `plan` (applica i fix) → `impl
 
 - **Ogni decisione va in `docs/DECISIONS.md`** (una riga: data, decisione, motivo). Non rimettere in discussione decisioni registrate senza chiederlo all'utente.
 - **"Crudele ma giusto":** ogni trappola deve avere un indizio leggibile e un comportamento deterministico (niente casualità nelle trappole).
-- **Restart < 1 s**, nessun menu prima di giocare.
+- **Restart < 1 s.** Prima di giocare c'è solo la homepage all'apertura della pagina (un tasto, Spazio, per partire); restart e retry non ci ripassano.
 - La logica pura sta in `src/core/` (senza Phaser) e ha test Vitest.
 - `localStorage` sempre dentro try/catch; il gioco deve funzionare anche senza.
 - Nessuna dipendenza nuova senza versione esatta (niente `^`/`~`).
@@ -64,3 +65,5 @@ npm run build      # build di produzione in dist/
 npm test           # test Vitest della logica in src/core/ (incluso il validatore dei livelli)
 npm run smoke      # build + smoke nel browser (Chrome locale): a macchina scarica
 ```
+
+Classifica online in locale: `VITE_LEADERBOARD_API_URL=http://localhost:7071/api npm run dev` con l'API avviata (`func start` + Azurite nella repo dell'API), oppure `?lbApi=<url>` su localhost. Senza nessuno dei due, in locale il gioco non tocca la rete.

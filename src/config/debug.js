@@ -23,6 +23,8 @@ export const DEBUG = {
   pivot: PIVOTS.includes(q.get('pivot')) ? q.get('pivot') : null,
   standupOff: q.get('standup') === 'off',
   resetStats: q.get('resetStats') === '1',
+  // the homepage is skipped in debug (smoke tests start in the game); ?home=1 shows it anyway
+  home: q.get('home') === '1',
   gu: num('gu'),
   clock: parseClock(q.get('clock')),
   clockSpeed: num('clockSpeed') ?? 1,

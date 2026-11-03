@@ -9,6 +9,11 @@ export default class BootScene extends Phaser.Scene {
 
   create() {
     generateAll(this);
+    // the homepage, only when the page opens (docs/LEADERBOARD.md §Homepage); it launches the HUD itself
+    if (DEBUG.home || (!DEBUG.debug && !DEBUG.anyOverride)) {
+      this.scene.start('HomeScene');
+      return;
+    }
     // UIScene first, so its listeners exist before GameScene emits the initial state.
     this.scene.launch('UIScene');
     if (DEBUG.ending) {

@@ -20,7 +20,13 @@ description: Implementa una milestone di un piano (docs/ITERATION_N.md, docs/BUR
 6. Spunta la milestone nel piano (`- [x]`) e annota eventuali scostamenti. Se tocca un livello, aggiorna anche la sua scheda in `docs/LEVELS.md`.
 7. Se devi scegliere qualcosa che il piano non dice: scegli l'opzione più semplice, scrivila in `docs/DECISIONS.md` e segnalala nel resoconto.
 8. Commit locale per milestone, a nome dell'utente e senza righe `Co-Authored-By`/`Claude-Session`. Mai push senza richiesta esplicita (il permesso vale per quel giro di commit).
-9. **Aggiorna i playbook** toccati con quello che hai imparato (utente: "aggiorna sempre i playbook").
+9. **Rete (classifica online, `docs/LEADERBOARD.md`):** il codice di rete sta solo in `src/services/leaderboardApi.js`, che non lancia mai eccezioni verso il gioco. Le scene usano `src/scenes/onlineScore.js`.
+   - Gli smoke non toccano mai l'API vera: su localhost è spenta. Per provarla, usa `?lbApi=http://lb.test/api` e la request interception di puppeteer (vedi `smokeLeaderboard.mjs`); rispondi anche alle `OPTIONS` con gli header CORS.
+   - Attenzione: `standup=off`, `god=1`, `cp=`… sono override di gioco (`DEBUG.anyOverride`), quindi la partita **non** va online. Per uno smoke online usa solo `?debug=1`.
+   - Un `<input>` DOM sopra il canvas deve fermare la propagazione dei tasti, altrimenti Phaser (che ascolta su `window`) vede Spazio e Invio.
+   - Menu con più tasti (es. `HomeScene`): usa un solo `keyboard.on('keydown')` sull'`event.code` e ignora un evento già visto (`WeakSet`). In headless due tasti nello stesso frame hanno rigiocato un evento.
+   - La homepage si salta in debug: uno smoke che deve vederla usa `?debug=1&home=1`.
+10. **Aggiorna i playbook** toccati con quello che hai imparato (utente: "aggiorna sempre i playbook").
 
 ## Fermati e chiedi se
 - il piano contraddice una decisione registrata;
