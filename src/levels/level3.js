@@ -1,6 +1,6 @@
 import { createGrid } from './builder.js';
 
-const W = 180;
+const W = 215;
 const g = createGrid(W);
 
 // S0 — spawn
@@ -23,7 +23,10 @@ g.ground(128, 129).ground(134, 144).ground(149, 165);
 // S6 — micromanager slot zone 150–165, KT slot over a spike pit 166–173 (pillar 169–170), goal
 g.ground(166, 173);
 for (let x = 166; x <= 173; x++) if (x !== 169 && x !== 170) g.put(x, 14, '^');
-g.ground(169, 170, 14).ground(174, W - 1).put(176, 14, 'G');
+g.ground(169, 170, 14).ground(174, 190);
+// S7 (docs/IT_HR_EXTERNAL.md §5, 180 → 215 columns): HR team building 176–181, checkpoint 183, IT kiosk 184 and ticket
+// barrier 189, then the VPN pit 191–204 (VPNs 193–194, 197–198, 201–202; every jump has 2 empty columns), goal 210
+g.put(183, 14, 'C').ground(205, W - 1).put(210, 14, 'G');
 
 const replyAllNormal = { triggerDx: -3, triggerWidth: 2, startDelayMs: 0, count: 10, intervalMs: 120, columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], spawnHeight: 6, fallSpeed: 14, restRow: 14 };
 const deckNormal = {
@@ -113,6 +116,33 @@ export default {
       params: {
         normal: { callMs: 4000 },
         pivoted: { callMs: 800, hiddenPlatforms: [{ dx: 3, dy: 2, w: 2, h: 1 }, { dx: 6, dy: 2, w: 2, h: 1 }, { dx: 9, dy: 2, w: 2, h: 1 }] },
+      },
+    },
+    // S7 — HR, IT (docs/IT_HR_EXTERNAL.md): team building (HR is born here, no slot), the IT ticket and the VPNs (slots `it`)
+    { id: 'tb1', type: 'teamBuilding', x: 178, y: 14, params: { zoneFrom: 176, zoneTo: 181, awayMs: 8000 } },
+    {
+      id: 'slotTicket', type: 'itTicket', cause: 'it', x: 189, y: 14, slot: true,
+      params: { normal: { kioskDx: -5, workMs: 4000, openMs: 2500 }, pivoted: { kioskDx: -5, workMs: 4000, openMs: 2500 } },
+    },
+    {
+      id: 'slotVPN1', type: 'vpn', cause: 'it', x: 193, y: 14, slot: true,
+      params: {
+        normal: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 0, pitRect: { dx: -2, dy: 1, w: 6, h: 2 } },
+        pivoted: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 0 },
+      },
+    },
+    {
+      id: 'slotVPN2', type: 'vpn', cause: 'it', x: 197, y: 14, slot: true,
+      params: {
+        normal: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 400, pitRect: { dx: -2, dy: 1, w: 6, h: 2 } },
+        pivoted: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 400 },
+      },
+    },
+    {
+      id: 'slotVPN3', type: 'vpn', cause: 'it', x: 201, y: 14, slot: true,
+      params: {
+        normal: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 800, pitRect: { dx: -2, dy: 1, w: 6, h: 2 } },
+        pivoted: { width: 2, onMs: 2000, offMs: 1200, phaseMs: 800 },
       },
     },
   ],

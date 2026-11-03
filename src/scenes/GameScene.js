@@ -475,7 +475,9 @@ export default class GameScene extends Phaser.Scene {
     this.goal.update(dt);
     this.escalation?.update(dt);
     this.sycophant?.update(dt);
-    this.team?.update(dt, input.delegate);
+    // E first goes to an NPC that wants it (the contractor at his desk), else it delegates
+    const acted = input.delegate && this.npcs.some((n) => n.onAction?.());
+    this.team?.update(dt, input.delegate && !acted);
     for (const p of this.pickups) p.update(dt);
     for (const d of this.deals) d.update(dt);
 

@@ -58,8 +58,9 @@ export const BUDGET = {
 // with +1% the GU always ran out before 100%).
 export const BURNOUT = {
   levelMin: [0, 15, 30, 45, 60],
-  // pmResource: the level 4 PM takes a junior (user, 2026-11-03: +10%, the loss included)
-  gain: { death: 3, escalation: 5, teamLoss: 5, micromanager: 5, fiveMinutes: 5, standupOverrun: 5, fakeKT: 5, clientSwitch: 5, pmResource: 10 },
+  // pmResource: the level 4 PM takes a junior (user, 2026-11-03: +10%, the loss included); hrCourse: the level 4 HR
+  // course (user, 2026-11-03: +10%)
+  gain: { death: 3, escalation: 5, teamLoss: 5, micromanager: 5, fiveMinutes: 5, standupOverrun: 5, fakeKT: 5, clientSwitch: 5, pmResource: 10, hrCourse: 10 },
   relief: { coffee: 2, realKT: 3, cleanLevel: 5 },
 };
 

@@ -48,6 +48,17 @@ export default {
       id: 'slotPMR', type: 'pmStaffing', cause: 'pm', x: 143, y: 14, slot: true,
       params: { normal: { reach: [142, 144] }, pivoted: { reach: [142, 144] } },
     },
+    // HR course (docs/IT_HR_EXTERNAL.md §3.2): barrier at 120 after the deck corridor; the certificate (108, row 5) sits
+    // on top of the contractor's stairs (desk 104, steps 110–111 r13, 107–108 r11, 110–111 r9: the last one only after
+    // the defect is reported — without it the certificate is out of reach)
+    {
+      id: 'slotHR', type: 'hrCourse', cause: 'hr', x: 120, y: 14, slot: true,
+      params: { normal: { courseMs: 2000, certX: 108, certY: 5 }, pivoted: { courseMs: 2000 } },
+    },
+    {
+      id: 'contractor1', type: 'contractor', x: 104, y: 14,
+      params: { cost: 4, delayMs: 4000, fixMs: 2000, steps: [{ dx: 6, dy: -1, w: 2 }, { dx: 3, dy: -3, w: 2 }, { dx: 6, dy: -5, w: 2 }] },
+    },
     { id: 'five1', type: 'fiveMinutes', x: 46, y: 14, slot: true, params: { normal: {}, pivoted: { shortcutTo: { col: 70, row: 14 } } } },
     {
       id: 'slotA', type: 'replyAll', x: 52, y: 14, slot: true,

@@ -147,22 +147,24 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 
 **Registro:**
 - **2026-11-03 — Più denso, stessa lunghezza: il PM e LinkedIn** (utente: "complicare il livello 2, nuove trappole, introdurre il PM e LinkedIn"). Burrone 67–72 con la barra del PM che scivola indietro (poi due colonne, 73–74, prima delle spine 75–76); burrone 97–103 con due post LinkedIn (il secondo sponsorizzato, crolla al primo like) prima della consegna. Le cause `pm` e `linkedin` sono pivotabili: il livello 3 ha gli slot. Catena dei pivot in entrata invariata (gli slot del livello 2 restano quelli delle 4 cause del livello 1). Dettaglio in `docs/PM_LINKEDIN.md`. Classifica del livello 2: chiedere all'utente se azzerarla.
+- **2026-11-03 — IT: riavvio forzato** (`it1`, col 77): dopo le spine parte "Il PC si riavvierà tra 3…", a zero 1,2 s fermo mentre il mondo continua. Di corsa lo zero cade sopra la fossa del KT o sui post di LinkedIn. L'IT nasce qui: lezione `it` con slot nel livello 3. Dettaglio in `docs/IT_HR_EXTERNAL.md`.
 
 ## Livello 3 — "Il primo team"
 | | |
 |---|---|
-| File | `src/levels/level3.js` (180 colonne, orizzontale) |
+| File | `src/levels/level3.js` (215 colonne, orizzontale) |
 | Carriera / GU / burnout min | manager · 15 GU · 30% |
 | Nato da | `ITERATION_3.md` §3 · `ITERATION_4.md` §4 (team, delega, varco, stagista) |
-| Slot (pivot dal livello 2) | mmA/mmB/slotMM micromanager · slotA replyAll · slotB scopeCreep · slotC deckCollapse · five4 fiveMinutes · slotD fakeKT · **slotPM pm** (burrone 41–46) · **slotLI linkedin** (burrone 58–62) |
-| Altro | 4 porte "Hai 5 minuti?" (51, 56, 84, 140), stagista, varco di approvazione |
-| Checkpoint | cp0 |
+| Slot (pivot dal livello 2) | mmA/mmB/slotMM micromanager · slotA replyAll · slotB scopeCreep · slotC deckCollapse · five4 fiveMinutes · slotD fakeKT · **slotPM pm** (burrone 41–46) · **slotLI linkedin** (burrone 58–62) · **slotTicket itTicket e slotVPN1–3 vpn** (causa it, S7) |
+| Altro | 4 porte "Hai 5 minuti?" (51, 56, 84, 140), stagista, varco di approvazione, **team building HR** (zona 176–181) |
+| Checkpoint | cp0 (112), **cp1 (183)** |
 | Test | `tests/LevelParser.test.js`: completabile con tutte le combinazioni di pivot (anche `pm`, `linkedin`); chiuso se il varco resta chiuso; `tests/PmLinkedin.test.js` |
 | Smoke | `smoke3.mjs`, `smoke4.mjs`, `smokeBurnout.mjs`, `smokePmLinkedin.mjs` |
 | Prova | `?debug=1&level=level3[&pivot=…]` (anche `pivot=pm`, `pivot=linkedin`) |
 
 **Registro:**
 - **2026-11-03 — Slot del PM e di LinkedIn** (le cause nuove del livello 2 sono pivotabili, scelta dell'utente). Burrone 41–46 con la barra del Gantt (normale: scivola indietro; pivoted: ti porta avanti di 2) e burrone 58–62 con un post (normale: crolla al terzo like; pivoted: non crolla). La prima porta passa da col 47 a 51. In modalità normale sono due trappole in più. Livello 4 senza slot nuovi (come già per micromanager e KT). Dettaglio in `docs/PM_LINKEDIN.md`.
+- **2026-11-03 — Sezione S7: HR e IT, da 180 a 215 colonne** (utente). Team building 176–181 (i junior via per 8 s), checkpoint 183, chiosco IT 184 e barriera del ticket 189 (4 s di lavorazione, aperta 2,5 s), burrone 191–204 con tre VPN (connesse 2 s, disconnesse 1,2 s, sfasate di 400 ms), traguardo a 210. Con la lezione `it` il ticket è P1 e le VPN restano connesse. La classifica del livello 3 non è più confrontabile (`?resetStats=1` in locale). Dettaglio in `docs/IT_HR_EXTERNAL.md`.
 
 ## Livello 4 — "Il cliente strategico"
 | | |
@@ -170,8 +172,8 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | File | `src/levels/level4.js` (200 colonne, orizzontale) |
 | Carriera / GU / burnout min | seniorManager · 15 GU · 45% |
 | Nato da | `ITERATION_4.md` §5 (e §3, traguardo che tradisce) |
-| Slot (pivot dal livello 3) | five1 fiveMinutes · slotA replyAll · slotC deckCollapse · slotB scopeCreep · **slotRec recruiter (causa linkedin, zona 37–44)** · **slotPMR pmStaffing (causa pm, scrivania 143)** |
-| Altro | 2 arrivisti, 2 stagisti, 2 varchi, bonus AI, traguardo che tradisce |
+| Slot (pivot dal livello 3) | five1 fiveMinutes · slotA replyAll · slotC deckCollapse · slotB scopeCreep · **slotRec recruiter (causa linkedin, zona 37–44)** · **slotPMR pmStaffing (causa pm, scrivania 143)** · **slotHR hrCourse (causa hr, barriera 120)** |
+| Altro | 2 arrivisti, 2 stagisti, 2 varchi, bonus AI, traguardo che tradisce, **fornitore esterno** (scrivania 104, E) |
 | Checkpoint | cp0 |
 | Test | `tests/LevelParser.test.js`: completabile con salti "normali" per ogni pivot; varchi obbligatori |
 | Smoke | `smoke4.mjs` |
@@ -179,6 +181,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 
 **Registro:**
 - **2026-11-03 — Il PM e il recruiter chiedono risorse** (utente: "in level 4 i want them to interact with the player as asking for resources"; PM con burnout +10%). Il PM alla scrivania (143) prende l'ultimo junior a chi calpesta il suo tappeto (142, 144); il recruiter fa dimettere i junior che restano 1,5 s nella zona #OpenToWork (37–44). Con le lezioni `pm`/`linkedin` dal livello 3 ti danno un junior. Dettaglio in `docs/PM_LINKEDIN.md` §8–9.
+- **2026-11-03 — HR e fornitore esterno** (utente). Corso obbligatorio alla barriera 120: 2 s fermo e **burnout +10%**, una volta per livello, a meno di avere l'attestato. L'attestato è in cima ai gradini del fornitore (scrivania 104, E = 4 GU; "come da specifica" manca l'ultimo gradino, E segnala il difetto). Con la lezione `hr` la barriera è aperta. Dettaglio in `docs/IT_HR_EXTERNAL.md` §10.
 
 ## Livello 5 — "La Partnership"
 | | |

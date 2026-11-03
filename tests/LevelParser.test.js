@@ -61,7 +61,7 @@ describe('LevelValidator', () => {
 
   it('levels 1 and 3 need only "normal" jumps on their mandatory path', () => {
     expect(validateLevel(parseLevel(resolveLevel(LEVELS.level1, null)), { table: 'normal' }).errors).toEqual([]);
-    for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin']) {
+    for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin', 'it', 'hr']) {
       expect(validateLevel(parseLevel(resolveLevel(LEVELS.level3, pivot)), { table: 'normal' }).errors, String(pivot)).toEqual([]);
     }
   });
@@ -79,7 +79,7 @@ describe('LevelValidator', () => {
     expect(r.reachable.has('120:14')).toBe(true);
   });
 
-  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin']) {
+  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin', 'it', 'hr']) {
     it(`level4 is completable with "normal" jumps, pivot=${pivot}`, () => {
       const r = validateLevel(parseLevel(resolveLevel(LEVELS.level4, pivot)), { table: 'normal' });
       expect(r.errors).toEqual([]);
@@ -123,7 +123,7 @@ describe('LevelValidator', () => {
     });
   }
 
-  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin']) {
+  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin', 'it', 'hr']) {
     it(`level3 is completable with pivot=${pivot}`, () => {
       const r = validateLevel(parseLevel(resolveLevel(LEVELS.level3, pivot)));
       expect(r.errors).toEqual([]);

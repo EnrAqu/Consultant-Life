@@ -46,6 +46,17 @@ export const CAUSES = {
     // the user's line (2026-11-03): the post that kills you was "an opportunity"; from now on the posts hold
     lesson: "LinkedIn: hai evitato un'opportunità, errore.",
   },
+  // IT and HR (docs/IT_HR_EXTERNAL.md): IT born in level 2 (slots in level 3), HR born in level 3 (slot in level 4)
+  it: {
+    label: "l'IT",
+    pivotable: true,
+    lesson: "L'IT ora è dalla tua parte: hai il numero diretto del sistemista.",
+  },
+  hr: {
+    label: "l'HR",
+    pivotable: true,
+    lesson: "Hai capito come funziona HR: l'attestato ce l'hai già, e il team building lo salti.",
+  },
   fiveMinutes: {
     label: 'i "hai 5 minuti?"',
     pivotable: true,
@@ -69,4 +80,4 @@ export const causeLabel = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.labe
 export const causeLesson = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.lesson ?? CAUSES[cause]?.lesson;
 
 // Lessons Learned weight of non-death incidents (a death always weighs 1).
-export const INCIDENT_WEIGHT = { death: 1, fakeKT: 2, micromanager: 1, fiveMinutes: 1, pm: 1, linkedin: 1 };
+export const INCIDENT_WEIGHT = { death: 1, fakeKT: 2, micromanager: 1, fiveMinutes: 1, pm: 1, linkedin: 1, it: 1, hr: 1 };

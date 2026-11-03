@@ -66,9 +66,25 @@ export default class Team {
     this.prepaid = 0;
   }
 
-  // following you or still running to a delegated trap: not lost (yet)
+  // following you, running to a delegated trap or away at the HR team building: not lost (yet)
   get aliveCount() {
-    return this.members.filter((m) => m.state === 'follow' || m.state === 'going').length;
+    return this.members.filter((m) => m.state === 'follow' || m.state === 'going' || m.state === 'away').length;
+  }
+
+  // HR team building (docs/IT_HR_EXTERNAL.md §3.1): away for a while, then back at the end of the line
+  sendAway(member) {
+    if (member.state !== 'follow') return;
+    member.state = 'away';
+    member.sprite.setVisible(false);
+    this.emit();
+  }
+
+  comeBack(member) {
+    if (member.state !== 'away' || !this.members.includes(member)) return;
+    member.state = 'follow';
+    this.members.splice(this.members.indexOf(member), 1);
+    this.members.push(member);
+    this.emit();
   }
 
   // juniors lost since the last checkpoint (or the level start): what the burnout charges for
@@ -78,6 +94,7 @@ export default class Team {
 
   restore() {
     this.prepaid = 0;
+    this.hrSaid = false;
     this.setCount(this.savedCount);
     this.resetTrail();
     this.bubble.setVisible(false);
@@ -178,6 +195,13 @@ export default class Team {
     const player = scene.player;
     const first = this.followers[0];
     if (!first) {
+      // everyone at the team building: that is HR's doing (one `hr` incident per life, review A)
+      if (this.members.some((m) => m.state === 'away')) {
+        bus.emit(EV.TOAST, { text: 'Sono tutti al team building. Torneranno motivatissimi.', durationMs: 1800, color: '#d8b4fe' });
+        if (!this.hrSaid) scene.stats.recordIncident('hr');
+        this.hrSaid = true;
+        return;
+      }
       bus.emit(EV.TOAST, { text: 'Nessuno a cui delegare. Assumi uno stagista.', durationMs: 1800 });
       return;
     }

@@ -5,6 +5,8 @@ import Rival from './Rival.js';
 import Worker from './Worker.js';
 import PmStaffing from './PmStaffing.js';
 import Recruiter from './Recruiter.js';
+import TeamBuilding from './TeamBuilding.js';
+import Contractor from './Contractor.js';
 
 export const NPC_CLASSES = {
   micromanager: Micromanager,
@@ -14,4 +16,6 @@ export const NPC_CLASSES = {
   worker: Worker,
   pmStaffing: PmStaffing,
   recruiter: Recruiter,
+  teamBuilding: TeamBuilding,
+  contractor: Contractor,
 };

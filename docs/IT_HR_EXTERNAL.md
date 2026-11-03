@@ -63,7 +63,7 @@ Lezione: *"Hai capito come funziona HR: l'attestato ce l'hai già, e il team bui
 
 ### 3.2 Corso obbligatorio — `hrCourse` (livello 4, slot)
 - Una barriera alta 4 tile con la referente HR: "Sicurezza sul lavoro — modulo 7 di 12".
-- Toccarla avvia il corso: blocco di `courseMs` = 2000 (lock `hr`), burnout **+5%** (`BURNOUT.gain.hrCourse`), incidente `hr`, poi la barriera si apre.
+- Toccarla avvia il corso: blocco di `courseMs` = 2000 (lock `hr`), burnout **+10%** (`BURNOUT.gain.hrCourse`, scelta dell'utente), incidente `hr`, poi la barriera si apre.
 - Con l'**attestato** (raccolta `certificate`, sul percorso più difficile) la barriera si apre subito: "Attestato valido. Prego."
 - **Pivoted:** l'attestato ce l'hai già (barriera aperta, cartello verde "Attestato caricato su Workday").
 
@@ -102,11 +102,11 @@ Legenda: team building 176–181; `C` checkpoint 183 (review A); `K` chiosco IT 
 - `contractor`: la posizione si propone nella milestone F-5, nella scheda del livello, dopo aver giocato il livello 4.
 
 ## 6. Milestone
-- [ ] **IT-1** `RestartBrain` + `forcedRestart` nel livello 2 + causa `it` + test + smoke.
-- [ ] **IT-2** `VpnBrain`, `TicketBrain`, `vpn`, `itTicket`; livello 3 allungato (S7) con gli slot `it`; test (anche il validatore con ogni pivot) + smoke.
-- [ ] **HR-1** `TeamBuildingBrain` + stato `away` nel `Team` + zona nel livello 3 + causa `hr` + test + smoke.
-- [ ] **HR-2** `hrCourse` + attestato + slot `hr` nel livello 4 + burnout `hrCourse` +5% + test + smoke.
-- [ ] **EXT-1** `ContractorBrain` + `contractor` nel livello 4 + test + smoke.
+- [x] **IT-1** `RestartBrain` + `forcedRestart` nel livello 2 + causa `it` + test + smoke.
+- [x] **IT-2** `VpnBrain`, `TicketBrain`, `vpn`, `itTicket`; livello 3 allungato (S7) con gli slot `it`; test (anche il validatore con ogni pivot) + smoke.
+- [x] **HR-1** `TeamBuildingBrain` + stato `away` nel `Team` + zona nel livello 3 + causa `hr` + test + smoke.
+- [x] **HR-2** `hrCourse` + attestato + slot `hr` nel livello 4 + burnout `hrCourse` +5% + test + smoke.
+- [x] **EXT-1** `ContractorBrain` + `contractor` nel livello 4 + test + smoke.
 - [ ] **EXT-2** fornitore nel livello 5 (proposta nella scheda, poi codice).
 
 Ogni milestone:
@@ -153,3 +153,39 @@ Lasciati:
 - il salto massimo dal pilastro che può atterrare sul tappeto (142): il tappeto è visibile;
 - i test Vitest sul `prepaid` del `Team` (il `Team` dipende da Phaser; lo coprono gli smoke);
 - il confronto R / proseguire dopo aver perso il team.
+
+## 10. Risposte dell'utente e come è stato costruito (2026-11-03)
+Risposte:
+1. Sì alle lezioni `it` e `hr` con i testi proposti.
+2. Sì al livello 3 a 215 colonne.
+3. Corso HR **+10%**.
+4. Le lezioni senza slot nel livello dopo restano come sono.
+
+Differenze rispetto al piano:
+- **Fornitore (EXT-1):** la scrivania è a col **104** del livello 4, prima del checkpoint 106; si ingaggia con **E** (4 GU), mai al tocco.
+  - Costruisce tre gradini one-way: 110–111 r13, 107–108 r11, 110–111 r9. "Come da specifica" manca l'ultimo; si aggiunge segnalando il difetto con un altro **E**.
+  - In cima, a col 108 riga 5, c'è l'**attestato HR**, raggiungibile solo dall'ultimo gradino (verificato con un test sull'altezza del salto).
+  - Così il fornitore è una scelta vera: 4 GU contro il corso (+10% burnout e 2 s fermo).
+- **Corso HR:** barriera a col 120, referente a 119, si attiva arrivando a 118–119. Corso e attestato valgono per tutto il livello.
+- **Ticket IT:** un junior delegato apre il ticket e resta al chiosco. L'incidente `it` conta se la barriera si richiude con te davanti (entro 6 colonne).
+- **VPN:** piattaforme one-way, ciclo sul tempo del livello (non si azzera al respawn).
+- **Team building:** stato `away` nel `Team` (conta in `aliveCount`, torna in fondo alla fila).
+- **Tasto E:** `GameScene` chiede prima agli NPC (`onAction`, il fornitore) e poi delega.
+- **EXT-2 (fornitore nel livello 5):** non costruito. La posizione nella torre si propone dopo il playtest del livello 4.
+
+Verifica:
+- `tests/ItHrExternal.test.js` (14 test):
+  - i brain;
+  - livello 3: 215 colonne, non attraversabile senza VPN, barriera del ticket;
+  - lezioni;
+  - attestato raggiungibile solo dall'ultimo gradino.
+- `tests/LevelParser.test.js` con i pivot `it` e `hr`.
+- `scripts/smoke/smokeItHr.mjs`, 11 controlli:
+  - riavvio forzato;
+  - ticket, incidente e P1;
+  - VPN;
+  - team building, incidente e ritorno;
+  - corso +10%;
+  - fornitore con difetto e attestato;
+  - pivot `hr`.
+- Gli smoke hanno timeout larghi: in un container lento il tempo di gioco scorre a circa 0,3× quello reale.

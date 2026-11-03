@@ -8,6 +8,10 @@ import HiddenMail from './HiddenMail.js';
 import RequirementShift from './RequirementShift.js';
 import PmGantt from './PmGantt.js';
 import LinkedinPost from './LinkedinPost.js';
+import ForcedRestart from './ForcedRestart.js';
+import VpnPlatform from './VpnPlatform.js';
+import ItTicket from './ItTicket.js';
+import HrCourse from './HrCourse.js';
 
 export const TRAP_CLASSES = {
   replyAll: ReplyAllAvalanche,
@@ -20,4 +24,8 @@ export const TRAP_CLASSES = {
   requirementShift: RequirementShift,
   pm: PmGantt,
   linkedin: LinkedinPost,
+  forcedRestart: ForcedRestart,
+  vpn: VpnPlatform,
+  itTicket: ItTicket,
+  hrCourse: HrCourse,
 };

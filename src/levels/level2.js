@@ -40,6 +40,9 @@ export default {
       id: 'scEnd', type: 'scopeCreep', x: 111, y: 12,
       params: { direction: 'right', baseLength: 1, maxLength: 4, triggerDx: 1, triggerWidth: 2, armDelayMs: 250, extendSpeed: 12, pitRect: { dx: 4, dy: 1, w: 3, h: 4 } },
     },
+    // IT (docs/IT_HR_EXTERNAL.md §2.1): a forced restart triggered right after the spikes; at full run its zero falls
+    // over the KT pit or the LinkedIn posts — safe spots 77–84, the pillar 89–90, 95–96
+    { id: 'it1', type: 'forcedRestart', x: 77, y: 14, params: { countdownMs: 3000, freezeMs: 1200 } },
     {
       id: 'pm1', type: 'pm', x: 68, y: 14,
       params: { width: 3, shift: -3, speed: 6, delayMs: 450, returnDelayMs: 1200, pmDx: -2, label: 'Go-live (da ripianificare)', pitRect: { dx: -1, dy: 1, w: 6, h: 2 } },

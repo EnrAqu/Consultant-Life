@@ -1,6 +1,6 @@
 import { parseClock } from '../core/format.js';
 
-const PIVOTS = ['replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin'];
+const PIVOTS = ['replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin', 'it', 'hr'];
 
 function readParams() {
   try {

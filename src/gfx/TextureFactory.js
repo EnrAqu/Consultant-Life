@@ -512,6 +512,36 @@ export function generateAll(scene) {
     p.fill(0x0a66c2).rect(0, 0, 32, 5);
     p.fill(0xe2e8f0).rect(3, 22, 26, 2).rect(3, 26, 18, 2);
   });
+  // IT (docs/IT_HR_EXTERNAL.md): VPN platform tile, help-desk kiosk
+  make(scene, 'vpnTile', 32, 32, (p) => {
+    p.fill(0x0f172a).rect(0, 0, 32, 32);
+    p.fill(0x1e293b).rect(0, 0, 32, 29);
+    p.fill(0x22d3ee).rect(0, 0, 32, 3);
+    p.line(1.5, 0x22d3ee).strokeRound(10, 9, 12, 12, 3);
+    p.fill(0x22d3ee).rect(14, 5, 4, 6);
+  });
+  make(scene, 'itKiosk', 24, 40, (p) => {
+    p.fill(0x334155).round(0, 14, 24, 26, 2);
+    p.fill(0x0f172a).round(2, 0, 20, 14, 2);
+    p.fill(0x38bdf8).rect(4, 2, 16, 10);
+    p.fill(0xffffff).rect(6, 4, 8, 1.5).rect(6, 7, 11, 1.5);
+    p.fill(0x1d4ed8).round(4, 20, 16, 6, 1);
+  });
+  // HR (level 4): the HR rep sheet, the certificate; the contractor's desk
+  makePlayerSheet(scene, 'hr', { ...OUTFITS.manager, top: 0xbe185d, topDark: 0x9d174d, shirtV: 0xffffff, hair: 0x92400e }, 'npc_hr');
+  make(scene, 'certificate', 18, 14, (p) => {
+    p.fill(0xfef3c7).rect(0, 0, 18, 14);
+    p.line(1, 0xb45309).strokeRect(1, 1, 16, 12);
+    p.fill(0x92400e).rect(4, 4, 10, 1).rect(4, 7, 7, 1);
+    p.fill(0xdc2626).circle(14, 10, 2.5);
+  });
+  make(scene, 'contractorDesk', 32, 40, (p) => {
+    p.fill(0x78350f).round(0, 16, 32, 24, 2);
+    p.fill(0xa16207).rect(0, 16, 32, 3);
+    p.fill(0x0f172a).round(6, 2, 20, 13, 2);
+    p.fill(0xf59e0b).rect(8, 4, 16, 9);
+    p.fill(0x0f172a).rect(10, 6, 7, 1.5).rect(10, 9, 10, 1.5);
+  });
   generateFarm(scene);
 }
 

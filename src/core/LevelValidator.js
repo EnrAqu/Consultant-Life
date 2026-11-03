@@ -41,6 +41,8 @@ export function trapSurfaces(entity) {
     if (mode === 'pivoted') rect(x + Math.min(0, p.shift), y, p.width + Math.abs(p.shift), 1);
     else rect(x, y, p.width, 1);
   }
+  // a VPN is there when it is connected (the pit around it is the danger)
+  if (type === 'vpn') rect(x, y, p.width, 1);
   // a LinkedIn post is there when you land on it (it collapses later)
   if (type === 'linkedin') rect(x, y, p.width, 1);
   if (mode !== 'pivoted') return cells;
@@ -86,7 +88,8 @@ export function validateLevel(parsed, { table = 'hard', gatesClosed = false, wor
       }
     }
     const cells = trapSurfaces(e);
-    if (gatesClosed && e.type === 'approvalGate' && e.mode !== 'pivoted') for (let r = 0; r < 4; r++) cells.push({ x: e.x, y: e.y - r });
+    // barriers someone must open: the approval gate, the IT ticket, the HR course
+    if (gatesClosed && ['approvalGate', 'itTicket', 'hrCourse'].includes(e.type) && e.mode !== 'pivoted') for (let r = 0; r < 4; r++) cells.push({ x: e.x, y: e.y - r });
     for (const c of cells) {
       if (c.x < 0 || c.x >= width || c.y < minRow || c.y >= height) errors.push(`entity ${e.id} surface out of bounds`);
       else solid[c.y][c.x] = true;
@@ -182,6 +185,18 @@ function entityColumns(e) {
       return [Math.min(e.x, e.x + p.shift) - 1, Math.max(e.x, e.x + p.shift) + p.width];
     case 'linkedin':
       return [e.x - 1, e.x + p.width];
+    case 'hrCourse':
+      return [e.x - 2, e.x];
+    case 'contractor':
+      return [e.x - 1, e.x + 1];
+    case 'vpn':
+      return [e.x - 1, e.x + p.width];
+    case 'itTicket':
+      return [e.x + (p.kioskDx ?? -5) - 1, e.x];
+    case 'teamBuilding':
+      return [p.zoneFrom, p.zoneTo];
+    case 'forcedRestart':
+      return [e.x, e.x];
     case 'pmStaffing':
       return [p.reach[0] - 1, p.reach[1] + 1];
     case 'recruiter':
