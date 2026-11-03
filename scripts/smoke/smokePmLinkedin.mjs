@@ -128,14 +128,14 @@ const l4 = (page) => page.evaluate(() => {
   await teleportTeam(page, 41, 14);
   const lost = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 0, 8000);
   const s = await l4(page);
-  check('L4: standing still in the #OpenToWork zone, the juniors resign one by one (incidents linkedin 3)', lost && s.incidents.linkedin === 3, s);
+  check('L4: standing still in the #OpenToWork zone, the juniors resign one by one (one linkedin incident per life)', lost && s.incidents.linkedin === 1, s);
   await page.screenshot({ path: OUT + 'l4-recruiter.png' });
   await page.close();
 }
 {
   const page = await open('?debug=1&level=level4&standup=off');
   // keep the colleague at door 46 inside: this check is about crossing the zone
-  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.occupy(20000));
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.occupy());
   // a real crossing: run from col 25, jump the pit 34–36, keep running through the zone 37–44
   await teleportTeam(page, 25, 14); await sleep(1200);
   await page.keyboard.down('ArrowRight');
@@ -153,6 +153,26 @@ const l4 = (page) => page.evaluate(() => {
   await teleportTeam(page, 40, 14); await sleep(600);
   const s = await l4(page);
   check('L4 pivot=linkedin: the recruiter hires one for you (team 4)', s.team === 4, s);
+  await page.close();
+}
+
+{
+  // review B#1: after a death the PM gives the junior back and does not ask again (+10% once per level)
+  const page = await open('?debug=1&level=level4&standup=off&cp=cp0');
+  await teleportTeam(page, 140, 14); await sleep(600);
+  await page.keyboard.down('ArrowRight');
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count < 3, 4000);
+  await page.keyboard.up('ArrowRight');
+  const b1 = (await l4(page)).burnout;
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').die('spike'));
+  await sleep(900);
+  await teleportTeam(page, 140, 14); await sleep(400);
+  await page.keyboard.down('ArrowRight');
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.x >= 146 * 32, 4000);
+  await page.keyboard.up('ArrowRight');
+  await sleep(300);
+  const s = await l4(page);
+  check('L4: after a death the PM does not ask again (team 3, only the death +3%)', s.team === 3 && s.burnout === b1 + 3, { b1, s });
   await page.close();
 }
 

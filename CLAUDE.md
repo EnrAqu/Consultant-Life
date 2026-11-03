@@ -18,6 +18,7 @@ Lingua: documenti e testi di gioco in **italiano**, identificatori di codice in 
 | `docs/MOBILE.md` | Versione mobile: controlli su schermo (`src/input/TouchControls.js`) | Playbook `plan` / `implement` |
 | `docs/BURNOUT.md` | Barra burnout: regole, agganci, HUD, finale burnout | Playbook `burnout` |
 | `docs/FARM.md` | Livello extra "Il contadino" (dopo il burnout al 100%): `FarmScene`, telefono, stagno, panchina, finale | Playbook `plan` / `implement` |
+| `docs/IT_HR_EXTERNAL.md` | Piano di IT (livelli 2–3), HR (3–4) e fornitore esterno (4–5): riavvio forzato, VPN, ticket, team building, corso, contractor | Playbook `plan` / `implement` |
 | `docs/PM_LINKEDIN.md` | Il PM e LinkedIn: barre del Gantt e post che crollano (livelli 2–3), richieste di risorse (livello 4: PM alla scrivania, recruiter), pivot | Playbook `plan` / `level` |
 | `docs/PLAYTEST.md` | Note grezze dei playtest dell'utente | Dopo ogni playtest |
 | `docs/PLAN_REVIEW.md` | Ultima revisione del piano (problemi + fix proposti) | Playbook `review` |

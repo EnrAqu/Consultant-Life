@@ -38,7 +38,7 @@ export const CAUSES = {
   pm: {
     label: 'il PM che ripianifica',
     pivotable: true,
-    lesson: 'Il PM ora ripianifica a tuo favore: le barre del Gantt ti portano avanti.',
+    lesson: 'Il PM ora ripianifica a tuo favore: le barre del Gantt ti portano avanti, e le risorse te le presta lui.',
   },
   linkedin: {
     label: 'i post virali su LinkedIn',

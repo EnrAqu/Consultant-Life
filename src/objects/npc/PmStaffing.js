@@ -9,7 +9,7 @@ const BUBBLE_MS = 2200;
 // tile in the map) with the sign "Cercasi risorse – urgente"; the floor tiles either side of it are his "area
 // risorse" (yellow carpet). Step on it and he takes the last junior in your line: burnout +10% on the spot (the loss
 // included: Team.lose(..., prepaid)). Counter: jump over his desk from before the carpet, or stop on the desk.
-// Pivoted ("il PM ripianifica a tuo favore"): he lends you one of his juniors.
+// Pivoted ("il PM ripianifica a tuo favore"): he lends you one of his juniors. He asks once per level.
 export default class PmStaffing {
   static type = 'pmStaffing';
 
@@ -56,8 +56,11 @@ export default class PmStaffing {
     this.bubbleLeft = BUBBLE_MS;
   }
 
+  // Once per level (review B#1): after a death you get the junior back and he does not ask again (each life +10% made
+  // a few failed runs cost ~40%). The pivoted gift re-arms: the respawn takes the lent junior back too.
   reset() {
-    this.brain.reset();
+    if (this.pivoted || !this.built) this.brain.reset();
+    this.built = true;
     this.bubbleLeft = 0;
     this.bubble.setVisible(false);
   }

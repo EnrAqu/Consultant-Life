@@ -52,6 +52,8 @@ export default class Recruiter {
 
   reset() {
     this.brain.reset();
+    // one incident per life, however many juniors resign (review B#2: 3 per hook made linkedin the lesson every time)
+    this.incidentSaid = false;
     this.bubbleLeft = 0;
     this.bubble.setVisible(false);
     this.bar.clear();
@@ -98,7 +100,8 @@ export default class Recruiter {
   poach(team, member) {
     if (member.state !== 'follow') return;
     const scene = this.scene;
-    scene.stats.recordIncident('linkedin');
+    if (!this.incidentSaid) scene.stats.recordIncident('linkedin');
+    this.incidentSaid = true;
     scene.floatText('#OpenToWork → assunto', member.sprite.x, member.sprite.y - 30, '#86efac');
     team.lose(member, true);
     this.say('Ha accettato un\'opportunità imperdibile. Preavviso: zero.');
