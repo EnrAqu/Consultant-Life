@@ -141,6 +141,8 @@ burnout: {
 ### Lessons Learned
 - Nuovo punto con il motivo: `Burnout: 23% → il Progetto 3 parte dal 30% (minimo del progetto)`, oppure `parte dal 41%`, oppure `parte dal 25% (−5%: progetto senza morti)`. Calcolato con la stessa logica di `create` (funzione pura `nextStart` in `core/Burnout.js`).
 
+> **Aggiornamento 2026-11-03 (utente):** nuova causa `pmResource` **+10%**: il PM del livello 4 si prende un junior (la perdita è compresa, il team non la addebita di nuovo). Vedi `docs/PM_LINKEDIN.md` §8.
+
 ## 7. Milestone
 
 - [x] **B-M1** `core/Burnout.js` + test + `BURNOUT` in constants + `session.burnout` + debug `burnout`/`ending=burnout`.

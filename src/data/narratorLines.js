@@ -41,6 +41,12 @@ export const NARRATOR_LINES = [
   { id: 'death_pm_2', event: 'death', when: { cause: 'pm' }, text: 'La milestone è slittata. Tu sei slittato di sotto.' },
   { id: 'death_linkedin_1', event: 'death', when: { cause: 'linkedin' }, text: 'Il post è diventato virale. Tu sei diventato un caso di studio.' },
   { id: 'death_linkedin_2', event: 'death', when: { cause: 'linkedin' }, text: 'Hai messo like al post sbagliato. Con tutto il corpo.' },
+  { id: 'pm_steal_1', event: 'pmSteal', text: 'Il PM ti ha "preso in prestito" un junior. Due settimane. Come i progetti di due settimane.' },
+  { id: 'pm_steal_2', event: 'pmSteal', text: 'Risorsa riallocata. Su un progetto più strategico. Di chi, non si sa.' },
+  { id: 'pm_gift_1', event: 'pmGift', text: 'Un PM che ti presta una risorsa. Segnatelo: non ricapiterà.' },
+  { id: 'recruiter_poach_1', event: 'recruiterPoach', text: "Il tuo junior ha trovato un'opportunità imperdibile. Tu no." },
+  { id: 'recruiter_poach_2', event: 'recruiterPoach', text: 'Dimissioni via InMail. Il futuro del recruiting.' },
+  { id: 'recruiter_gift_1', event: 'recruiterGift', text: 'Assunto da LinkedIn. Il colloquio è stato un like.' },
   { id: 'death_self_1', event: 'death', when: { cause: 'selfRestart' }, text: 'Dimissioni accettate. Ti riassumiamo subito, stessa RAL.' },
   { id: 'death_self_2', event: 'death', when: { cause: 'selfRestart' }, text: 'Ripartire da zero è molto agile. Costa uguale.' },
 

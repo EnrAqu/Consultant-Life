@@ -14,7 +14,9 @@ g.ground(37, 87).fill(62, 68, 10, 10, '#').put(65, 9, 'o');
 g.ground(92, 93).ground(98, 99).ground(102, 129).put(106, 14, 'C');
 // S5 — deck slot corridor 112–117; scope creep slot: ledge 124–129, pit 130–139 with a pillar at 134–135
 g.ground(134, 135).ground(140, 183);
-// S6 — intern (147), gate (156, plate 152); a second arrivista sprints to the goal, a short avalanche in the way
+// S6 — the PM's desk (143, docs/PM_LINKEDIN.md §8): his carpet 142 and 144; then intern (147), gate (156, plate 152);
+// a second arrivista sprints to the goal, a short avalanche in the way
+g.put(143, 14, '#');
 g.put(172, 14, 'o');
 // S7 — betraying goal at 176 (client side 177–179), then spikes 180–181, pit 184–186, the sign is carried to 190
 g.put(176, 14, 'G').put(180, 14, '^').put(181, 14, '^').ground(187, W - 1);
@@ -37,6 +39,15 @@ export default {
     { id: 'sign1', type: 'sign', x: 3, y: 13, text: 'Senior Manager: ora il cliente ti chiama per nome. Purtroppo.' },
     // starts well behind you and your team: he only steals a junior if you stop
     { id: 'rival1', type: 'rival', x: 0, y: 14, params: { startCol: 0, triggerCol: 9, stopCol: 75 } },
+    // the LinkedIn recruiter (docs/PM_LINKEDIN.md §9): #OpenToWork zone 37–44, right after the pit and before door 46
+    {
+      id: 'slotRec', type: 'recruiter', cause: 'linkedin', x: 40, y: 14, slot: true,
+      params: { normal: { zoneFrom: 37, zoneTo: 44, poachMs: 1500 }, pivoted: { zoneFrom: 37, zoneTo: 44 } },
+    },
+    {
+      id: 'slotPMR', type: 'pmStaffing', cause: 'pm', x: 143, y: 14, slot: true,
+      params: { normal: { reach: [142, 144] }, pivoted: { reach: [142, 144] } },
+    },
     { id: 'five1', type: 'fiveMinutes', x: 46, y: 14, slot: true, params: { normal: {}, pivoted: { shortcutTo: { col: 70, row: 14 } } } },
     {
       id: 'slotA', type: 'replyAll', x: 52, y: 14, slot: true,

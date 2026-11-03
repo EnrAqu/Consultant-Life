@@ -21,6 +21,8 @@ export default class Team {
       .setVisible(false);
     this.bubbleLeft = 0;
     this.savedCount = count;
+    // juniors whose loss was already charged to the burnout on the spot (the PM's +10%): netLoss skips them
+    this.prepaid = 0;
     this.setCount(count);
     this.resetTrail();
   }
@@ -61,6 +63,7 @@ export default class Team {
   // checkpoint reached: this is the team you get back after a death
   snapshot() {
     this.savedCount = this.aliveCount;
+    this.prepaid = 0;
   }
 
   // following you or still running to a delegated trap: not lost (yet)
@@ -70,10 +73,11 @@ export default class Team {
 
   // juniors lost since the last checkpoint (or the level start): what the burnout charges for
   netLoss() {
-    return Math.max(0, this.savedCount - this.aliveCount);
+    return Math.max(0, this.savedCount - this.aliveCount - this.prepaid);
   }
 
   restore() {
+    this.prepaid = 0;
     this.setCount(this.savedCount);
     this.resetTrail();
     this.bubble.setVisible(false);
@@ -84,8 +88,10 @@ export default class Team {
     this.bubbleLeft = BUBBLE_MS;
   }
 
-  lose(member, quiet = false) {
+  // prepaid: its burnout was already charged (the PM's request), so netLoss does not charge it again
+  lose(member, quiet = false, prepaid = false) {
     member.state = 'gone';
+    if (prepaid) this.prepaid += 1;
     this.scene.playerView.paper.explode(6, member.sprite.x, member.sprite.y - 12);
     member.sprite.setVisible(false);
     if (!quiet) this.scene.narrate('teamLoss');

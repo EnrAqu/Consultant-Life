@@ -499,6 +499,7 @@ export function generateAll(scene) {
 
   // the PM (docs/PM_LINKEDIN.md): teal polo, his Gantt bar; LinkedIn post tiles
   makePlayerSheet(scene, 'pm', { ...OUTFITS.consultant, top: 0x0d9488, topDark: 0x0f766e, badge: true, hair: 0x78350f }, 'npc_pm');
+  makePlayerSheet(scene, 'recruiter', { ...OUTFITS.manager, top: 0x0a66c2, topDark: 0x075093, shirtV: 0xffffff, hair: 0x111827, sunglasses: true }, 'npc_recruiter');
   make(scene, 'ganttBar', 32, 32, (p) => {
     p.fill(0x134e4a).rect(0, 0, 32, 32);
     p.fill(0x14b8a6).rect(0, 0, 32, 29);

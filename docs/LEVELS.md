@@ -170,14 +170,15 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 | File | `src/levels/level4.js` (200 colonne, orizzontale) |
 | Carriera / GU / burnout min | seniorManager · 15 GU · 45% |
 | Nato da | `ITERATION_4.md` §5 (e §3, traguardo che tradisce) |
-| Slot (pivot dal livello 3) | five1 fiveMinutes · slotA replyAll · slotC deckCollapse · slotB scopeCreep |
+| Slot (pivot dal livello 3) | five1 fiveMinutes · slotA replyAll · slotC deckCollapse · slotB scopeCreep · **slotRec recruiter (causa linkedin, zona 37–44)** · **slotPMR pmStaffing (causa pm, scrivania 143)** |
 | Altro | 2 arrivisti, 2 stagisti, 2 varchi, bonus AI, traguardo che tradisce |
 | Checkpoint | cp0 |
 | Test | `tests/LevelParser.test.js`: completabile con salti "normali" per ogni pivot; varchi obbligatori |
 | Smoke | `smoke4.mjs` |
 | Prova | `?debug=1&level=level4[&pivot=…]` |
 
-**Registro:** —
+**Registro:**
+- **2026-11-03 — Il PM e il recruiter chiedono risorse** (utente: "in level 4 i want them to interact with the player as asking for resources"; PM con burnout +10%). Il PM alla scrivania (143) prende l'ultimo junior a chi calpesta il suo tappeto (142, 144); il recruiter fa dimettere i junior che restano 1,5 s nella zona #OpenToWork (37–44). Con le lezioni `pm`/`linkedin` dal livello 3 ti danno un junior. Dettaglio in `docs/PM_LINKEDIN.md` §8–9.
 
 ## Livello 5 — "La Partnership"
 | | |

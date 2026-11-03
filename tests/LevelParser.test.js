@@ -79,7 +79,7 @@ describe('LevelValidator', () => {
     expect(r.reachable.has('120:14')).toBe(true);
   });
 
-  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes']) {
+  for (const pivot of [null, 'replyAll', 'scopeCreep', 'deckCollapse', 'fakeKT', 'micromanager', 'fiveMinutes', 'pm', 'linkedin']) {
     it(`level4 is completable with "normal" jumps, pivot=${pivot}`, () => {
       const r = validateLevel(parseLevel(resolveLevel(LEVELS.level4, pivot)), { table: 'normal' });
       expect(r.errors).toEqual([]);

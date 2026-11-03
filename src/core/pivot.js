@@ -1,6 +1,8 @@
+// A slot turns into a help when the lesson is its cause: `cause` when it differs from the type (the level 4 PM and
+// recruiter are lessons `pm` and `linkedin`, docs/PM_LINKEDIN.md §8–9), else the type.
 export function resolveMode(entity, pivotCause) {
   if (!entity.slot) return entity.mode ?? 'normal';
-  return entity.type === pivotCause ? 'pivoted' : 'normal';
+  return (entity.cause ?? entity.type) === pivotCause ? 'pivoted' : 'normal';
 }
 
 // Returns a level definition with slot modes resolved and tile overrides applied.

@@ -82,3 +82,34 @@ col   60        70        80        90        100       110
 - **#11 test** — accolto in parte: test su superfici, atterraggi, larghezza del burrone, innesco del reply-all.
 - **#12 commenti vecchi** — accolto.
 - **#13 classifica del livello 2 e secondo checkpoint** — da chiedere all'utente.
+
+## 8. Livello 4 — il PM: "Mi presti una risorsa?" — `pmStaffing` (slot, causa `pm`)
+Scelta dell'utente (2026-11-03): nel livello 4 PM e LinkedIn chiedono **risorse**, cioè i tuoi junior. Burnout del PM: **+10%**.
+- File: `src/objects/npc/PmStaffing.js`, logica `src/core/StaffingBrain.js`.
+- Scrivania del PM: un tile solido a col 143 (sulla mappa). Il suo "area risorse" sono i tile di pavimento 142 e 144, segnati da un tappeto giallo. Sopra, il cartello "Cercasi risorse – urgente".
+- **Normale:** se metti i piedi sul tappeto (a terra), il PM prende l'**ultimo junior** della fila: "Mi presti una risorsa? Due settimane, giuro." Incidente `pm` e burnout **+10%** subito (`BURNOUT.gain.pmResource`).
+  - Quel +10% comprende la perdita: `Team.lose(member, quiet, prepaid = true)` e `netLoss` non la conta di nuovo al checkpoint.
+  - Una volta per vita: al respawn torna a chiedere.
+  - Senza junior: "Niente risorse? Allora ripianifico. Te." e nient'altro.
+- Contromossa: saltare la scrivania partendo prima del tappeto (141 → 145), oppure fermarsi sulla scrivania.
+- Subito dopo ci sono lo stagista (147) e il varco (156, piastra 152): senza junior devi assumere (2 GU).
+- **Pivoted** ("il PM ripianifica a tuo favore"): tappeto verde, "Risorse disponibili: chiedi pure"; ti presta un junior (+1).
+
+## 9. Livello 4 — LinkedIn: il recruiter — `recruiter` (slot, causa `linkedin`)
+- File: `src/objects/npc/Recruiter.js`, logica `src/core/RecruiterBrain.js`.
+- Zona "#OpenToWork" alle colonne 37–44: subito dopo il burrone 34–36 e prima della porta "Hai 5 minuti?" (46). La segnalano una banda verde sul pavimento e lo striscione "LinkedIn — #OpenToWork: opportunità imperdibili"; il recruiter è a col 40.
+- **Normale:** un junior che ti segue e resta **1,5 s di fila** nella zona accetta "un'opportunità imperdibile" e si dimette.
+  - Conta come perdita del team (+5% al checkpoint, come sempre) e come incidente `linkedin`.
+  - Uscire dalla zona azzera il suo orologio.
+  - Una barra rossa sopra il junior più esposto mostra il tempo.
+- Attraversarla di corsa costa niente: circa 1 s per junior.
+- La combo: se il collega della porta 46 ti aggancia mentre i junior sono ancora nella zona, la scia si ferma (il team si blocca con te) e li perdi.
+- **Pivoted** ("hai evitato un'opportunità, errore": ora la cogli): striscione blu "#Hiring", la prima volta che entri ti assume un junior (+1).
+
+### Pivot per causa
+`resolveMode` usa `entity.cause ?? entity.type`: gli slot `pmStaffing` e `recruiter` scattano con le lezioni `pm` e `linkedin` (i tipi `pm`/`linkedin` sono già le trappole dei livelli 2–3).
+
+### Verifica
+- `tests/Level4Resources.test.js`: i due brain, il pivot per causa, la scrivania, il +10%.
+- `tests/LevelParser.test.js`: livello 4 completabile anche con i pivot `pm` e `linkedin`.
+- `smokePmLinkedin.mjs` (sezione livello 4): il PM prende un junior (+10%, niente da addebitare dopo); la scrivania è sicura; con il pivot il PM ti presta un junior; fermo nella zona perdi i 3 junior; attraversandola di corsa li tieni; con il pivot il recruiter ti assume un junior.

@@ -69,4 +69,4 @@ export const causeLabel = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.labe
 export const causeLesson = (cause, skin = null) => SKIN_TEXT[skin]?.[cause]?.lesson ?? CAUSES[cause]?.lesson;
 
 // Lessons Learned weight of non-death incidents (a death always weighs 1).
-export const INCIDENT_WEIGHT = { death: 1, fakeKT: 2, micromanager: 1, fiveMinutes: 1 };
+export const INCIDENT_WEIGHT = { death: 1, fakeKT: 2, micromanager: 1, fiveMinutes: 1, pm: 1, linkedin: 1 };

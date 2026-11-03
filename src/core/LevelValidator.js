@@ -182,6 +182,10 @@ function entityColumns(e) {
       return [Math.min(e.x, e.x + p.shift) - 1, Math.max(e.x, e.x + p.shift) + p.width];
     case 'linkedin':
       return [e.x - 1, e.x + p.width];
+    case 'pmStaffing':
+      return [p.reach[0] - 1, p.reach[1] + 1];
+    case 'recruiter':
+      return [p.zoneFrom, p.zoneTo];
     case 'rival':
       return [p.startCol, p.triggerCol];
     default:
