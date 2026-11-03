@@ -11,10 +11,10 @@
 Livello 4 invariato: come per micromanager e KT, una lezione senza slot nel livello dopo produce solo la riga in Lessons Learned.
 
 ## 2. Il PM — `pm` (`src/objects/traps/PmGantt.js`, logica `src/core/GanttBrain.js`)
-- Barra del Gantt (`width` colonne, una riga, texture `ganttBar`) sopra un burrone; il PM (texture `npc_pm`, solo grafica) accanto, a `pmDx`. Sulla barra: la freccia (◀◀ / ▶▶) e l'etichetta (`label`, es. "Go-live (da ripianificare)").
-- **Normale:** quando atterri sulla barra, dopo `delayMs` compare "Il PM: «Abbiamo ripianificato.»" e la barra scivola di `shift` colonne a `speed` colonne/s **senza portarti** (scivola via da sotto i piedi). Contromossa: risaltare subito, oppure correre nella direzione della freccia.
+- Barra del Gantt (`width` colonne, una riga, texture `ganttBar`, **solida solo da sopra**) sopra un burrone; il PM (texture `npc_pm`, solo grafica) accanto, a `pmDx`. Sulla barra: la freccia (◀◀ / ▶▶) e l'etichetta (`label`, es. "Go-live (da ripianificare)").
+- **Normale:** quando atterri sulla barra il PM dice "Un attimo…" e la barra lampeggia; dopo `delayMs` compare "Il PM: «Abbiamo ripianificato.»" e la barra scivola di `shift` colonne a `speed` colonne/s **senza portarti** (scivola via da sotto i piedi). Contromossa: risaltare subito, oppure correre nella direzione della freccia.
 - Ferma e senza nessuno sopra, dopo `returnDelayMs` torna a casa e si riarma (niente soft-lock).
-- **Pivoted** ("Il PM ora ripianifica a tuo favore"): scivola nella direzione della freccia e **ti porta**.
+- **Pivoted** ("Il PM ora ripianifica a tuo favore"): scivola nella direzione della freccia e **ti porta** (solo all'andata, non quando torna a casa).
 - Movimento cinematico: a ogni frame la barra va dove dice il brain (tempo di gioco), e il giocatore sopra una barra pivoted si sposta della stessa quantità. Il `friction` di Arcade non trascinava il giocatore in modo affidabile.
 - Morte: zona `pitRect` sul burrone → causa `pm` se la barra si è mossa da ≤ 3 s.
 - `dangerCols`: il micromanager non ti ferma mai sopra la barra.
@@ -31,22 +31,27 @@ Livello 4 invariato: come per micromanager e KT, una lezione senza slot nel live
 ```
 col   60        70        80        90        100       110
 13    ...................................................#
-14    ..............^^^........^^^^##^^^^...........G....#
-15    #######......#######################........########
+14    ...............^^........^^^^##^^^^...........G....#
+15    #######......########################.......########
 ```
-- **PM** (`pm1`): burrone 67–72 subito dopo la zona del micromanager; barra 68–70 una riga sopra il pavimento, `shift: -3`, `speed: 6`, `delayMs: 450`; PM a col 66. Dopo: una sola colonna (73) prima delle tre spine 74–76. Percorso: barra → 73 (salto corto) → sopra le spine. Senza la barra il burrone non si passa (66 → 73 = 6 colonne vuote).
-- **LinkedIn** (`li1`, `li2`): burrone 96–103 prima della consegna.
-  - Post 97–98 una riga sopra, 3 like.
+- **PM** (`pm1`): burrone 67–72 subito dopo la zona del micromanager; barra 68–70 una riga sopra il pavimento, `shift: -3`, `speed: 6`, `delayMs: 450`; PM a col 66.
+  - Dopo la barra: due colonne (73–74), poi le spine 75–76.
+  - Percorso: barra → 73–74 → sopra le spine.
+  - Senza la barra il burrone non si passa (66 → 73 = 6 colonne vuote).
+- **LinkedIn** (`li1`, `li2`): burrone 97–103 prima della consegna, con due colonne d'appoggio (95–96) dopo la fossa del KT.
+  - Post 98–99 una riga sopra, 3 like.
   - Post sponsorizzato 101–102 tre righe sopra, 1 like: da lì si può saltare oltre il cartello (102 → 107) e vincere da destra.
   - Senza i post il burrone non si passa.
 
 ## 5. Livello 3 (slot nuovi)
-- `slotPM`: burrone 41–45 dopo la zona A del micromanager, barra 42–43.
+- `slotPM`: burrone 41–46 dopo la zona A del micromanager (6 colonne: nessun salto pieno lo supera senza la barra), barra 42–43.
   - Normale: `shift: -3`, `delayMs: 450`.
-  - Pivoted: `shift: +2`, `speed: 4`, `delayMs: 300`, ti porta verso la porta di col 47.
-- `slotLI`: burrone 59–64 dopo la seconda porta, post 60–62.
+  - Pivoted: `shift: +2`, `speed: 4`, `delayMs: 300`, ti porta verso 47.
+  - La prima porta "Hai 5 minuti?" passa da col 47 a **col 51**: il collega non esce mentre atterri dalla barra.
+- `slotLI`: burrone 58–62 dopo la seconda porta (56), post 59–61.
   - Normale: 3 like.
   - Pivoted: non crolla.
+  - Atterraggio 63–65: l'innesco normale del reply-all (63–64) è sul pavimento, non sopra il burrone.
 - In modalità normale sono trappole in più: il livello 3 diventa più difficile.
 
 ## 6. Verifica
@@ -61,4 +66,19 @@ col   60        70        80        90        100       110
   - i like partono e il post regge, al terzo like si muore per `linkedin`;
   - il post sponsorizzato crolla al primo like;
   - livello 3 con `pivot=pm` la barra ti porta, con `pivot=linkedin` il post non crolla.
-- Playtest utente: il salto corto barra → col 73 prima delle spine (stretto di proposito), ritmo dei like.
+- Playtest utente: ritmo della barra (450 ms) e dei like (350 ms).
+
+## 7. Esito della review (`docs/CODE_REVIEW_PM_LINKEDIN.md`)
+- **#1 smoke4 (regressione vera)** — accolto: si delega da col 47 con la porta a 51.
+- **#2 innesco del reply-all sopra il burrone di LinkedIn** — accolto: burrone a 58–62, innesco normale sul pavimento.
+- **#3 porta subito dopo il burrone del PM** — accolto: porta a col 51.
+- **#4 nessun avviso prima che la barra si muova** — accolto: "Un attimo…" e barra che lampeggia; etichetta più leggibile.
+- **#5 atterraggi da una colonna (73 e 95)** — accolto: due colonne (73–74 e 95–96); una spina in meno (75–76).
+- **#6 catena dei pivot verso il livello 4** — da chiedere all'utente (decisione registrata: livello 4 invariato).
+- **#7 burrone del PM nel livello 3 superabile con un salto pieno** — accolto: largo 6.
+- **#8 la barra che scivola sul pavimento** — accolto: piattaforma solida solo da sopra.
+- **#9 la barra pivoted ti porta anche al ritorno** — accolto: solo all'andata.
+- **#10 i junior camminano nel vuoto** — lasciato (solo grafica, come già sopra le trappole che scattano).
+- **#11 test** — accolto in parte: test su superfici, atterraggi, larghezza del burrone, innesco del reply-all.
+- **#12 commenti vecchi** — accolto.
+- **#13 classifica del livello 2 e secondo checkpoint** — da chiedere all'utente.

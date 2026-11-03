@@ -108,3 +108,32 @@ describe('PM and LinkedIn in the levels', () => {
     expect(causeLesson('linkedin')).toBe("LinkedIn: hai evitato un'opportunità, errore.");
   });
 });
+
+describe('PM and LinkedIn — validator and danger columns (review #11)', () => {
+  it('trapSurfaces: bar at home in normal, the whole ride when pivoted; posts where they stand', () => {
+    const l2 = resolveLevel(LEVELS.level2);
+    const bar = l2.entities.find((e) => e.id === 'pm1');
+    expect(trapSurfaces(bar).map((c) => `${c.x}:${c.y}`)).toEqual(['68:14', '69:14', '70:14']);
+    const post = l2.entities.find((e) => e.id === 'li1');
+    expect(trapSurfaces(post).map((c) => `${c.x}:${c.y}`)).toEqual(['98:13', '99:13']);
+  });
+
+  it('level 2: two-tile landings after the bar (73–74) and before the posts (95–96)', () => {
+    const lv = parseLevel(resolveLevel(LEVELS.level2));
+    const solid = (x, y) => lv.tiles[y][x] === 0;
+    expect([solid(73, 15), solid(74, 15), solid(95, 15), solid(96, 15)]).toEqual([true, true, true, true]);
+    expect(lv.spikes.filter((s) => s.x >= 73 && s.x <= 76).map((s) => s.x)).toEqual([75, 76]);
+  });
+
+  it('level 3: the PM pit is 6 wide (no full jump clears it) and the first door is 4+ tiles past it', () => {
+    const lv = parseLevel(resolveLevel(LEVELS.level3));
+    const pit = [];
+    for (let x = 36; x < 56; x++) if (lv.tiles[15][x] !== 0) pit.push(x);
+    expect(pit).toEqual([41, 42, 43, 44, 45, 46]);
+    expect(LEVELS.level3.entities.find((e) => e.id === 'five1').x - 46).toBeGreaterThanOrEqual(4);
+    // the normal reply-all trigger (wait-there counter) sits on the floor after the LinkedIn pit 58–62, not over it
+    const slotA = LEVELS.level3.entities.find((e) => e.id === 'slotA');
+    const from = slotA.x + slotA.params.normal.triggerDx;
+    for (let x = from; x < from + slotA.params.normal.triggerWidth; x++) expect(lv.tiles[15][x], `col ${x}`).toBe(0);
+  });
+});

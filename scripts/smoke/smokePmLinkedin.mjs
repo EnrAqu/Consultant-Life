@@ -48,7 +48,7 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
 // level 2: LinkedIn posts — the first holds until its 3rd like, the sponsored one goes at the first
 {
   const page = await open('?debug=1&level=level2&standup=off&cp=cp0');
-  await teleport(page, 97, 11);
+  await teleport(page, 98, 11);
   const liking = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'li1').brain.likes >= 1);
   const s0 = await state(page);
   check('L2: on the post the likes start and it still holds', liking && s0.li1.state === 'liking' && s0.deaths === 0, s0);
@@ -76,7 +76,7 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
 }
 {
   const page = await open('?debug=1&level=level3&standup=off&pivot=linkedin');
-  await teleport(page, 61, 12);
+  await teleport(page, 60, 12);
   await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotLI').brain.likes >= 4, 12000);
   const s = await state(page);
   check('L3 pivot=linkedin: the post keeps getting likes and never collapses', s.slotLI.mode === 'pivoted' && s.slotLI.likes >= 4 && s.slotLI.state === 'liking' && s.deaths === 0, s);

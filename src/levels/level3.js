@@ -7,10 +7,13 @@ const g = createGrid(W);
 g.ground(0, 26).put(2, 14, 'P');
 // S1 — micromanager zone A (16–40), plants at 20 and 33, pit 27–29 = his demo jump
 g.put(20, 14, 'p').ground(30, 123).put(33, 14, 'p');
-// S1b — the PM slot (docs/PM_LINKEDIN.md): pit 41–45 after zone A, Gantt bar 42–43 one up
-g.fill(41, 45, 15, 16, '.');
-// S2 — two "hai 5 minuti?" doors (47, 56) on a flat corridor; then the LinkedIn slot: pit 59–64, post 60–62 one up
-g.fill(59, 64, 15, 16, '.');
+// S1b — the PM slot (docs/PM_LINKEDIN.md): pit 41–46 after zone A (6 wide: no full jump clears it, review #7),
+// Gantt bar 42–43 one up
+g.fill(41, 46, 15, 16, '.');
+// S2 — two "hai 5 minuti?" doors (51, 56) on a flat corridor (51, not 47: the colleague must not step out while you
+// land from the bar, review #3); then the LinkedIn slot: pit 58–62, post 59–61 one up, landing 63–65 before the
+// reply-all corridor (its trigger 61–64 must not sit over the pit, review #2)
+g.fill(58, 62, 15, 16, '.');
 // S3 — slot replyAll corridor 66–75, unreachable ledge (+5) with coffee, door at the exit (84)
 g.fill(76, 82, 10, 10, '#').put(79, 9, 'o');
 // S4 — micromanager zone B (86–110) with the deck slot corridor 96–101, plant at 93
@@ -51,17 +54,17 @@ export default {
     {
       id: 'slotPM', type: 'pm', x: 42, y: 14, slot: true,
       params: {
-        normal: { width: 2, shift: -3, speed: 6, delayMs: 450, returnDelayMs: 1200, pmDx: -2, label: 'Milestone (da ripianificare)', pitRect: { dx: -1, dy: 1, w: 5, h: 2 } },
-        pivoted: { width: 2, shift: 2, speed: 4, delayMs: 300, returnDelayMs: 1200, pmDx: -2, label: 'Milestone (a tuo favore)', pitRect: { dx: -1, dy: 1, w: 5, h: 2 } },
+        normal: { width: 2, shift: -3, speed: 6, delayMs: 450, returnDelayMs: 1200, pmDx: -2, label: 'Milestone (da ripianificare)', pitRect: { dx: -1, dy: 1, w: 6, h: 2 } },
+        pivoted: { width: 2, shift: 2, speed: 4, delayMs: 300, returnDelayMs: 1200, pmDx: -2, label: 'Milestone (a tuo favore)', pitRect: { dx: -1, dy: 1, w: 6, h: 2 } },
       },
     },
-    { id: 'five1', type: 'fiveMinutes', x: 47, y: 14, params: {} },
+    { id: 'five1', type: 'fiveMinutes', x: 51, y: 14, params: {} },
     { id: 'five2', type: 'fiveMinutes', x: 56, y: 14, params: {} },
     {
-      id: 'slotLI', type: 'linkedin', x: 60, y: 14, slot: true,
+      id: 'slotLI', type: 'linkedin', x: 59, y: 14, slot: true,
       params: {
-        normal: { width: 3, likes: 3, likeMs: 350, text: 'Cosa mi ha insegnato il primo team', pitRect: { dx: -1, dy: 1, w: 6, h: 2 } },
-        pivoted: { width: 3, likes: 3, likeMs: 350, text: 'Cosa mi ha insegnato il primo team', pitRect: { dx: -1, dy: 1, w: 6, h: 2 } },
+        normal: { width: 3, likes: 3, likeMs: 350, text: 'Cosa mi ha insegnato il primo team', pitRect: { dx: -1, dy: 1, w: 5, h: 2 } },
+        pivoted: { width: 3, likes: 3, likeMs: 350, text: 'Cosa mi ha insegnato il primo team', pitRect: { dx: -1, dy: 1, w: 5, h: 2 } },
       },
     },
     {

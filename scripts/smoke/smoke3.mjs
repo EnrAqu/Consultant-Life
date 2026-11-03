@@ -78,8 +78,13 @@ const check = (name, ok, info) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}$
   const page = await open('?debug=1&standup=off&level=level3');
   const s0 = await state(page);
   check('level 3 starts with the manager outfit', s0.outfit === 'manager' && s0.gu === 15, s0);
-  // col 46: the PM's pit is 41–45 (docs/PM_LINKEDIN.md)
-  await teleport(page, 46, 14); await sleep(200);
+  // col 47: the PM's pit is 41–46 and the door is at 51 (docs/PM_LINKEDIN.md)
+  await teleport(page, 47, 14); await sleep(200);
+  // step up to his door and let him come out (from 47 at full speed you would be past 51 before he is out)
+  await page.keyboard.down('ArrowRight');
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').player.x >= 48 * 32, { timeout: 4000 }).catch(() => {});
+  await page.keyboard.up('ArrowRight');
+  await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.isOut, { timeout: 4000 }).catch(() => {});
   await page.keyboard.down('ArrowRight'); await sleep(900);
   const s = await state(page);
   await page.screenshot({ path: OUT + 'i3-five.png' });

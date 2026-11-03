@@ -87,13 +87,13 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.screenshot({ path: OUT + 'i4-gate.png' });
   const s2 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] > 12);
   check('you can walk through the open gate', s2.tile[0] > 12, s2);
-  // delegate the "hai 5 minuti?" colleague at door 47
-  // col 46: the PM's pit is 41–45 (docs/PM_LINKEDIN.md)
-  await teleport(page, 46, 14); await sleep(400);
+  // delegate the "hai 5 minuti?" colleague at door 51
+  // col 47: the PM's pit is 41–46; 4 tiles from the door, so the colleague is still inside (docs/PM_LINKEDIN.md)
+  await teleport(page, 47, 14); await sleep(400);
   await page.keyboard.press('KeyE');
   // wait for the junior to reach the door, then walk past it
   await page.waitForFunction(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five1').brain.state === 'occupied', { timeout: 4000 }).catch(() => {});
-  const s3 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] >= 50 || s.locks.includes('five'));
+  const s3 = await holdUntil(page, 'ArrowRight', (s) => s.tile[0] >= 54 || s.locks.includes('five'));
   check('a delegated colleague never hooks you', !(s3.incidents.fiveMinutes > 0) && s3.team === 1, s3);
   await page.close();
 }

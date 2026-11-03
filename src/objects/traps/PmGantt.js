@@ -6,9 +6,10 @@ const CAUSE_WINDOW_MS = 3000;
 const CAPTION_MS = 2000;
 
 // The PM reschedules (docs/PM_LINKEDIN.md §2). A Gantt bar over a pit, the PM next to it.
-// Normal: land on it and after `delayMs` the milestone slips: the bar slides away under you (friction 0) in the
-// direction of its arrow. Tell: the arrow on the bar and the PM's sign. Counter: hop off at once, or run along with it.
-// Pivoted ("il PM ripianifica a tuo favore"): it slides in the arrow's direction carrying you (friction 1).
+// Normal: land on it and the PM says "Un attimo…" while the bar flashes; after `delayMs` the milestone slips and the
+// bar slides away under you in the direction of its arrow. Tells: the arrow, the label, the warning. Counter: hop off
+// at once, or run along with it. Pivoted ("il PM ripianifica a tuo favore"): it slides that way carrying you.
+// A one-way platform (solid from above only): sliding over the floor it never pushes or traps the player (review #8).
 // The validator sees it at home (normal) or along the whole ride (pivoted).
 export default class PmGantt extends BaseTrap {
   static type = 'pm';
@@ -20,14 +21,19 @@ export default class PmGantt extends BaseTrap {
     this.homeX = this.tx * TILE;
     this.y = this.ty * TILE;
     this.plat = this.addPlatform(this.tx, this.ty, p.width, 1, 'ganttBar');
-    // moved by hand (update), never by velocity: Arcade's friction would not carry the player reliably
+    // moved by hand (update), never by velocity; solid from above only
     this.plat.body.setFriction(0, 0);
+    this.plat.body.checkCollision.left = false;
+    this.plat.body.checkCollision.right = false;
+    this.plat.body.checkCollision.down = false;
     const style = (size, color, extra = {}) => ({ fontFamily: UI_FONT, fontStyle: 'bold', fontSize: `${size}px`, color, resolution: TEXT_RESOLUTION * 2, ...extra });
     const arrow = p.shift < 0 ? '◀◀' : '▶▶';
     this.arrow = scene.add.text(0, 0, arrow, style(10, '#ffffff')).setOrigin(0.5).setDepth(DEPTH.traps + 1);
-    this.label = scene.add.text(0, 0, p.label ?? 'Milestone (da ripianificare)', style(8, '#0f766e')).setOrigin(0.5, 1).setDepth(DEPTH.traps);
+    // readable on the dark office (review #4)
+    this.label = scene.add.text(0, 0, p.label ?? 'Milestone (da ripianificare)', style(9, '#ccfbf1', { backgroundColor: '#134e4a', padding: { x: 3, y: 1 } })).setOrigin(0.5, 1).setDepth(DEPTH.traps);
+    this.moveLine = this.pivoted ? 'Il PM: "Ripianifico io. A tuo favore."' : 'Il PM: "Abbiamo ripianificato."';
     this.caption = scene.add
-      .text(0, 0, this.pivoted ? 'Il PM: "Ripianifico io. A tuo favore."' : 'Il PM: "Abbiamo ripianificato."', style(11, '#5eead4', { backgroundColor: '#134e4a', padding: { x: 4, y: 2 } }))
+      .text(0, 0, '', style(11, '#5eead4', { backgroundColor: '#134e4a', padding: { x: 4, y: 2 } }))
       .setOrigin(0.5, 1)
       .setDepth(DEPTH.fx)
       .setVisible(false);
@@ -43,6 +49,11 @@ export default class PmGantt extends BaseTrap {
     }
     this.clock = 0;
     this.reset();
+  }
+
+  say(text) {
+    this.caption.setText(text).setVisible(true);
+    this.captionMs = CAPTION_MS;
   }
 
   place(x) {
@@ -76,6 +87,7 @@ export default class PmGantt extends BaseTrap {
 
   reset() {
     this.brain.reset();
+    this.plat.clearTint();
     this.movedAt = -Infinity;
     this.captionMs = 0;
     this.caption.setVisible(false);
@@ -87,17 +99,23 @@ export default class PmGantt extends BaseTrap {
   update(dt) {
     this.clock += dt;
     const riding = this.riding();
+    const wasIdle = this.brain.state === 'idle';
     const ev = this.brain.update(dt, riding);
+    // the warning: from the landing to the move, "Un attimo…" and the bar flashes
+    if (wasIdle && this.brain.state === 'armed') this.say('Il PM: "Un attimo…"');
+    const armed = this.brain.state === 'armed';
+    if (armed && Math.floor(this.brain.timer / 90) % 2 === 0) this.plat.setTint(0xfde68a);
+    else this.plat.clearTint();
     if (ev === 'move') {
       this.movedAt = this.clock;
-      this.captionMs = CAPTION_MS;
-      this.caption.setVisible(true);
+      this.say(this.moveLine);
     }
     const x = this.homeX + this.brain.offset * TILE;
     const delta = x - this.plat.body.x;
     if (delta !== 0) {
       this.place(x);
-      if (this.pivoted && riding) {
+      // carried only while it moves forward, not on its way back home (review #9)
+      if (this.pivoted && riding && Math.sign(delta) === Math.sign(this.p.shift)) {
         // the sprite only: the body follows it at the next physics step (moving both counted the shift twice)
         this.scene.player.x += delta;
       }
