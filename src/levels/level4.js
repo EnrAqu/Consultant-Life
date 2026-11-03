@@ -51,6 +51,8 @@ export default {
     // HR course (docs/IT_HR_EXTERNAL.md §3.2): barrier at 120 after the deck corridor; the certificate (108, row 5) sits
     // on top of the contractor's stairs (desk 104, steps 110–111 r13, 107–108 r11, 110–111 r9: the last one only after
     // the defect is reported — without it the certificate is out of reach)
+    // the junior who stops with a question (docs/JUNIOR_QUESTION.md): after the second gate, while the arrivista races you
+    { id: 'stall4', type: 'juniorStall', x: 160, y: 14 },
     {
       id: 'slotHR', type: 'hrCourse', cause: 'hr', x: 120, y: 14, slot: true,
       params: { normal: { courseMs: 2000, certX: 108, certY: 5 }, pivoted: { courseMs: 2000 } },

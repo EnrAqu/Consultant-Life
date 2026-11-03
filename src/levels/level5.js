@@ -77,6 +77,8 @@ export default {
   startGu: 15,
   map: g.toMap(),
   entities: [
+    // the junior who stops with a question (docs/JUNIOR_QUESTION.md): floor 2, with the escalation coming up from below
+    { id: 'stall5', type: 'juniorStall', x: 26, y: 61 },
     { id: 'sign1', type: 'sign', x: 5, y: 96, text: "Partner: finalmente puoi chiedere tu \"hai 5 minuti?\"" },
     { id: 'sign2', type: 'sign', x: 6, y: 13, text: 'Board dei Partner — solo con la pipeline piena' },
     { id: 'sign3', type: 'sign', x: 8, y: 92, text: 'Il Board riceve solo con 3 opportunità in pipeline' },

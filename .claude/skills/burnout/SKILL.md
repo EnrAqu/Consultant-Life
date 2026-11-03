@@ -22,13 +22,14 @@ I valori stanno in `BURNOUT` in `src/config/constants.js`. La storia è in `DECI
 | Scende | caffè −2%; KT vero −3% (una volta per livello); livello senza morti −5% sulla partenza del livello dopo (mai su un retry) |
 | Tra i livelli | si trascina; partenza = `max(trascinato, minimo)`, minimi `levelMin = [0, 15, 30, 45, 60]` |
 | Nuova campagna | si riparte da 0 (livello 1 non da retry) |
-| 100% | finale **burnout = il contadino / "i campi"** (segnaposto in `EndingScene`; il livello extra "Il contadino" è da fare). Vince sulle GU |
+| 100% | finale **burnout = il contadino / "i campi"**: prima il livello extra `FarmScene` (`docs/FARM.md`), poi `EndingScene`. Vince sulle GU |
 | Si legge | barra 200×6 nell'HUD (`Burnout N%`, per difetto), occhiaie al 50%, curvo e tremante all'80%, narratore al tier 2 |
 
 ## Procedura per una modifica
 1. **Ritaratura di valori** (gain, relief, minimi): la decide l'utente.
    - Cambia `BURNOUT` e aggiorna §1 di `docs/BURNOUT.md`, la scheda in `docs/LEVELS.md` se tocca i minimi, e `DECISIONS.md`.
-   - Aggiorna i valori attesi in `tests/Burnout.test.js` e `scripts/smoke/smokeBurnout.mjs`.
+   - Aggiorna i valori attesi in `tests/Burnout.test.js` e `scripts/smoke/smokeBurnout.mjs`, **e** nei test e smoke delle feature che controllano un valore preciso: `tests/Level4Resources.test.js`, `tests/ItHrExternal.test.js`, `smokePmLinkedin.mjs`, `smokeItHr.mjs` (cerca `BURNOUT.gain` e `burnout ===`).
+   - Valori attuali (2026-11-03): morte 3; eventi sociali, junior perso, KT finto, cliente 4; PM che prende un junior e corso HR 6.
 2. **Nuova causa o nuovo sollievo:**
    - aggiungi la voce in `BURNOUT.gain`/`relief`;
    - aggancia il punto di gioco con `GameScene.addBurnout(cause)` / `relieveBurnout(reason)`, **prima** di `spendGu`, perché il burnout vince;

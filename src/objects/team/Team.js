@@ -79,6 +79,23 @@ export default class Team {
     this.emit();
   }
 
+  // the junior who stops with a question (docs/JUNIOR_QUESTION.md): not following, not counted as alive — leave him
+  // there and he is a lost junior (netLoss at the checkpoint, gone at the end of the level)
+  stall(member) {
+    if (member.state !== 'follow') return;
+    member.state = 'stalled';
+    member.sprite.setFrame('idle0');
+    this.emit();
+  }
+
+  resumeStalled(member) {
+    if (member.state !== 'stalled' || !this.members.includes(member)) return;
+    member.state = 'follow';
+    this.members.splice(this.members.indexOf(member), 1);
+    this.members.push(member);
+    this.emit();
+  }
+
   // end of the level: whoever is at the team building comes back first (review IT_HR #1: they were lost for good)
   recallAway() {
     for (const m of this.members.filter((x) => x.state === 'away')) this.comeBack(m);

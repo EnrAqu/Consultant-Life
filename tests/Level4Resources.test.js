@@ -75,7 +75,7 @@ describe('level 4: the PM and the recruiter as lessons', () => {
     expect(intern.x).toBeGreaterThan(144);
   });
 
-  it('the PM costs +10% burnout (the user asked for it)', () => {
-    expect(BURNOUT.gain.pmResource).toBe(10);
+  it('the PM costs +6% burnout (the user asked for it: 10% → 6%)', () => {
+    expect(BURNOUT.gain.pmResource).toBe(6);
   });
 });

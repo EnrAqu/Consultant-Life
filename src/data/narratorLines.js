@@ -55,6 +55,8 @@ export const NARRATOR_LINES = [
   { id: 'team_building_2', event: 'teamBuilding', text: 'Escape room aziendale: escono tutti, tranne il budget.' },
   { id: 'hr_course_1', event: 'hrCourse', text: 'Formazione obbligatoria. Il quiz finale ha una sola risposta giusta: "Ho letto e compreso".' },
   { id: 'hr_course_2', event: 'hrCourse', text: 'Modulo 7 di 12. Gli altri 11 li fai stanotte.' },
+  { id: 'junior_q_1', event: 'juniorQuestion', text: 'Mezza giornata per spiegare come si accende un PC. Fatturabile? No.' },
+  { id: 'junior_q_2', event: 'juniorQuestion', text: 'Non esistono domande stupide. Esistono junior a 0,5 GU l\'una.' },
   { id: 'death_self_1', event: 'death', when: { cause: 'selfRestart' }, text: 'Dimissioni accettate. Ti riassumiamo subito, stessa RAL.' },
   { id: 'death_self_2', event: 'death', when: { cause: 'selfRestart' }, text: 'Ripartire da zero è molto agile. Costa uguale.' },
 

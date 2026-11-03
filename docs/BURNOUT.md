@@ -143,6 +143,8 @@ burnout: {
 
 > **Aggiornamento 2026-11-03 (utente):** nuova causa `pmResource` **+10%**: il PM del livello 4 si prende un junior (la perdita è compresa, il team non la addebita di nuovo). Vedi `docs/PM_LINKEDIN.md` §8.
 
+> **Aggiornamento 2026-11-03 (utente):** "lo stai facendo crescere un pochino troppo". Tutti i **+5% diventano +4%** (escalation, perdita di un junior, micromanager, 5 minuti, standup che sfora, KT finto, cliente che cambia idea) e i **+10% diventano +6%** (il PM che si prende un junior, il corso HR). La morte resta +3%.
+
 ## 7. Milestone
 
 - [x] **B-M1** `core/Burnout.js` + test + `BURNOUT` in constants + `session.burnout` + debug `burnout`/`ending=burnout`.

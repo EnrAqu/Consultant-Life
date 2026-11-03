@@ -113,7 +113,7 @@ void G;
   await page.close();
 }
 
-// L4: the HR course without the certificate: frozen, +10%, then open; only once per level
+// L4: the HR course without the certificate: frozen, +6%, then open; only once per level
 {
   const page = await open('?debug=1&level=level4&standup=off&cp=cp0');
   await teleport(page, 116, 14); await sleep(300);
@@ -124,7 +124,7 @@ void G;
   const s1 = await state(page);
   await page.screenshot({ path: OUT + 'hr-course.png' });
   const opened = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotHR').state === 'open');
-  check('L4: the HR course freezes you, costs +10% burnout and an `hr` incident, then opens', inCourse && s1.burnout === b0 + 10 && s1.incidents.hr === 1 && opened, { b0, s1 });
+  check('L4: the HR course freezes you, costs +6% burnout and an `hr` incident, then opens', inCourse && s1.burnout === b0 + 6 && s1.incidents.hr === 1 && opened, { b0, s1 });
   await page.close();
 }
 
@@ -194,6 +194,32 @@ void G;
   await sleep(3000);
   const s = await state(page);
   check('L3: after a death the solved IT ticket stays open', s.ticket.state === 'open' && !s.ticket.barrier, s);
+  await page.close();
+}
+
+// the junior who stops with a question (docs/JUNIOR_QUESTION.md): level 3, col 136
+{
+  const page = await open('?debug=1&level=level3&standup=off&cp=cp0');
+  await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'five4').brain.occupy());
+  await teleport(page, 134, 14); await sleep(400);
+  // run to col 142 (the pit 145–148 is right after) and let the line catch up past 136
+  await page.keyboard.down('ArrowRight');
+  await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.x >= 141 * 32);
+  await page.keyboard.up('ArrowRight');
+  const stalled = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.members.some((m) => m.state === 'stalled'));
+  const s0 = await state(page);
+  check('L3: the last junior stops at col 136 with a question (team 3 → 2)', stalled && s0.team === 2, s0);
+  await page.screenshot({ path: OUT + 'junior-stall.png' });
+  // go back to him
+  await page.keyboard.down('ArrowLeft');
+  const asking = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.locks.has('junior'));
+  await page.keyboard.up('ArrowLeft');
+  const s1 = await state(page);
+  const q = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'stall3').bubble.text);
+  await page.screenshot({ path: OUT + 'junior-question.png' });
+  const back = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 3);
+  const s2 = await state(page);
+  check('L3: going back he asks a stupid question: you explain standing still, -0.5 GU, then he rejoins (team 3)', asking && s1.gu === s0.gu - 0.5 && /\?$/.test(q) && back && !s2.locks.includes('junior'), { q, s0: s0.gu, s1: s1.gu, s2 });
   await page.close();
 }
 

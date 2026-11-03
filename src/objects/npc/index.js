@@ -7,6 +7,7 @@ import PmStaffing from './PmStaffing.js';
 import Recruiter from './Recruiter.js';
 import TeamBuilding from './TeamBuilding.js';
 import Contractor from './Contractor.js';
+import JuniorStall from './JuniorStall.js';
 
 export const NPC_CLASSES = {
   micromanager: Micromanager,
@@ -18,4 +19,5 @@ export const NPC_CLASSES = {
   recruiter: Recruiter,
   teamBuilding: TeamBuilding,
   contractor: Contractor,
+  juniorStall: JuniorStall,
 };

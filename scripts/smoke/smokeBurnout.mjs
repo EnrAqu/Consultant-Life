@@ -119,7 +119,7 @@ const scenes = (page) => page.evaluate(() => globalThis.__game.scene.getScenes(t
   await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').addBurnout('micromanager'));
   await sleep(150);
   const s = await state(page);
-  check('at 60% the player has eye bags (tier 1)', s.tier === 1 && s.key.endsWith('_t1') && s.burnout === 60, s);
+  check('at 59% (55 + micromanager 4) the player has eye bags (tier 1)', s.tier === 1 && s.key.endsWith('_t1') && s.burnout === 59, s);
   await page.screenshot({ path: OUT + 'burnout-tier1.png' });
   await page.close();
 }

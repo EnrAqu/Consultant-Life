@@ -113,9 +113,9 @@ import { CAUSES } from '../src/data/causes.js';
 const without = (def, ids) => ({ ...def, entities: def.entities.filter((e) => !ids.includes(e.id)) });
 
 describe('IT and HR in the levels', () => {
-  it('both are pivotable lessons; the HR course costs +10% (user)', () => {
+  it('both are pivotable lessons; the HR course costs +6% (user: 10% → 6%)', () => {
     expect(CAUSES.it.pivotable && CAUSES.hr.pivotable).toBe(true);
-    expect(BURNOUT.gain.hrCourse).toBe(10);
+    expect(BURNOUT.gain.hrCourse).toBe(6);
   });
 
   it('level 3: 215 columns, checkpoint 183, goal 210; the VPN pit cannot be crossed without the VPNs', () => {
@@ -151,6 +151,43 @@ describe('IT and HR in the levels', () => {
     for (const r of rows) {
       expect(prev - r).toBeLessThanOrEqual(2);
       prev = r;
+    }
+  });
+});
+
+import StallBrain from '../src/core/StallBrain.js';
+import { JUNIOR_QUESTIONS } from '../src/data/juniorQuestions.js';
+
+describe('StallBrain — the junior who stops with a question', () => {
+  it('the last junior stops at the stall point; go back, he asks, 1.8 s later he is back; once per life', () => {
+    const b = new StallBrain({ col: 136, row: 14, explainMs: 1800 });
+    expect(b.update(16, { last: { key: 'j', col: 135, row: 14 }, playerNear: false })).toBe(null);
+    expect(b.update(16, { last: { key: 'j', col: 136, row: 12 }, playerNear: false })).toBe(null);
+    expect(b.update(16, { last: { key: 'j', col: 136, row: 14 }, playerNear: false })).toBe('stall');
+    expect(b.key).toBe('j');
+    expect(b.update(5000, { last: null, playerNear: false })).toBe(null);
+    expect(b.update(16, { last: null, playerNear: true })).toBe('ask');
+    expect(b.update(1799, { last: null, playerNear: true })).toBe(null);
+    expect(b.update(1, { last: null, playerNear: true })).toBe('resume');
+    expect(b.update(16, { last: { key: 'k', col: 136, row: 14 }, playerNear: false })).toBe(null);
+    b.reset();
+    // a respawn past the point (checkpoint 183) does not trigger it; crossing it does
+    expect(b.update(16, { last: { key: 'k', col: 183, row: 14 }, playerNear: false })).toBe(null);
+    expect(b.update(16, { last: { key: 'k', col: 137, row: 14 }, playerNear: false })).toBe('stall');
+  });
+
+  it('the questions are stupid and in a fixed order', () => {
+    expect(JUNIOR_QUESTIONS[0]).toBe('Ma il PC si accende premendo il tasto ON?');
+    expect(JUNIOR_QUESTIONS[1]).toMatch(/Come sono fatte le persone/);
+  });
+
+  it('a stall point in levels 3, 4 and 5, all on a floor you can stand on', () => {
+    for (const id of ['level3', 'level4', 'level5']) {
+      const stall = LEVELS[id].entities.find((e) => e.type === 'juniorStall');
+      expect(stall, id).toBeTruthy();
+      const lv = parseLevel(resolveLevel(LEVELS[id]));
+      expect(lv.tiles[stall.y][stall.x], id).toBe(-1);
+      expect(lv.tiles[stall.y + 1][stall.x], id).not.toBe(-1);
     }
   });
 });

@@ -105,7 +105,7 @@ const l4 = (page) => page.evaluate(() => {
   await page.keyboard.up('ArrowRight');
   await sleep(300);
   const s1 = await l4(page);
-  check('L4: walking on the PM\'s carpet he takes a junior: team 3 → 2, burnout +10%, incident pm, nothing more to charge', took && s0.team === 3 && s1.team === 2 && s1.burnout === s0.burnout + 10 && s1.incidents.pm === 1 && s1.net === 0, { s0, s1 });
+  check('L4: walking on the PM\'s carpet he takes a junior: team 3 → 2, burnout +6%, incident pm, nothing more to charge', took && s0.team === 3 && s1.team === 2 && s1.burnout === s0.burnout + 6 && s1.incidents.pm === 1 && s1.net === 0, { s0, s1 });
   await page.screenshot({ path: OUT + 'l4-pm-resource.png' });
   await page.close();
 }
@@ -157,7 +157,7 @@ const l4 = (page) => page.evaluate(() => {
 }
 
 {
-  // review B#1: after a death the PM gives the junior back and does not ask again (+10% once per level)
+  // review B#1: after a death the PM gives the junior back and does not ask again (+6% once per level)
   const page = await open('?debug=1&level=level4&standup=off&cp=cp0');
   await teleportTeam(page, 140, 14); await sleep(600);
   await page.keyboard.down('ArrowRight');

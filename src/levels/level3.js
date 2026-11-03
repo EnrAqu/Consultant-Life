@@ -119,6 +119,8 @@ export default {
       },
     },
     // S7 — HR, IT (docs/IT_HR_EXTERNAL.md): team building (HR is born here, no slot), the IT ticket and the VPNs (slots `it`)
+    // the junior who stops with a question (docs/JUNIOR_QUESTION.md): after the scope pit, before door 140
+    { id: 'stall3', type: 'juniorStall', x: 136, y: 14 },
     { id: 'tb1', type: 'teamBuilding', x: 178, y: 14, params: { zoneFrom: 176, zoneTo: 181, awayMs: 8000 } },
     {
       id: 'slotTicket', type: 'itTicket', cause: 'it', x: 189, y: 14, slot: true,

@@ -32,6 +32,8 @@ export const CAUSES = {
   hiddenClient: { label: 'il cliente in copia nascosta', pivotable: false },
   requirementChange: { label: 'il requisito che cambia a metà salto', pivotable: false },
   intern: { label: 'il budget formazione', pivotable: false },
+  // the junior's stupid question (docs/JUNIOR_QUESTION.md): 0.5 GU, not a lesson
+  juniorQuestion: { label: 'le domande dei junior', pivotable: false },
   rival: { label: "l'arrivista", pivotable: false },
   escalation: { label: "l'escalation", pivotable: false },
   // the PM and LinkedIn (docs/PM_LINKEDIN.md): born in level 2, lessons with slots in level 3
