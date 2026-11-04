@@ -186,8 +186,8 @@ describe('StallBrain — the junior who stops with a question', () => {
   });
 
   it('the questions are stupid and in a fixed order', () => {
-    expect(JUNIOR_QUESTIONS[0]).toBe('Ma il PC si accende premendo il tasto ON?');
-    expect(JUNIOR_QUESTIONS[1]).toMatch(/Come sono fatte le persone/);
+    // user, 2026-11-04: he asks this, and when you come back he answers it himself
+    expect(JUNIOR_QUESTIONS[0]).toEqual({ ask: 'Come si fa uno screenshot?', answer: 'Aaah, fai la foto da telefono al PC!' });
   });
 
   it('a stall point in levels 3 and 5 (not 4: user 2026-11-03), all on a floor you can stand on', () => {

@@ -78,6 +78,8 @@ L'obiettivo è cambiare il livello N senza rompere né lui né la catena dei liv
 - Un ostacolo a tempo (ticket, corso…) **non si azzera al respawn** se il checkpoint è prima di lui: una volta superato resta superato.
 - Una trappola che scatta su una colonna deve scattare quando la si **attraversa** (posizione precedente e attuale da parti opposte, spostamento ≤ 3 colonne), non con `>= col`. Un respawn, un teletrasporto o il primo frame di uno sprite nuovo (i junior nascono a x = 0) la farebbero scattare subito.
 - Prima di fissare il punto di una trappola, controlla **cosa costa davvero tornare indietro** lì: porte, burroni, arrivista, escalation.
+- Un percorso facoltativo (l'attestato in cima ai gradini del fornitore) ha bisogno di un **suggerimento dove il giocatore si blocca** ("Controlla il fornitore" sul secondo gradino) e di una **domanda dove serve** ("Hai l'attestato di sicurezza?" alla barriera): da playtest, senza questi non si capisce.
+- Negli smoke, un'attesa di N secondi di gioco va data con un timeout di almeno 4×N in tempo reale (il container scende a 0,25×).
 - Confrontando gli smoke su un worktree, crea prima `scripts/smoke/shots/`: senza, lo smoke va in crash e `grep FAIL` dà 0, cioè un falso verde.
 
 ## Verifica nel container cloud

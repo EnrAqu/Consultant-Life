@@ -27,6 +27,8 @@ export default class Contractor {
     scene.add.image(this.x, this.floorY, 'contractorDesk').setOrigin(0.5, 1).setScale(BASE).setDepth(DEPTH.objects);
     const style = (size, color, bg) => ({ fontFamily: UI_FONT, fontStyle: 'bold', fontSize: `${size}px`, color, backgroundColor: bg, padding: { x: 4, y: 2 }, resolution: TEXT_RESOLUTION * 2, wordWrap: { width: 180 } });
     this.sign = scene.add.text(this.x, this.floorY - 46, '', style(9, '#111827', '#fde68a')).setOrigin(0.5, 1).setDepth(DEPTH.objects);
+    // on the second step, with the last one missing: a hint (user, 2026-11-04)
+    this.hint = scene.add.text(0, 0, 'Controlla il fornitore', style(9, '#111827', '#fde68a')).setOrigin(0.5, 1).setDepth(DEPTH.fx).setVisible(false);
     this.steps = this.p.steps.map((st) => {
       const col = this.def.x + st.dx;
       const row = this.def.y + st.dy;
@@ -95,7 +97,17 @@ export default class Contractor {
     this.steps[i].body.enable = true;
   }
 
+  // the player standing on step i
+  onStep(i) {
+    const pb = this.scene.player.body;
+    const s = this.steps[i]?.body;
+    return Boolean(s && s.enable && this.scene.player.grounded && Math.abs(pb.bottom - s.top) <= 3 && pb.right > s.left && pb.left < s.right);
+  }
+
   update(dt) {
+    const second = this.steps.length > 2 && this.brain.state === 'built' && this.onStep(1);
+    if (second) this.hint.setPosition(this.steps[1].x + this.steps[1].width / 2, this.steps[1].y - 34);
+    this.hint.setVisible(second);
     const ev = this.brain.update(dt);
     if (ev === 'build') for (let i = 0; i < this.steps.length - 1; i++) this.show(i);
     if (ev === 'fix') this.show(this.steps.length - 1);

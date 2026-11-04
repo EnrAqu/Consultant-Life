@@ -207,3 +207,8 @@ Verifica:
   - #10: la barriera che si richiude spinge indietro chi ci sta davanti, che è il suo scopo;
   - la spia E e il tasto touch per il fornitore;
   - parte di #12: test a input reale sui gradini.
+
+## 12. Leggibilità dell'attestato (utente, 2026-11-04)
+- **Sul secondo gradino del fornitore**, se manca ancora l'ultimo gradino ("come da specifica"), compare il cartello **"Controlla il fornitore"**: è il suggerimento a tornare alla scrivania e segnalare il difetto con E.
+- **Prima della barriera HR** la referente chiede **"Hai l'attestato di sicurezza?"**. Se ce l'hai: "Attestato di sicurezza? Ah, ce l'hai. Prego."
+

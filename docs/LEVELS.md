@@ -186,6 +186,7 @@ Ogni modifica a un livello aggiorna la sua scheda (sezione "Registro") e aggiung
 - **2026-11-03 — HR e fornitore esterno** (utente). Corso obbligatorio alla barriera 120: 2 s fermo e **burnout +10%**, una volta per livello, a meno di avere l'attestato. L'attestato è in cima ai gradini del fornitore (scrivania 104, E = 4 GU; "come da specifica" manca l'ultimo gradino, E segnala il difetto). Con la lezione `hr` la barriera è aperta. Dettaglio in `docs/IT_HR_EXTERNAL.md` §10.
 - **2026-11-03 — Il junior che si ferma** (utente): l'ultimo junior si ferma a col 149 (prima del varco) con un "?"; tornando a prenderlo fa una domanda stupida, 1,8 s fermo e −0,5 GU; lasciarlo = junior perso. Burnout ritarato (+5% → +4%, +10% → +6%). Dettaglio in `docs/JUNIOR_QUESTION.md`.
 - **2026-11-03 — Assumere junior** (utente: "invece di togliere una meccanica ne aggiungerei una che aggiunge junior"). Tolto il junior che si ferma; aggiunte l'agenzia interinale (col 62: 2 interinali gratis fino al checkpoint 106) e l'annuncio su LinkedIn (col 150: 1 GU, un junior vero dopo 6 s; gratis con la lezione `linkedin`). Standup ogni 30 minuti di gioco. Dettaglio in `docs/HIRING.md`.
+- **2026-11-04 — Attestato più leggibile** (utente: "come prendo l'attestato di sicurezza?"): cartello "Controlla il fornitore" sul secondo gradino quando manca l'ultimo; la referente HR chiede "Hai l'attestato di sicurezza?" prima della barriera.
 
 ## Livello 5 — "La Partnership"
 | | |

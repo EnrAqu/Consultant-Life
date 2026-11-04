@@ -108,7 +108,8 @@ void G;
   const s1 = await state(page);
   check('L3: all three juniors go to the team building (not lost: no net loss); E with nobody there is an `hr` incident', allAway && s0.team === 0 && s1.incidents.hr === 1, { s0, s1, net: await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').team.netLoss()) });
   await page.screenshot({ path: OUT + 'hr-team-building.png' });
-  const back = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 3);
+  // 8 s of game time: on a slow machine (0.25×) that is over 30 s of real time
+  const back = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 3, 60000);
   check('L3: after 8 s they are back', back, await state(page));
   await page.close();
 }
@@ -139,6 +140,14 @@ void G;
   const built = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'contractor1').brain.state === 'built');
   const steps1 = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'contractor1').steps.map((s) => s.body.enable));
   await page.screenshot({ path: OUT + 'ext-contractor-spec.png' });
+  // on the second step with the last one missing: "Controlla il fornitore" (user, 2026-11-04); the HR rep asks
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(107 * 32 + 32, 11 * 32 - 16); });
+  const hint = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'contractor1').hint.visible);
+  const rep = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotHR').repBubble.text);
+  await page.screenshot({ path: OUT + 'ext-contractor-hint.png' });
+  check('L4: on the second step, with the last missing, the sign says "Controlla il fornitore"; the HR rep asks "Hai l\'attestato di sicurezza?"', hint && rep === "Hai l'attestato di sicurezza?", { hint, rep });
+  await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(104 * 32 + 16, 15 * 32 - 16); });
+  await sleep(400);
   await page.keyboard.press('KeyE');
   const fixed = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'contractor1').brain.state === 'complete');
   const steps2 = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'contractor1').steps.map((s) => s.body.enable));
@@ -146,8 +155,16 @@ void G;
   // on the last step, jump to the certificate
   await page.evaluate(() => { const g = globalThis.__game.scene.getScene('GameScene'); g.player.body.reset(110 * 32 + 16, 9 * 32 - 16); });
   await sleep(400);
-  await page.keyboard.down('ArrowLeft'); await page.keyboard.down('Space'); await sleep(350); await page.keyboard.up('Space'); await sleep(150); await page.keyboard.up('ArrowLeft');
-  const cert = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotHR').hasCert);
+  // hold the keys until the certificate is taken or the player is back on a surface (game time, not real time:
+  // fixed sleeps were flaky at 0.25× speed)
+  await page.keyboard.down('ArrowLeft'); await page.keyboard.down('Space');
+  await waitFor(page, () => !globalThis.__game.scene.getScene('GameScene').player.grounded, 10000);
+  await waitFor(page, () => {
+    const g = globalThis.__game.scene.getScene('GameScene');
+    return g.traps.find((x) => x.def.id === 'slotHR').hasCert || g.player.grounded;
+  });
+  await page.keyboard.up('Space'); await page.keyboard.up('ArrowLeft');
+  const cert = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').traps.find((x) => x.def.id === 'slotHR').hasCert);
   await sleep(600);
   await teleport(page, 116, 14); await sleep(300);
   const b0 = (await state(page)).burnout;
@@ -206,8 +223,9 @@ void G;
   await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').player.x >= 116 * 32);
   await page.keyboard.up('ArrowRight');
   const stalled = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.members.some((m) => m.state === 'stalled'));
+  const asked = await page.evaluate(() => globalThis.__game.scene.getScene('GameScene').npcs.find((n) => n.def.id === 'stall3').bubble.text);
   const s0 = await state(page);
-  check('L3: the last junior stops at col 113 with a question (team 3 → 2)', stalled && s0.team === 2, s0);
+  check('L3: the last junior stops at col 113 asking "Come si fa uno screenshot?" (team 3 → 2)', stalled && s0.team === 2 && asked === 'Come si fa uno screenshot?', { asked, s0 });
   await page.screenshot({ path: OUT + 'junior-stall.png' });
   // go back to him
   await page.keyboard.down('ArrowLeft');
@@ -218,7 +236,7 @@ void G;
   await page.screenshot({ path: OUT + 'junior-question.png' });
   const back = await waitFor(page, () => globalThis.__game.scene.getScene('GameScene').team.count === 3);
   const s2 = await state(page);
-  check('L3: going back he asks a stupid question: you explain standing still, -0.5 GU, then he rejoins (team 3)', asking && s1.gu === s0.gu - 0.5 && /\?$/.test(q) && back && !s2.locks.includes('junior'), { q, s0: s0.gu, s1: s1.gu, s2 });
+  check('L3: going back he answers himself ("Aaah, fai la foto da telefono al PC!"): you stand still, -0.5 GU, then he rejoins (team 3)', asking && s1.gu === s0.gu - 0.5 && q === 'Aaah, fai la foto da telefono al PC!' && back && !s2.locks.includes('junior'), { q, s0: s0.gu, s1: s1.gu, s2 });
   await page.close();
 }
 

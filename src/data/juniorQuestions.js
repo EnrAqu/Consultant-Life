@@ -1,11 +1,5 @@
-// The junior's stupid questions (docs/JUNIOR_QUESTION.md): a fixed order, one per stop, cycling.
+// The junior who stops (docs/JUNIOR_QUESTION.md): what he asks while waiting for you, and what he says when you come
+// back to him (user, 2026-11-04: he answers his own question). Fixed order, one per stop, cycling.
 export const JUNIOR_QUESTIONS = [
-  'Ma il PC si accende premendo il tasto ON?',
-  'Come sono fatte le persone? Tipo, in generale.',
-  'Il cliente è quello che paga o quello che si lamenta?',
-  'Se rispondo a tutti, rispondo anche a me?',
-  'Excel è un linguaggio di programmazione, vero?',
-  'Il "venerdì" del "entro venerdì" è questo venerdì?',
-  'Una slide quanti minuti dura?',
-  'Perché il Wi-Fi non si vede?',
+  { ask: 'Come si fa uno screenshot?', answer: 'Aaah, fai la foto da telefono al PC!' },
 ];

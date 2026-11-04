@@ -24,6 +24,11 @@ export default class HrCourse extends BaseTrap {
     this.addTrigger(-2, 2, this.ty - 1, this.ty);
     const style = (size, color, bg) => ({ fontFamily: UI_FONT, fontStyle: 'bold', fontSize: `${size}px`, color, backgroundColor: bg, padding: { x: 4, y: 2 }, resolution: TEXT_RESOLUTION * 2, wordWrap: { width: 170 } });
     this.label = scene.add.text(this.tx * TILE + 16, (this.ty - HEIGHT) * TILE - 4, '', style(9, '#ffffff', '#be185d')).setOrigin(0.5, 1).setDepth(DEPTH.traps);
+    // the HR rep's question before the barrier (user, 2026-11-04)
+    this.repBubble = scene.add
+      .text((this.tx - 1) * TILE + 16, this.floorY - 46, '', style(9, '#111827', '#fce7f3'))
+      .setOrigin(0.5, 1)
+      .setDepth(DEPTH.traps);
     if (!this.pivoted && p.certX !== undefined) {
       this.cert = scene.add.image(p.certX * TILE + 16, p.certY * TILE + 16, 'certificate').setScale(BASE * 1.4).setDepth(DEPTH.objects);
       scene.add.text(p.certX * TILE + 16, p.certY * TILE - 4, 'Attestato sicurezza', style(7, '#78350f', '#fef3c7')).setOrigin(0.5, 1).setDepth(DEPTH.objects);
@@ -36,6 +41,8 @@ export default class HrCourse extends BaseTrap {
 
   apply() {
     const open = this.state === 'open';
+    const rep = this.state !== 'closed' ? '' : this.hasCert ? 'Attestato di sicurezza? Ah, ce l\'hai. Prego.' : 'Hai l\'attestato di sicurezza?';
+    this.repBubble?.setText(rep).setVisible(rep !== '');
     this.barrier.body.enable = !open;
     this.barrier.setAlpha(open ? 0.2 : 1);
     this.label.setText(this.pivoted ? 'Attestato caricato su Workday' : open ? 'Formazione completata' : this.state === 'course' ? 'Modulo 7 di 12…' : 'Formazione obbligatoria: sicurezza sul lavoro');
@@ -85,6 +92,7 @@ export default class HrCourse extends BaseTrap {
       if (b.right > c.x - 8 && b.left < c.x + 8 && b.bottom > c.y - 8 && b.top < c.y + 8) {
         this.hasCert = true;
         c.setVisible(false);
+        this.apply();
         bus.emit(EV.TOAST, { text: this.state === 'closed' ? 'Attestato preso: il corso HR è saltato' : "Attestato preso. Il corso l'avevi già fatto.", durationMs: 1800, color: '#fde68a' });
       }
     }

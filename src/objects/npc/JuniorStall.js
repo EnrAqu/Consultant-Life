@@ -66,15 +66,16 @@ export default class JuniorStall {
     if (ev === 'stall') {
       this.member = this.brain.key;
       team.stall(this.member);
-      this.say('Ehm… ho una domanda.');
+      // his question while he waits; when you come back he answers it himself (user, 2026-11-04)
+      this.question = JUNIOR_QUESTIONS[questionIndex % JUNIOR_QUESTIONS.length];
+      questionIndex += 1;
+      this.say(this.question.ask);
       bus.emit(EV.TOAST, { text: 'Un junior si è fermato: torna a prenderlo', durationMs: 2200, color: '#fde68a' });
     }
     if (ev === 'ask') {
-      const q = JUNIOR_QUESTIONS[questionIndex % JUNIOR_QUESTIONS.length];
-      questionIndex += 1;
       scene.player.lockInput('junior', true);
       scene.player.stopMotion();
-      this.say(q);
+      this.say(this.question.answer);
       scene.floatText(`-${COST.toString().replace('.', ',')} GU`, pb.center.x, pb.top - 10);
       if (scene.spendGu(COST, 'juniorQuestion')) return;
       scene.narrate('juniorQuestion');

@@ -16,7 +16,7 @@ Richiesta dell'utente (2026-11-03): *"dal livello 3 in poi lo junior si ferma e 
   - un grande "?" giallo sulla testa e il fumetto "Ehm… ho una domanda";
   - il toast "Un junior si è fermato: torna a prenderlo";
   - l'HUD del team che scende di uno.
-- **Tornare a prenderlo:** quando lo raggiungi (stessa altezza, entro 24 px) fa una domanda stupida, in ordine fisso per la pagina (`src/data/juniorQuestions.js`).
+- **La domanda:** mentre aspetta chiede **"Come si fa uno screenshot?"**. Quando lo raggiungi (stessa altezza, entro 24 px) **si risponde da solo**: "Aaah, fai la foto da telefono al PC!" (utente, 2026-11-04). Le coppie domanda/risposta sono in `src/data/juniorQuestions.js`, in ordine fisso.
   - Tu glielo spieghi stando fermo per 1,8 s (lock `junior`).
   - Costa **0,5 GU** (causa `juniorQuestion`, non pivotabile).
   - Poi torna in fondo alla fila.
